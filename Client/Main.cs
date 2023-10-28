@@ -17,15 +17,29 @@ namespace Client {
 		Boolean isRaderExtended = false;
 
 		public Main() {
-			Tick += OnTick;
+			//Tick += OnTick;
 			Tick += PlayerBlipTick;
 			Tick += PlayerMinimapTick;
-			Tick += Renderer;
+			
 			EventHandlers["event:test"] += new Action<int, List<object>, string>(OnClientTest);
+
+			
+			Streamer.createMarker(-1381.218f, 737.7022f, 183.0317f);
+			Streamer.create3dText("~bold~Testujeme", -1381.218f, 737.7022f, 183.0317f);
+			Streamer.createBlip("~bold~Testujeme", -1381.218f, 737.7022f, 183.0317f, 255, 1);
+
+
+			Streamer.createMarker(-1393.996f, 742.8211f, 182.9561f);
+			Streamer.create3dText("~r~Testujeme", -1393.996f, 742.8211f, 182.9561f);
+
+			new Streamer();
+			Tick += Renderer;
+
 		}
 
-		private async Task Renderer() {
-			Streamer.renderWorldText();
+		private Task Renderer() {
+			Streamer.render();
+			return Task.FromResult(0);
 		}
 
 		private void OnClientTest(int src, List<object> args, string raw) {
@@ -74,27 +88,26 @@ namespace Client {
 		//API.SetRadarBigmapEnabled(false, false);
 		}
 
-		private async Task PlayerBlipTick() {
+		private Task PlayerBlipTick() {
 
-		foreach (var player in API.GetActivePlayers()) {
-			var playerPed = API.GetPlayerPed(player);
-			if (API.NetworkIsPlayerActive(player) && API.GetPlayerPed(player) != API.GetPlayerPed(-1)) {
-				var blip = API.GetBlipFromEntity(playerPed);
-				if (!API.DoesBlipExist(blip)) {
-					blip = API.AddBlipForEntity(playerPed);
-					API.SetBlipSprite(blip, 1);
-					Function.Call(Hash.SHOW_HEADING_INDICATOR_ON_BLIP, blip, true);
-				} else {
-					API.SetBlipNameToPlayerName(blip, player);
-					API.SetBlipScale(blip, 0.85f);
-					//API.SetBlipCoords(blip, playerPed.x, playerPed.y, playerPed.c);
+			foreach (var player in API.GetActivePlayers()) {
+				var playerPed = API.GetPlayerPed(player);
+				if (API.NetworkIsPlayerActive(player) && API.GetPlayerPed(player) != API.GetPlayerPed(-1)) {
+					var blip = API.GetBlipFromEntity(playerPed);
+					if (!API.DoesBlipExist(blip)) {
+						blip = API.AddBlipForEntity(playerPed);
+						API.SetBlipSprite(blip, 1);
+						Function.Call(Hash.SHOW_HEADING_INDICATOR_ON_BLIP, blip, true);
+					} else {
+						API.SetBlipNameToPlayerName(blip, player);
+						API.SetBlipScale(blip, 0.85f);
+						//API.SetBlipCoords(blip, playerPed.x, playerPed.y, playerPed.c);
+					}
 				}
-			}
+			
 		}
-
-		//Function.Call(Hash.SHOW_HEADING_INDICATOR_ON_BLIP, 2, false);
-		//API.AddBlipForEntity()
-		//SetBlipAsFriendly(Blip blip, bool toggle);
+		return Task.FromResult(0);
+	
 		}
 		//[Tick]
 		public void testTick() {
@@ -104,7 +117,7 @@ namespace Client {
 		//Game.PlayerPed.Weapons.RemoveAll();
 			foreach (WeaponHash weapon in Enum.GetValues(typeof(WeaponHash))) {
 				if (!Game.PlayerPed.Weapons.HasWeapon(weapon))
-					Game.PlayerPed.Weapons.Give(weapon, 2000, false, true);
+					Game.PlayerPed.Weapons.Give(weapon, 20000, false, true);
 
 			}
 			await Delay(5000);
@@ -113,12 +126,12 @@ namespace Client {
 		API.DrawRect(0.5f, 0.5f, 5f, 5f, 255, 255, 255, 150);
 		}
 
-		private void SendMessage(string text) {
-		TriggerEvent("chat:addMessage", new {
-			color = new[] { 100, 100, 100 },
-			multiline = false,
-			args = new[] { text }
-		}); ;
+		public static void SendMessage(string text) {
+			TriggerEvent("chat:addMessage", new {
+				color = new[] { 100, 100, 100 },
+				multiline = false,
+				args = new[] { text }
+			}); ;
 		}
 	}
 }
