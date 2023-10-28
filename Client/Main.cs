@@ -1,5 +1,6 @@
 ﻿using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Streamable;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,12 @@ namespace Client {
 			Tick += OnTick;
 			Tick += PlayerBlipTick;
 			Tick += PlayerMinimapTick;
+			Tick += Renderer;
 			EventHandlers["event:test"] += new Action<int, List<object>, string>(OnClientTest);
+		}
+
+		private async Task Renderer() {
+			Streamer.renderWorldText();
 		}
 
 		private void OnClientTest(int src, List<object> args, string raw) {
@@ -47,8 +53,9 @@ namespace Client {
 				type = "open"
 			}));
 		}
+
 	
-		} else SendMessage("Only allowed args are: <bank, cash, nui, mypos, nui2>");
+			} else SendMessage("Only allowed args are: <bank, cash, nui, mypos, nui2>");
 		}
 
 		private async Task PlayerMinimapTick() {
