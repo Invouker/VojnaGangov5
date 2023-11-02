@@ -46,5 +46,12 @@ namespace Server {
 				});
 			}), false);
 		}
+
+		public static void sendMessage(string message) {
+			TriggerEvent("chat:addMessage", new {
+				color = new[] { 16, 43, 76 },
+				args = new[] { "[Server]", message }
+			});
+		}
 	}
 }

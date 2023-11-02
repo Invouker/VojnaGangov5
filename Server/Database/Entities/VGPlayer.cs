@@ -2,7 +2,8 @@
 
 namespace Server.Database.Entities {
 
-	// CREATE TABLE `vg5_fivem`.`accounts` ( `id` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(255) NOT NULL , `licence` VARCHAR(255) NOT NULL , `wantedLevel` INT(6) NOT NULL , `money` BIGINT NOT NULL , `bankMoney` BIGINT NOT NULL , `Level` INT(255) NOT NULL , `Xp` INT NOT NULL , `posX` FLOAT NOT NULL , `posY` FLOAT NOT NULL , `posZ` FLOAT NOT NULL , `Dimension` INT(1000) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+	/* CREATE TABLE `accounts` (  `id` int(11) NOT NULL,  `name` varchar(255) NOT NULL,  `licence` varchar(255) NOT NULL,  `hp` int (255) NOT NULL DEFAULT 100,  `max_hp` int (255) DEFAULT 100,  `armour` int (255) NOT NULL DEFAULT 100,  `max_armour` int (255) NOT NULL DEFAULT 100,  `wantedLevel` int (6) NOT NULL DEFAULT 0,  `money` bigint(20) NOT NULL DEFAULT 0,  `bankMoney` bigint(20) NOT NULL DEFAULT 0,  `Level` int (255) DEFAULT 1,  `Xp` int (11) NOT NULL DEFAULT 0,  `posX` float NOT NULL,  `posY` float NOT NULL,  `posZ` float NOT NULL,  `Dimension` int (255) NOT NULL DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE = utf8mb4_general_ci;ALTER TABLE `accounts`  ADD PRIMARY KEY(`id`);ALTER TABLE `accounts`  MODIFY `id` int (11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;COMMIT;
+*/
 	class VGPlayer {
 
 		public const string TABLE_NAME = "accounts";
@@ -18,6 +19,11 @@ namespace Server.Database.Entities {
 		public int Id { get; set; }
 		public string Name { get; set; }
 		public string Licence { get; set; }
+
+		public int Hp { get; set; }
+		public int Max_hp { get; set; }
+		public int Armour { get; set; }
+		public int Max_armour { get; set; }
 		public int WantedLevel { get; set; }
 		public long Money { get; set; }
 		public long BankMoney { get; set; }
@@ -33,10 +39,14 @@ namespace Server.Database.Entities {
 
 		#endregion
 
-		public VGPlayer(int id, string name, string licence, int wantedLevel, int money, int bankMoney, int level, int xp, float posX, float posY, float posZ, int dimension) {
+		public VGPlayer(int id, string name, string licence, int hp, int max_hp, int armour, int max_armour, int wantedLevel, int money, int bankMoney, int level, int xp, float posX, float posY, float posZ, int dimension) {
 			Id = id;
 			Name = name ?? throw new ArgumentNullException(nameof(name));
 			Licence = licence ?? throw new ArgumentNullException(nameof(licence));
+			Hp = hp;
+			Max_hp = max_hp;
+			Armour = armour;
+			Max_armour = max_armour;
 			WantedLevel = wantedLevel;
 			Money = money;
 			BankMoney = bankMoney;
@@ -48,9 +58,13 @@ namespace Server.Database.Entities {
 			Dimension = dimension;
 		}
 
-		public VGPlayer(string name, string licence, int wantedLevel, int money, int bankMoney, int level, int xp, float posX, float posY, float posZ, int dimension) {
+		public VGPlayer(string name, string licence, int hp, int max_hp, int armour, int max_armour, int wantedLevel, int money, int bankMoney, int level, int xp, float posX, float posY, float posZ, int dimension) {
 			Name = name ?? throw new ArgumentNullException(nameof(name));
 			Licence = licence ?? throw new ArgumentNullException(nameof(licence));
+			Hp = hp;
+			Max_hp = max_hp;
+			Armour = armour;
+			Max_armour = max_armour;	
 			WantedLevel = wantedLevel;
 			Money = money;
 			BankMoney = bankMoney;
@@ -66,7 +80,7 @@ namespace Server.Database.Entities {
 		public VGPlayer() {}
 
 		public override string ToString() {
-		return $"Id: {Id}, Name: {Name}, License: {Licence}, WantedLevel: {WantedLevel}, Money: {Money}, BankMoney: {BankMoney}, Level: {Level},Xp: {Xp}, PosX: {PosX}, PosY: {PosY}, PosZ: {PosZ}, Dimension: {Dimension}";
+		return $"Id: {Id}, Name: {Name}, License: {Licence}, Hp: {Hp}, Max HP: {Max_hp}, Armour: {Armour}, Max Armour: {Max_armour}, WantedLevel: {WantedLevel}, Money: {Money}, BankMoney: {BankMoney}, Level: {Level},Xp: {Xp}, PosX: {PosX}, PosY: {PosY}, PosZ: {PosZ}, Dimension: {Dimension}";
 		}
 
 
