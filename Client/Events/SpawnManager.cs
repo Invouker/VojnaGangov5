@@ -11,19 +11,18 @@ namespace Client.Events{
      * -463.4458, -1718.268, 18.65963
      */
     public class SpawnManager{
-        public async static Task spawnPlayer(){
+        public async static Task SpawnPlayer(){
             API.DoScreenFadeOut(500);
 
             var player = Player.Local.Handle;
             var playerPed = Game.PlayerPed.Handle;
             FreezePlayer(player, true);
             var model = new Model("mp_f_freemode_01");
-            uint spawnModel = (uint)API.GetHashKey("mp_f_freemode_01");
             await Game.Player.ChangeModel(model);
 
-            API.RequestModel(spawnModel);
-            API.SetPlayerModel(player, spawnModel);
-            API.SetModelAsNoLongerNeeded(spawnModel);
+            API.RequestModel(model);
+            API.SetPlayerModel(player, model);
+            API.SetModelAsNoLongerNeeded(model);
             API.SetPedDefaultComponentVariation(API.GetPlayerPed(-1));
 
             API.RequestCollisionForModel(model);
@@ -34,16 +33,13 @@ namespace Client.Events{
             API.ClearPlayerWantedLevel(player);
 
             API.ShutdownLoadingScreen();
-
             API.DoScreenFadeIn(500);
-
 
             FreezePlayer(player, false);
         }
 
 
         private static void FreezePlayer(int player, bool freeze){
-            //API.SetPlayerControl(player, freeze, 1<<8);
             var ped = API.GetPlayerPed(-1);
             if (freeze){
                 if (API.IsEntityVisible(ped))

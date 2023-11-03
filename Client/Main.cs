@@ -9,7 +9,7 @@ namespace Client{
             TriggerServerEvent("player:join");
             EventHandlers["player:load:data"] +=
                 new Action<long, long, float, float, float, int, int, int, int, int>(LoadPlayerData);
-            SpawnManager.spawnPlayer();
+            SpawnManager.SpawnPlayer();
         }
 
 
