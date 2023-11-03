@@ -1,13 +1,9 @@
-﻿
+﻿namespace Server.Services{
+    class ServiceManager{
+        public static PlayerService playerService{ get; private set; }
 
-namespace Server.Services {
-
-	class ServiceManager {
-
-		public static PlayerService playerService { get; private set; }
-
-		public ServiceManager() {
-			playerService = new PlayerService();
-		}
-	}
+        public ServiceManager(){
+            playerService = new PlayerService();
+        }
+    }
 }
