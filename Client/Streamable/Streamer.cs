@@ -4,8 +4,7 @@ using CitizenFX.Core;
 using CitizenFX.Core.Native;
 
 namespace Client.Streamable{
-    internal class Streamer{
-        public const int MaximumMarker = 100;
+    internal static class Streamer{
         public static readonly List<IStreamer> Streamed = new List<IStreamer>();
 
         public static void stream(){
