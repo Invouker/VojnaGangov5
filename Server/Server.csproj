@@ -103,13 +103,12 @@
     <Compile Include="Services\PlayerService.cs" />
     <Compile Include="Services\ServiceManager.cs" />
     <Compile Include="Services\StreamerService.cs"/>
+    <Compile Include="Testable\CommandsTest.cs"/>
+    <Compile Include="Testable\StreamerTest.cs"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Testable\"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
