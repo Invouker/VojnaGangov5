@@ -14,9 +14,12 @@ namespace Client{
 
             EventHandlers["streamer:createBlip"] +=
                 new Action<string, float, float, float, int, int, int, int, float, bool>(Streamer.CreateBlip);
-            EventHandlers["streamer:createMarker"] += new Action<float, float, float, int>(Streamer.CreateMarker);
+            EventHandlers["streamer:createMarker"] +=
+                new Action<int, float, float, float, int, int, int, int, bool>(Streamer.CreateMarker);
             EventHandlers["streamer:create3dText"] +=
                 new Action<string, float, float, float, int, int, int, int>(Streamer.Create3dText);
+
+            Tick += InteractStreamable.OnInteractTick;
 
             SpawnManager.SpawnPlayer();
             TriggerServerEvent("player:post_join");
@@ -25,6 +28,12 @@ namespace Client{
         [Tick]
         public async Task onTickRender(){
             Streamer.stream();
+            await Task.FromResult(true);
+        }
+
+        [Tick]
+        public async Task OnTickInteract(){
+            InteractStreamable.OnInteractTick();
             await Task.FromResult(true);
         }
 

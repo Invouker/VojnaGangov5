@@ -9,8 +9,10 @@ namespace Server.Services{
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="type"></param>
-        public static void CreateMarker(float x, float y, float z, int type = 1){
-            BaseScript.TriggerClientEvent("streamer:createMarker", x, y, z, type);
+        public static void CreateMarker(int id, float x, float y, float z, int type = 1, int red = 255, int green = 255,
+            int blue = 255, bool allowVehcleInteract = true){
+            BaseScript.TriggerClientEvent("streamer:createMarker", id, x, y, z, type, red, green, blue,
+                                          allowVehcleInteract);
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using CitizenFX.Core.Native;
 
 namespace Client.Streamable{
     internal class Streamer{
+        public const int MaximumMarker = 100;
         public static readonly List<IStreamer> Streamed = new List<IStreamer>();
 
         public static void stream(){
@@ -13,8 +14,9 @@ namespace Client.Streamable{
                     streamer.Render();
         }
 
-        public static void CreateMarker(float x, float y, float z, int type = 1){
-            var marker = new Marker(type, x, y, z);
+        public static void CreateMarker(int id, float x, float y, float z, int type = 1, int red = 255, int green = 255,
+            int blue = 255, bool allowVehicleInteract = true){
+            var marker = new Marker(id, type, x, y, z, red, green, blue, allowVehicleInteract);
             Streamed.Add(marker);
         }
 
@@ -94,33 +96,47 @@ namespace Client.Streamable{
     }
 
     internal class Marker : IStreamer{
+        private static List<int> UsedMarkers = new List<int>();
         private const int RenderDistance = 40;
 
+        public int _id{ get; private set; }
         private int MarkerType{ get; }
-        private float PosX{ get; }
-        private float PosY{ get; }
-        private float PosZ{ get; }
+        private float _x{ get; }
+        private float _y{ get; }
+        private float _z{ get; }
         private int Red{ get; }
         private int Green{ get; }
         private int Blue{ get; }
+        public bool AllowVehicleInteract{ get; }
 
-        public Marker(int type, float x, float y, float z, int red = 255, int green = 255, int blue = 255){
+        public Marker(int id, int type, float x, float y, float z, int red = 255, int green = 255, int blue = 255,
+            bool allowVehcleInteract = true){
+            if (UsedMarkers.Contains(id))
+                throw new ArgumentOutOfRangeException($"Marker already registred with id of {id}, please use another!");
+            _id = id;
             MarkerType = type;
-            PosX = x;
-            PosY = y;
-            PosZ = z;
+            _x = x;
+            _y = y;
+            _z = z;
             Red = red;
             Green = green;
             Blue = blue;
+            AllowVehicleInteract = allowVehcleInteract;
+
+            UsedMarkers.Add(id);
+        }
+
+        public Vector3 GetMarkerPosition(){
+            return new Vector3(_x, _y, _z);
         }
 
         public void Render(){
             var playerPos = GetPlayerPosition();
-            var distance = API.GetDistanceBetweenCoords(PosX, PosY, PosZ, playerPos.X, playerPos.Y, playerPos.Z, true);
+            var distance = API.GetDistanceBetweenCoords(_x, _y, _z, playerPos.X, playerPos.Y, playerPos.Z, true);
             if (distance > RenderDistance)
                 return;
 
-            API.DrawMarker(MarkerType, PosX, PosY, PosZ - 1.5f, 0, 0, 0, 0, 0, 0, 1.75f, 1.75f, 1.75f, Red, Green, Blue,
+            API.DrawMarker(MarkerType, _x, _y, _z - 1.5f, 0, 0, 0, 0, 0, 0, 1.75f, 1.75f, 1.75f, Red, Green, Blue,
                            255, false, true, 2, true, null, null, false);
         }
 
