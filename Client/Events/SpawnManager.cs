@@ -11,21 +11,29 @@ namespace Client.Events{
      * -463.4458, -1718.268, 18.65963
      */
     public class SpawnManager{
-        public async static Task SpawnPlayer(){
+        public static async Task SpawnPlayer(){
             API.DoScreenFadeOut(500);
 
             var player = Player.Local.Handle;
             var playerPed = Game.PlayerPed.Handle;
             FreezePlayer(player, true);
+
             var model = new Model("mp_f_freemode_01");
             await Game.Player.ChangeModel(model);
+            // var hash = (uint)model.Hash;
 
-            API.RequestModel(model);
-            API.SetPlayerModel(player, model);
-            API.SetModelAsNoLongerNeeded(model);
+
+            /*
+            while (!API.HasModelLoaded(hash)){
+                API.RequestModel(hash);
+                await Task.Delay(0);
+            }*/
+            //API.SetPlayerModel(player, hash);
+            //API.SetModelAsNoLongerNeeded(hash);
             API.SetPedDefaultComponentVariation(API.GetPlayerPed(-1));
 
-            API.RequestCollisionForModel(model);
+            //API.RequestCollisionForModel(hash);
+            API.RequestCollisionAtCoord(-468.547f, -1719.703f, 18.67876f);
             API.SetEntityCoordsNoOffset(playerPed, -468.547f, -1719.703f, 18.67876f, false, false, true);
             API.NetworkResurrectLocalPlayer(-468.547f, -1719.703f, 18.67876f, 0, true, true);
             API.ClearPedTasksImmediately(playerPed);
@@ -36,6 +44,7 @@ namespace Client.Events{
             API.DoScreenFadeIn(500);
 
             FreezePlayer(player, false);
+            await Task.FromResult(true);
         }
 
 

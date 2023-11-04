@@ -54,6 +54,8 @@
     <Compile Include="Events\SpawnManager.cs"/>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Streamable\InteractStreamable.cs"/>
+    <Compile Include="Streamable\Streamer.cs"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -99,8 +99,10 @@
     <Compile Include="Database\Test.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IService.cs"/>
     <Compile Include="Services\PlayerService.cs" />
     <Compile Include="Services\ServiceManager.cs" />
+    <Compile Include="Services\StreamerService.cs"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -111,8 +113,5 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>call "$(ProjectDir)../copy_files.bat"</PostBuildEvent>
   </PropertyGroup>
 </Project>
