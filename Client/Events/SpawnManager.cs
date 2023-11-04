@@ -44,6 +44,7 @@ namespace Client.Events{
             API.DoScreenFadeIn(500);
 
             FreezePlayer(player, false);
+            await Task.FromResult(true);
         }
 
 

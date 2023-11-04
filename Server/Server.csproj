@@ -114,7 +114,4 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>call "$(ProjectDir)../copy_files.bat"</PostBuildEvent>
-  </PropertyGroup>
 </Project>
