@@ -165,8 +165,9 @@ namespace Server.Services{
                     continue;
 
                 ServiceManager.PlayerService.UpdatePlayer(player);
-                Debug.WriteLine("[Server] Autosave of players [Every 5 minutes];");
             }
+
+            Debug.WriteLine("[Server] Autosave of players [Every 5 minutes];");
         }
     }
 }
