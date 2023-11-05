@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Events;
+using Client.ScaleformUI;
 using Client.Streamable;
 
 namespace Client{
@@ -18,6 +19,9 @@ namespace Client{
                 new Action<int, float, float, float, int, int, int, int, bool>(Streamer.CreateMarker);
             EventHandlers["streamer:create3dText"] +=
                 new Action<string, float, float, float, int, int, int, int>(Streamer.Create3dText);
+
+
+            EventHandlers["player:interact:marker"] += new Action<int>(CharacterCreatorUI.Interact);
 
             Tick += InteractStreamable.OnInteractTick;
 
