@@ -65,6 +65,12 @@
   <ItemGroup>
     <Folder Include="Testable\"/>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="objs\**"/>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="objs\**"/>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

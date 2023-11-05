@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using CitizenFX.Core;
@@ -18,7 +19,13 @@ namespace Server.Services{
 
         public void PlayerJoin([FromSource] Player player){
             Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
-            LoadPlayer(player, true);
+            if (CheckIfPlayerExists(player).Result){
+                LoadPlayer(player, true);
+            }
+            else{
+                InsertPlayer(player);
+            }
+
 
             Players.TryGetValue(player, out VGPlayer vgp);
             //Debug.Write("Load Data of Player: " + vgp.ToString());
@@ -45,30 +52,26 @@ namespace Server.Services{
         public async void LoadPlayer(Player player, bool reload = false){
             if (Players.ContainsKey(player) && reload){
                 UpdatePlayer(player);
-                player.Drop("Multiple account connected by one");
+                player.Drop("Multiple account connected by one license.");
                 return;
             }
 
             using (var connection = Connector.GetConnection()){
                 await connection.OpenAsync();
                 VGPlayer vgPlayer =
-                    await
-                        connection
-                           .QueryFirstOrDefaultAsync<
-                                VGPlayer>($"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE Licence = @licence;",
-                                          new{ licence = GetLicense(player) }, null);
-                if (vgPlayer == null){
-                    UpdatePlayer(player);
-                    Debug.WriteLine("Adding new player!");
-                }
-                else{
-                    API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, false);
-                    player.TriggerEvent("player:load:data", vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.PosX,
-                                        vgPlayer.PosY, vgPlayer.PosZ, vgPlayer.Dimension, vgPlayer.Hp, vgPlayer.Max_hp,
-                                        vgPlayer.Armour, vgPlayer.Max_armour);
-                    Debug.WriteLine("Load data and send to client!");
-                    Debug.WriteLine($"Data: {vgPlayer.ToString()}");
-                }
+                    await connection.QueryFirstOrDefaultAsync<
+                        VGPlayer>($"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE Licence = @licence;",
+                                  new{ licence = GetLicense(player) }, null);
+                if (vgPlayer == null)
+                    throw new NoNullAllowedException("User cant be found.");
+                //UpdatePlayer(player);
+
+                API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, false);
+                player.TriggerEvent("player:load:data", vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.PosX,
+                                    vgPlayer.PosY, vgPlayer.PosZ, vgPlayer.Dimension, vgPlayer.Hp, vgPlayer.Max_hp,
+                                    vgPlayer.Armour, vgPlayer.Max_armour);
+                Debug.WriteLine("Load data and send to client!");
+                Debug.WriteLine($"Data: {vgPlayer.ToString()}");
 
                 Players.Add(player, vgPlayer);
                 await connection.CloseAsync();
@@ -102,8 +105,7 @@ namespace Server.Services{
 							   Money = @Money, BankMoney = @BankMoney, Level = @Level, Xp = @Xp,
 							   PosX = @PosX, PosY = @PosY, PosZ = @PosZ, Dimension = @Dimension
 						   WHERE Licence = @Licence";
-                if (Players.ContainsKey(player)){
-                    Players.TryGetValue(player, out VGPlayer vgPlayer);
+                if (Players.TryGetValue(player, out VGPlayer vgPlayer)){
                     vgPlayer.PosX = player.Character.Position.X;
                     vgPlayer.PosY = player.Character.Position.Y;
                     vgPlayer.PosZ = player.Character.Position.Z;
