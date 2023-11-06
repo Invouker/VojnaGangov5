@@ -20,6 +20,7 @@ namespace Client.Events{
 
             var model = new Model("mp_f_freemode_01");
             await Game.Player.ChangeModel(model);
+
             // var hash = (uint)model.Hash;
 
 

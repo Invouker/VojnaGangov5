@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CitizenFX.Core;
@@ -18,7 +17,7 @@ namespace Server.Services{
             new Thread(() => { new AutoSaver(); }).Start();
         }
 
-        public async void PlayerJoin([FromSource] Player player){
+        public void PlayerJoin([FromSource] Player player){
             Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
             Debug.WriteLine("Players counts: " + Players.Count);
 
@@ -35,16 +34,9 @@ namespace Server.Services{
                 while (!vgPlayer.IsCompleted)
                     await BaseScript.Delay(0);
 
-                if (vgPlayer.IsCompleted){
-                    Players.Add(license, vgPlayer.Result);
-                }
+                Players.Add(license, vgPlayer.Result);
             }
         }
-
-
-        //Players.TryGetValue(player, out VGPlayer vgp);
-        //Debug.Write("Load Data of Player: " + vgp.ToString());
-
 
         //[EventHandler("")]
         public void OnPlayerDropped([FromSource] Player player, string reason){
@@ -125,15 +117,6 @@ namespace Server.Services{
 						   WHERE Licence = @Licence";
 
                 if (Players.TryGetValue(license, out VGPlayer vgPlayer)){
-                    /*vgPlayer.PosX = playerClone.PosX;
-                    vgPlayer.PosY = playerClone.PosY;
-                    vgPlayer.PosZ = playerClone.PosZ;
-                    vgPlayer.Hp = playerClone.Hp;
-                    vgPlayer.Max_hp = playerClone.MaxHp;
-                    vgPlayer.Armour = playerClone.Armour;
-                    vgPlayer.Max_armour = playerClone.MaxArmour;
-                    vgPlayer.Dimension = playerClone.Dimension;*/
-
                     vgPlayer.PosX = player.Character.Position.X;
                     vgPlayer.PosY = player.Character.Position.Y;
                     vgPlayer.PosZ = player.Character.Position.Z;
@@ -143,8 +126,11 @@ namespace Server.Services{
                     vgPlayer.Max_armour = API.GetPlayerMaxArmour(player.Handle);
                     vgPlayer.Dimension = API.GetPlayerRoutingBucket(player.Handle);
                     int rowsAffected = await connection.ExecuteAsync(updateQuery, vgPlayer);
-                    if (rowsAffected <= 0)
-                        throw new NullReferenceException("Player cannot be updated.");
+                    Debug.WriteLine($"Rows Affected in table {rowsAffected}");
+
+                    Debug.WriteLine("PosX: " + vgPlayer.PosX);
+                    Debug.WriteLine("PosY: " + vgPlayer.PosY);
+                    Debug.WriteLine("PosZ: " + vgPlayer.PosZ);
                 }
 
                 connection.CloseAsync();
