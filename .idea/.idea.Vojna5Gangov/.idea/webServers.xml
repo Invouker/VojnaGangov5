@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="e1457a4f-b42e-4416-8bf2-5d93455931cd" name="VPS">
+        <fileTransfer rootFolder="/var/lib/pterodactyl/volumes/dfe1c9b4-6366-4196-ab27-441c8510d439/resources/vojnagangov5/" accessType="SFTP" host="78.46.213.235" port="22" sshConfigId="466249b4-8823-41af-ab96-64fb1e773635" sshConfig="root@78.46.213.235:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseSudo="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

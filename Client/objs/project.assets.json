@@ -1,0 +1,363 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.5.2": {
+      "CitizenFX.Core.Client/1.0.6947": {
+        "type": "package",
+        "compile": {
+          "lib/net45/CitizenFX.Core.Client.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/CitizenFX.Core.Client.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Confuser.MSBuild/1.6.0": {
+        "type": "package",
+        "build": {
+          "build/Confuser.MSBuild.targets": {}
+        }
+      },
+      "Microsoft.CSharp/4.7.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp"
+        ],
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "ScaleformUI/4.7.0": {
+        "type": "package",
+        "dependencies": {
+          "CitizenFX.Core.Client": "1.0.6370",
+          "Microsoft.CSharp": "4.7.0"
+        },
+        "frameworkAssemblies": [
+          "System.Net.Http"
+        ],
+        "compile": {
+          "lib/net452/ScaleformUI.dll": {}
+        },
+        "runtime": {
+          "lib/net452/ScaleformUI.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CitizenFX.Core.Client/1.0.6947": {
+      "sha512": "DLyEuggjeKvyUZGfgpLNAHX8VCBsCl/rJ/Y+lQ4jIfJO2/zGmq5hvkMequct9wB18vzMtaJ+XSE7cJgRQuWXyA==",
+      "type": "package",
+      "path": "citizenfx.core.client/1.0.6947",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "citizenfx.core.client.1.0.6947.nupkg.sha512",
+        "citizenfx.core.client.nuspec",
+        "lib/net45/CitizenFX.Core.Client.dll",
+        "lib/net45/CitizenFX.Core.Client.xml"
+      ]
+    },
+    "Confuser.MSBuild/1.6.0": {
+      "sha512": "ULnxEJX/9MTXoATewExPClEvoZUqXf6chDw6TEYF+OvX+w/OSxXlR/Sw7NEJPx22n6VwTgJ1ajjr0D0B0jT+QA==",
+      "type": "package",
+      "path": "confuser.msbuild/1.6.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Confuser.MSBuild.Tasks.targets",
+        "build/Confuser.MSBuild.targets",
+        "confuser.msbuild.1.6.0.nupkg.sha512",
+        "confuser.msbuild.nuspec",
+        "netframework/Confuser.Core.dll",
+        "netframework/Confuser.Core.pdb",
+        "netframework/Confuser.DynCipher.dll",
+        "netframework/Confuser.DynCipher.pdb",
+        "netframework/Confuser.MSBuild.Tasks.dll",
+        "netframework/Confuser.MSBuild.Tasks.pdb",
+        "netframework/Confuser.Protections.dll",
+        "netframework/Confuser.Protections.pdb",
+        "netframework/Confuser.Renamer.dll",
+        "netframework/Confuser.Renamer.pdb",
+        "netframework/Confuser.Runtime.dll",
+        "netframework/Confuser.Runtime.pdb",
+        "netframework/Microsoft.Build.Framework.dll",
+        "netframework/Microsoft.Build.Tasks.Core.dll",
+        "netframework/Microsoft.Build.Utilities.Core.dll",
+        "netframework/Microsoft.DiaSymReader.Native.amd64.dll",
+        "netframework/Microsoft.DiaSymReader.Native.x86.dll",
+        "netframework/Microsoft.VisualStudio.Setup.Configuration.Interop.dll",
+        "netframework/Microsoft.Win32.Primitives.dll",
+        "netframework/Microsoft.Win32.Registry.dll",
+        "netframework/System.AppContext.dll",
+        "netframework/System.Collections.Concurrent.dll",
+        "netframework/System.Collections.Immutable.dll",
+        "netframework/System.Collections.NonGeneric.dll",
+        "netframework/System.Collections.Specialized.dll",
+        "netframework/System.Collections.dll",
+        "netframework/System.ComponentModel.EventBasedAsync.dll",
+        "netframework/System.ComponentModel.Primitives.dll",
+        "netframework/System.ComponentModel.TypeConverter.dll",
+        "netframework/System.ComponentModel.dll",
+        "netframework/System.Console.dll",
+        "netframework/System.Data.Common.dll",
+        "netframework/System.Diagnostics.Contracts.dll",
+        "netframework/System.Diagnostics.Debug.dll",
+        "netframework/System.Diagnostics.FileVersionInfo.dll",
+        "netframework/System.Diagnostics.Process.dll",
+        "netframework/System.Diagnostics.StackTrace.dll",
+        "netframework/System.Diagnostics.TextWriterTraceListener.dll",
+        "netframework/System.Diagnostics.Tools.dll",
+        "netframework/System.Diagnostics.TraceSource.dll",
+        "netframework/System.Diagnostics.Tracing.dll",
+        "netframework/System.Drawing.Primitives.dll",
+        "netframework/System.Dynamic.Runtime.dll",
+        "netframework/System.Globalization.Calendars.dll",
+        "netframework/System.Globalization.Extensions.dll",
+        "netframework/System.Globalization.dll",
+        "netframework/System.IO.Compression.ZipFile.dll",
+        "netframework/System.IO.Compression.dll",
+        "netframework/System.IO.FileSystem.DriveInfo.dll",
+        "netframework/System.IO.FileSystem.Primitives.dll",
+        "netframework/System.IO.FileSystem.Watcher.dll",
+        "netframework/System.IO.FileSystem.dll",
+        "netframework/System.IO.IsolatedStorage.dll",
+        "netframework/System.IO.MemoryMappedFiles.dll",
+        "netframework/System.IO.Packaging.dll",
+        "netframework/System.IO.Pipes.dll",
+        "netframework/System.IO.UnmanagedMemoryStream.dll",
+        "netframework/System.IO.dll",
+        "netframework/System.Linq.Expressions.dll",
+        "netframework/System.Linq.Parallel.dll",
+        "netframework/System.Linq.Queryable.dll",
+        "netframework/System.Linq.dll",
+        "netframework/System.Net.Http.dll",
+        "netframework/System.Net.NameResolution.dll",
+        "netframework/System.Net.NetworkInformation.dll",
+        "netframework/System.Net.Ping.dll",
+        "netframework/System.Net.Primitives.dll",
+        "netframework/System.Net.Requests.dll",
+        "netframework/System.Net.Security.dll",
+        "netframework/System.Net.Sockets.dll",
+        "netframework/System.Net.WebHeaderCollection.dll",
+        "netframework/System.Net.WebSockets.Client.dll",
+        "netframework/System.Net.WebSockets.dll",
+        "netframework/System.ObjectModel.dll",
+        "netframework/System.Reflection.Extensions.dll",
+        "netframework/System.Reflection.Primitives.dll",
+        "netframework/System.Reflection.dll",
+        "netframework/System.Resources.Reader.dll",
+        "netframework/System.Resources.ResourceManager.dll",
+        "netframework/System.Resources.Writer.dll",
+        "netframework/System.Runtime.CompilerServices.VisualC.dll",
+        "netframework/System.Runtime.Extensions.dll",
+        "netframework/System.Runtime.Handles.dll",
+        "netframework/System.Runtime.InteropServices.RuntimeInformation.dll",
+        "netframework/System.Runtime.InteropServices.dll",
+        "netframework/System.Runtime.Numerics.dll",
+        "netframework/System.Runtime.Serialization.Formatters.dll",
+        "netframework/System.Runtime.Serialization.Json.dll",
+        "netframework/System.Runtime.Serialization.Primitives.dll",
+        "netframework/System.Runtime.Serialization.Xml.dll",
+        "netframework/System.Runtime.dll",
+        "netframework/System.Security.AccessControl.dll",
+        "netframework/System.Security.Claims.dll",
+        "netframework/System.Security.Cryptography.Algorithms.dll",
+        "netframework/System.Security.Cryptography.Csp.dll",
+        "netframework/System.Security.Cryptography.Encoding.dll",
+        "netframework/System.Security.Cryptography.Primitives.dll",
+        "netframework/System.Security.Cryptography.X509Certificates.dll",
+        "netframework/System.Security.Principal.Windows.dll",
+        "netframework/System.Security.Principal.dll",
+        "netframework/System.Security.SecureString.dll",
+        "netframework/System.Text.Encoding.Extensions.dll",
+        "netframework/System.Text.Encoding.dll",
+        "netframework/System.Text.RegularExpressions.dll",
+        "netframework/System.Threading.Overlapped.dll",
+        "netframework/System.Threading.Tasks.Dataflow.dll",
+        "netframework/System.Threading.Tasks.Parallel.dll",
+        "netframework/System.Threading.Tasks.dll",
+        "netframework/System.Threading.Thread.dll",
+        "netframework/System.Threading.ThreadPool.dll",
+        "netframework/System.Threading.Timer.dll",
+        "netframework/System.Threading.dll",
+        "netframework/System.ValueTuple.dll",
+        "netframework/System.Xml.ReaderWriter.dll",
+        "netframework/System.Xml.XDocument.dll",
+        "netframework/System.Xml.XPath.XDocument.dll",
+        "netframework/System.Xml.XPath.dll",
+        "netframework/System.Xml.XmlDocument.dll",
+        "netframework/System.Xml.XmlSerializer.dll",
+        "netframework/dnlib.dll",
+        "netframework/netstandard.dll",
+        "netstandard/Confuser.Core.dll",
+        "netstandard/Confuser.Core.pdb",
+        "netstandard/Confuser.DynCipher.dll",
+        "netstandard/Confuser.DynCipher.pdb",
+        "netstandard/Confuser.MSBuild.Tasks.dll",
+        "netstandard/Confuser.MSBuild.Tasks.pdb",
+        "netstandard/Confuser.Protections.dll",
+        "netstandard/Confuser.Protections.pdb",
+        "netstandard/Confuser.Renamer.dll",
+        "netstandard/Confuser.Renamer.pdb",
+        "netstandard/Microsoft.DiaSymReader.Native.amd64.dll",
+        "netstandard/Microsoft.DiaSymReader.Native.x86.dll"
+      ]
+    },
+    "Microsoft.CSharp/4.7.0": {
+      "sha512": "pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
+      "type": "package",
+      "path": "microsoft.csharp/4.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/netcore50/Microsoft.CSharp.dll",
+        "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.3/Microsoft.CSharp.dll",
+        "lib/netstandard2.0/Microsoft.CSharp.dll",
+        "lib/netstandard2.0/Microsoft.CSharp.xml",
+        "lib/portable-net45+win8+wp8+wpa81/_._",
+        "lib/uap10.0.16299/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "microsoft.csharp.4.7.0.nupkg.sha512",
+        "microsoft.csharp.nuspec",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/netcore50/Microsoft.CSharp.dll",
+        "ref/netcore50/Microsoft.CSharp.xml",
+        "ref/netcore50/de/Microsoft.CSharp.xml",
+        "ref/netcore50/es/Microsoft.CSharp.xml",
+        "ref/netcore50/fr/Microsoft.CSharp.xml",
+        "ref/netcore50/it/Microsoft.CSharp.xml",
+        "ref/netcore50/ja/Microsoft.CSharp.xml",
+        "ref/netcore50/ko/Microsoft.CSharp.xml",
+        "ref/netcore50/ru/Microsoft.CSharp.xml",
+        "ref/netcore50/zh-hans/Microsoft.CSharp.xml",
+        "ref/netcore50/zh-hant/Microsoft.CSharp.xml",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard1.0/Microsoft.CSharp.dll",
+        "ref/netstandard1.0/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/de/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/es/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/fr/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/it/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/ja/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/ko/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/ru/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/zh-hans/Microsoft.CSharp.xml",
+        "ref/netstandard1.0/zh-hant/Microsoft.CSharp.xml",
+        "ref/netstandard2.0/Microsoft.CSharp.dll",
+        "ref/netstandard2.0/Microsoft.CSharp.xml",
+        "ref/portable-net45+win8+wp8+wpa81/_._",
+        "ref/uap10.0.16299/_._",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "ScaleformUI/4.7.0": {
+      "sha512": "W3DCVLEH2ut34Z4PkFkckl+tx2/j/xckavS3Ov/AK+13lEKWQJgTzAQPk+dTIlSLZq8l0sresmOS4LJhXh3Zdw==",
+      "type": "package",
+      "path": "scaleformui/4.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "README.md",
+        "lib/net452/ScaleformUI.dll",
+        "scaleformui.4.7.0.nupkg.sha512",
+        "scaleformui.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.5.2": [
+      "CitizenFX.Core.Client >= 1.0.6947",
+      "Confuser.MSBuild >= 1.6.0",
+      "ScaleformUI >= 4.7.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\denis\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "E:\\Github\\Vojna5Gangov\\Client\\Client.csproj",
+      "projectName": "Client.net",
+      "projectPath": "E:\\Github\\Vojna5Gangov\\Client\\Client.csproj",
+      "packagesPath": "C:\\Users\\denis\\.nuget\\packages\\",
+      "outputPath": "E:\\Github\\Vojna5Gangov\\Client\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\denis\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net452"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net452": {
+          "targetAlias": "net452",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net452": {
+        "targetAlias": "net452",
+        "dependencies": {
+          "CitizenFX.Core.Client": {
+            "target": "Package",
+            "version": "[1.0.6947, )"
+          },
+          "Confuser.MSBuild": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[1.6.0, )"
+          },
+          "ScaleformUI": {
+            "target": "Package",
+            "version": "[4.7.0, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
