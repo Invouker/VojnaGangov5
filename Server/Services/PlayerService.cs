@@ -109,7 +109,7 @@ namespace Server.Services{
 
         public async void UpdatePlayer(Player player, string license){
             using (MySqlConnection connection = Connector.GetConnection()){
-                connection.OpenAsync();
+                await connection.OpenAsync();
                 string updateQuery = $@"UPDATE {VGPlayer.TABLE_NAME}
 						   SET Name = @Name, Licence = @Licence, Hp = @Hp, Max_hp = @Max_hp, Armour = @Armour, Max_armour = @Max_armour, WantedLevel = @WantedLevel,
 							   Money = @Money, BankMoney = @BankMoney, Level = @Level, Xp = @Xp,
@@ -133,11 +133,26 @@ namespace Server.Services{
                     Debug.WriteLine("PosZ: " + vgPlayer.PosZ);
                 }
 
-                connection.CloseAsync();
+                await connection.CloseAsync();
             }
         }
 
         public async Task<bool> CheckIfPlayerExists(Player player){
+            using (MySqlConnection connection = Connector.GetConnection()){
+                await connection.OpenAsync();
+                string checkExistenceQuery = $@"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE Licence = @Licence";
+                int recordCount =
+                    await connection.QueryFirstAsync<int>(checkExistenceQuery,
+                                                          new{ Licence = Utils.GetLicense(player) });
+                if (recordCount > 0)
+                    return true;
+                await connection.CloseAsync();
+            }
+
+            return false;
+        }
+
+        public async Task<bool> CheckIfPlayerCharacterExists(Player player){
             using (MySqlConnection connection = Connector.GetConnection()){
                 await connection.OpenAsync();
                 string checkExistenceQuery = $@"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE Licence = @Licence";
