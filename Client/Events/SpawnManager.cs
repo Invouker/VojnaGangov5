@@ -18,21 +18,20 @@ namespace Client.Events{
             var playerPed = Game.PlayerPed.Handle;
             FreezePlayer(player, true);
 
-            var model = new Model("mp_f_freemode_01");
-            await Game.Player.ChangeModel(model);
-            // var hash = (uint)model.Hash;
+            //var model = new Model("mp_f_freemode_01");
+            //await Game.Player.ChangeModel(model);
 
+            uint hash = (uint)API.GetHashKey("mp_f_freemode_01");
+            API.RequestModel(hash);
 
-            /*
-            while (!API.HasModelLoaded(hash)){
-                API.RequestModel(hash);
-                await Task.Delay(0);
-            }*/
-            //API.SetPlayerModel(player, hash);
-            //API.SetModelAsNoLongerNeeded(hash);
+            while (!API.HasModelLoaded(hash))
+                await BaseScript.Delay(0);
+
+            API.SetPlayerModel(player, hash);
+            API.SetModelAsNoLongerNeeded(hash);
+
             API.SetPedDefaultComponentVariation(API.GetPlayerPed(-1));
 
-            //API.RequestCollisionForModel(hash);
             API.RequestCollisionAtCoord(-468.547f, -1719.703f, 18.67876f);
             API.SetEntityCoordsNoOffset(playerPed, -468.547f, -1719.703f, 18.67876f, false, false, true);
             API.NetworkResurrectLocalPlayer(-468.547f, -1719.703f, 18.67876f, 0, true, true);
@@ -68,6 +67,8 @@ namespace Client.Events{
                     API.SetEntityCollision(ped, true, true);
                 API.FreezeEntityPosition(ped, false);
                 API.SetPlayerInvincible(player, false);
+
+                API.NetworkSetEntityVisibleToNetwork(player, false);
             }
         }
     }

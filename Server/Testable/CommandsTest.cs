@@ -10,7 +10,7 @@ namespace Server.Testable{
         public static void RegisterCommands(PlayerList Players){
             API.RegisterCommand("get", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                ServiceManager.PlayerService.Players.TryGetValue(player, out VGPlayer vgPlayer);
+                ServiceManager.PlayerService.Players.TryGetValue(Utils.GetLicense(player), out VGPlayer vgPlayer);
 
                 player.TriggerEvent("chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
@@ -20,7 +20,7 @@ namespace Server.Testable{
 
             API.RegisterCommand("save", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                ServiceManager.PlayerService.UpdatePlayer(player);
+                ServiceManager.PlayerService.UpdatePlayer(player, Utils.GetLicense(player));
                 player.TriggerEvent("chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player saved" }
@@ -29,7 +29,7 @@ namespace Server.Testable{
 
             API.RegisterCommand("load", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                ServiceManager.PlayerService.LoadPlayer(player);
+                ServiceManager.PlayerService.LoadPlayer(player, Utils.GetLicense(player));
                 player.TriggerEvent("chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player saved" }
