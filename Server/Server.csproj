@@ -43,9 +43,8 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CitizenFX.Server">
-      <HintPath>.\CitizenFX.Server.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="CitizenFX.Core">
+      <HintPath>CitizenFX.Server.dll</HintPath>
     </Reference>
     <Reference Include="Dapper, Version=1.60.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.1.60.6\lib\net451\Dapper.dll</HintPath>
