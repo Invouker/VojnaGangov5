@@ -10,7 +10,7 @@ using Server.Database.Entities;
 
 namespace Server.Services{
     class PlayerService : IService{
-        public Dictionary<string, VGPlayer> Players = new Dictionary<string, VGPlayer>();
+        public Dictionary<string, VGPlayer> Players = new();
 
         public PlayerService(){
             //Autosaving of online players!
@@ -78,9 +78,12 @@ namespace Server.Services{
                                   new{ licence = Utils.GetLicense(player) }, null);
 
                 API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, false);
+
                 player.TriggerEvent("player:load:data", vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.PosX,
                                     vgPlayer.PosY, vgPlayer.PosZ, vgPlayer.Dimension, vgPlayer.Hp, vgPlayer.Max_hp,
                                     vgPlayer.Armour, vgPlayer.Max_armour);
+                //   (long money, long bankMoney, float x, float y, float z, int dimension, int hp, int maxHp, int armour, int maxArmour){
+                //   new Action<long, long, float, float, float, int, int, int, int, int>(LoadPlayerData);
                 Debug.WriteLine($"Loaded data: {vgPlayer}");
 
                 Players.Add(license, vgPlayer);
