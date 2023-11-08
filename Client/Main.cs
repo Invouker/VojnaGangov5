@@ -24,8 +24,8 @@ namespace Client{
             EventHandlers["player:interact:marker"] += new Action<int>(CharacterCreatorUI.Interact);
 
             Tick += InteractStreamable.OnInteractTick;
-
-            SpawnManager.SpawnPlayer();
+            //SpawnManager.SpawnPlayer();
+            SpawnManager.SpawnToCreator();
             TriggerServerEvent("player:post_join");
         }
 
@@ -43,7 +43,7 @@ namespace Client{
 
         private void LoadPlayerData(long money, long bankMoney, float x, float y, float z, int dimension, int hp,
             int maxHp, int armour, int maxArmour){
-            API.StartPlayerTeleport(API.GetPlayerIndex(), x, y, z, 0, false, false, true);
+            //API.StartPlayerTeleport(API.GetPlayerIndex(), x, y, z, 0, false, false, true);
             int playerPed = API.GetPlayerPed(-1);
             API.SetEntityHealth(playerPed, hp);
             API.SetEntityMaxHealth(playerPed, maxHp);

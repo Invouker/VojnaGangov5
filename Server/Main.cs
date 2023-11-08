@@ -15,6 +15,7 @@ namespace Server{
             CommandsTest.RegisterCommands(Players);
         }
 
+
         public static void sendMessage(string message){
             TriggerEvent("chat:addMessage", new{
                 color = new[]{ 16, 43, 76 },
