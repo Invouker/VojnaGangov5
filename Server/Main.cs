@@ -1,65 +1,68 @@
 ﻿using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using System;
-using System.Collections.Generic;
-using System.Numerics;
+using MySqlConnector;
+//using System.Collections.Generic;
 using static CitizenFX.Core.Native.API;
-using static System.Net.Mime.MediaTypeNames;
+// ReSharper disable All
 
 namespace Server
 {
     public class Main : BaseScript
     {
+        private string connectionString;
         public Main()
         {
-            EventHandlers["playerSpawned"] += new Action<int>(OnPlayerSpawned);
-            RegisterCommand("pos", new Action<int, List<object>, string>((source, args, raw) =>
+            SendMessage("VG5Server-Load");
+            connectionString = GetConvar("mysql_connection_string", "default_connection_string_if_not_set");
+            Debug.WriteLine(connectionString);
+            EventHandlers["PlayerVIPSystemLoad"] += new Action<Player>(OnPlayerVIPSystemLoad);
+        }
+        
+        private void OnPlayerVIPSystemLoad([FromSource] Player player)
+        {
+            Debug.WriteLine("Preverujem hrača {player.Handle} VIPSystem. ");
+            if(IsPlayerVip(player.Handle))
             {
-                var player = Players[source];
-                if (player == null)
+                Debug.WriteLine($"Player {player.Handle} true");
+                SendMessage("VIP Ano");
+            }else
+            {
+                Debug.WriteLine($"Player {player.Handle} false");
+                SendMessage("VIP Nie");
+            }
+        }
+
+        private bool IsPlayerVip(string playerName)
+        {
+            bool isVip = false;
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                DateTime currentTime = DateTime.Now;
+                string query = "SELECT COUNT(*) FROM your_table_name WHERE name = @PlayerName AND tariff > 0 AND date <= @CurrentTime";
+                Debug.WriteLine(query);
+                using (MySqlCommand cmd = new MySqlCommand(query, connection))
                 {
-                    return;
+                    cmd.Parameters.AddWithValue("@PlayerName", playerName);
+                    cmd.Parameters.AddWithValue("@CurrentTime", currentTime);
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (count > 0)
+                    {
+                        isVip = true;
+                    }
                 }
-
-                var position = player.Character.Position;
-                string message = $"X: {position.X}, Y: {position.Y}, Z: {position.Z}";
-
-                TriggerClientEvent(player, "chat:addMessage", new
-                {
-                    color = new[] { 255, 0, 0 },
-                    args = new[] { "Server", message }
-                });
-            }), false);
-            RegisterCommand("gw", new Action<int, List<object>, string>((source, args, raw) =>
-            {
-                var player = Players[source];
-                TriggerClientEvent(player, "chat:addMessage", new
-                {
-                    color = new[] { 255, 0, 0 },
-                    args = new[] { "Server", "gw command" }
-                });
-                TriggerClientEvent(player, "sendGiveWeapon");
-            }), false);
+            }
+            return isVip;
         }
-
-        private void OnPlayerSpawned(int source)
-        {
-            SendMessage("OnPlayerSpawned");
-            TriggerClientEvent("csharp:setPlayerPosition", source, 1786.84, 3316.642, 41.52966, 180);
-        }
-        private void OnPlayerDied(int source, List<object> deathReason)
-        {
-            SendMessage("OnPlayerDied");
-            TriggerClientEvent("csharp:setPlayerPosition", source, 1786.84, 3316.642, 41.52966, 180);
-        }
-        public void SendMessage(string text)
+        
+        private void SendMessage(string text)
         {
             TriggerEvent("chat:addMessage", new
             {
                 color = new[] { 250, 250, 250 },
                 multiline = false,
                 args = new[] { text }
-            }); ;
+            });
         }
     }
 }
