@@ -20,7 +20,7 @@ namespace Server
         
         private void OnPlayerVIPSystemLoad([FromSource] Player player)
         {
-            Debug.WriteLine("Preverujem hrača {player.Handle} VIPSystem. ");
+            Debug.WriteLine($"Player {player.Handle} true");
             if(IsPlayerVip(player.Handle))
             {
                 Debug.WriteLine($"Player {player.Handle} true");
@@ -35,15 +35,17 @@ namespace Server
         private bool IsPlayerVip(string playerName)
         {
             bool isVip = false;
+            string menoHraca = GetPlayerName(playerName);
+            Debug.WriteLine($"Hrac {menoHraca} skuska");
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 DateTime currentTime = DateTime.Now;
-                string query = "SELECT COUNT(*) FROM your_table_name WHERE name = @PlayerName AND tariff > 0 AND date <= @CurrentTime";
+                string query = "SELECT COUNT(*) FROM accounts_vip WHERE name = @PlayerName AND tariff > 0 AND date <= @CurrentTime";
                 Debug.WriteLine(query);
                 using (MySqlCommand cmd = new MySqlCommand(query, connection))
                 {
-                    cmd.Parameters.AddWithValue("@PlayerName", playerName);
+                    cmd.Parameters.AddWithValue("@PlayerName", menoHraca);
                     cmd.Parameters.AddWithValue("@CurrentTime", currentTime);
                     int count = Convert.ToInt32(cmd.ExecuteScalar());
                     if (count > 0)
