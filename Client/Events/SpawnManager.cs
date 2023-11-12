@@ -13,8 +13,16 @@ namespace Client.Events{
      */
 
     public class SpawnManager{
-        private const uint CreatorCamera = 10;
-        public static bool isPlayerInCreator = false;
+        public static bool IsPlayerInCreator = false;
+        public static int CameraCreator = -1;
+        public static PositionOfCamera CameraPos = PositionOfCamera.Main;
+
+        public enum PositionOfCamera{
+            Left = 0,
+            Main = 1,
+            Right = 2
+        }
+
 
         public static async Task SpawnPlayer(){
             API.DoScreenFadeOut(500);
@@ -66,9 +74,10 @@ namespace Client.Events{
 
             API.SetPedDefaultComponentVariation(API.GetPlayerPed(-1));
 
-            API.RequestCollisionAtCoord(-468.547f, -1719.703f, 18.67876f);
-            API.SetEntityCoordsNoOffset(playerPed, -468.547f, -1719.703f, 18.67876f, false, false, true);
-            API.NetworkResurrectLocalPlayer(-468.547f, -1719.703f, 18.67876f, 270, true, true);
+            API.RequestCollisionAtCoord(112.6813f, -618.4352f, 206.0344f);
+            API.SetEntityCoordsNoOffset(playerPed, 112.6813f, -618.4352f, 206.0344f, false, false, true);
+            API.NetworkResurrectLocalPlayer(112.6813f, -618.4352f, 206.0344f, 229.6063f, true, true);
+
             API.ClearPedTasksImmediately(playerPed);
             API.RemoveAllPedWeapons(playerPed, true);
             API.ClearPlayerWantedLevel(player);
@@ -79,34 +88,77 @@ namespace Client.Events{
             if (!API.IsEntityVisible(playerPed))
                 API.SetEntityVisible(playerPed, true, false);
 
-            //var camera = API.CreateCamera(CreatorCamera, true);
-            int camera = API.CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", -463.4458f, -1718.268f, 18.65963f, 0.0f,
-                                                 0.0f, 100.0f, 90.0f * 0.4f, true, 0);
-            //API.SetCamRot(camera, 0, 0, 0, 0);
-            API.SetCamActive(camera, true);
-            API.RenderScriptCams(true, false, 0, true, false);
-            API.SetCamAffectsAiming(camera, false);
+            CameraCreator = API.CreateCam("DEFAULT_SCRIPTED_CAMERA", true);
+            // Vector3 camOffset = API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), 1f, 0.3f, 0.65f); // left-side
+            //Vector3 camOffset = API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -1.8f, -0.5f, 0.65f); // right-side
+            Vector3 camOffset =
+                API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -0.7f, 2.26f,
+                                                     0.65f); // main (zoom 0.5 2,1 ) (unzoom 0.6 2.2 )
+            Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
+            API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
+            API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
+            API.SetCamActive(CameraCreator, true);
+            API.RenderScriptCams(true, false, 1, true, true);
 
-            //API.SetFollowPedCamViewMode(4);
-            //API.EnableControlAction(playerPed, 0, true);
-            //API.FreezePedCameraRotation(playerPed);
-            API.DisableAllControlActions(0);
-            Debug.WriteLine($"Entity visible: {API.IsEntityVisible(playerPed)}");
 
             if (API.IsEntityVisible(playerPed))
-                API.SetEntityVisible(playerPed, false, false);
-            Debug.WriteLine($"Entity visible: {API.IsEntityVisible(playerPed)}");
-            isPlayerInCreator = true;
+                API.SetEntityVisible(API.PlayerPedId(), false, false);
+
+            IsPlayerInCreator = true;
             API.DisplayRadar(false);
+            API.SetPedHeadBlendData(API.GetPlayerPed(-1), 0, 0, 0, 0, 0, 0, 0, 0f, 0f, false);
             CharacterCreatorUI.createUI();
         }
 
-        [Tick]
-        public async void HideWheelThisFrame(){
-            if (isPlayerInCreator)
-                API.BlockWeaponWheelThisFrame();
-        }
+        private const Control ToLeft = Control.FrontendLb; // Q
+        private const Control ToRight = Control.FrontendRb; // E
 
+        public static async Task tick(){
+            if (IsPlayerInCreator)
+                API.BlockWeaponWheelThisFrame();
+
+            if (Game.IsControlJustPressed(0, ToLeft) && CameraPos == PositionOfCamera.Main){
+                Vector3 camOffset =
+                    API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), 1f, 0.3f, 0.65f); // left-side
+                Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
+                API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
+                API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
+                //API.SetCamActive(CameraCreator, true);
+                API.RenderScriptCams(true, true, 1000, true, true);
+
+                CameraPos = PositionOfCamera.Right;
+                await BaseScript.Delay(1000);
+            }
+
+            if (Game.IsControlJustPressed(0, ToRight) && CameraPos == PositionOfCamera.Main){
+                Vector3 camOffset =
+                    API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -1.8f, -0.5f, 0.65f); // right-side
+                Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
+                API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
+                API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
+                //API.SetCamActive(CameraCreator, true);
+                API.RenderScriptCams(true, true, 1000, true, true);
+
+                CameraPos = PositionOfCamera.Left;
+                await BaseScript.Delay(1000);
+            }
+
+            if ((Game.IsControlJustPressed(0, ToLeft) || Game.IsControlJustPressed(0, ToRight)) &&
+                CameraPos != PositionOfCamera.Main){ // 108 - NUMPAD 4  ----  109 - NUMPAD 6
+                //CameraCreator = API.CreateCam("DEFAULT_SCRIPTED_CAMERA", true);
+                Vector3 camOffset =
+                    API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -0.7f, 2.26f,
+                                                         0.65f); // main (zoom 0.5 2,1 ) (unzoom 0.6 2.2 )
+                Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
+                API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
+                API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
+                //API.SetCamActive(CameraCreator, true);
+                API.RenderScriptCams(true, true, 1000, true, true);
+
+                CameraPos = PositionOfCamera.Main;
+                await BaseScript.Delay(1000);
+            }
+        }
 
         private static void FreezePlayer(int player, bool freeze){
             var ped = API.GetPlayerPed(-1);

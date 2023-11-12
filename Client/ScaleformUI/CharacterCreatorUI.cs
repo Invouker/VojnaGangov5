@@ -14,28 +14,276 @@ namespace Client.ScaleformUI{
                  createUI();*/
         }
 
+        public static string Sex = "Male";
+
         public static UIMenu createUI(){
             UIMenu menu = new("Character creator", "Change your character", new PointF(20, 20), true);
             menu.BuildingAnimation = MenuBuildingAnimation.NONE;
             menu.EnableAnimation = false;
-            menu.MaxItemsOnScreen = 7;
-            menu.ScrollingType = ScrollingType.ENDLESS;
+            menu.MaxItemsOnScreen = 8;
+            menu.ScrollingType = ScrollingType.CLASSIC;
+            menu.CanPlayerCloseMenu = false;
 
-            var sex = new List<dynamic>{
-                "Male",
-                "Female"
-            };
-            UIMenuListItem sexListItem = new("Sex", sex, 0, "Select your gender");
+            UIMenuListItem sexListItem =
+                new UIMenuListItem("Sex", new List<dynamic>{ "Male", "Female" }, 0, "Select your gender");
             menu.AddItem(sexListItem);
 
             menu.OnListChange += (sender, item, index) => {
-                if (item == sexListItem)
-                    ChangeSex(item.Items[index].ToString());
+                if (item != sexListItem) return;
+                ChangeSex(item.Items[index].ToString());
+                Sex = item.Items[index].ToString();
             };
 
             ByParentsCreatorUI(menu);
+
+            #region Nose UI
+
+            AddGridToMenu(menu, "Nose", "Up", "Narrow", "Wide", "Down", 0, 1);
+            AddGridToMenu(menu, "Nose Profile", "Crooked", "Short", "Long", "Curved", 2, 3);
+            AddGridToMenu(menu, "Nose Tip", "Tip Up", "Broken Left", "Broken Right", "Tip Down", 3, 4);
+            AddGridToMenu(menu, "Eye Brows", "Up", "In", "Out", "Down", 7, 6);
+            AddGridToMenu(menu, "Cheeks Bones", "Up", "In", "Out", "Down", 9, 8);
+
+            #endregion
+
+            #region Other UI
+
+            AddHorizontalGridToMenu(menu, "Eyes", "Squint", "Wide", 11);
+            AddHorizontalGridToMenu(menu, "Lips", "Thin", "Fat", 12);
+            AddGridToMenu(menu, "Jaw", "Round", "Narrow", "Wide", "Square", 13, 14);
+            AddGridToMenu(menu, "Chin", "Up", "In", "Out", "Down", 15, 16);
+            AddGridToMenu(menu, "Chin Shape", "Rounded", "Square", "Pointed", "Bum", 17, 18);
+            AddHorizontalGridToMenu(menu, "Neck Thickness", "Thin", "Fat", 19);
+
+            #endregion
+
+            #region Appearance UI
+
+            List<dynamic> mHairNames = new List<dynamic>(){
+                "Close Shave", "Buzzcut", "Faux Hawk", "Hipster", "Side Parting", "Shorter Cut", "Biker", "Ponytail",
+                "Cornrows", "Slicked", "Short Brushed", "Spikey",
+                "Caesar", "Chopped", "Dreads", "Long Hair", "Shaggy Curls", "Surfer Dude", "Short Side Part",
+                "High Slicked Sides", "Long Slicked", "Hipster Youth", "Mullet"
+            }; //Last was: "Nightvision"
+            List<dynamic> fHairNames = new List<dynamic>(){
+                "Close Shave", "Short", "Layered Bob", "Pigtails", "Ponytail", "Braided Mohawk", "Braids", "Bob",
+                "Faux Hawk", "French Twist", "Long Bob", "Loose Tied",
+                "Pixie", "Shaved Bangs", "Top Knot", "Wavy Bob", "Pin Up Girl", "Messy Bun", "Unknown", "Tight Bun",
+                "Twisted Bob", "Big Bangs", "Braided Top Knot", "Mullet"
+            }; //Last was: "Nightvision"
+
+            List<dynamic> HairNames;
+            if (Sex.Equals("Male")){
+                HairNames = mHairNames;
+            }
+            else
+                HairNames = fHairNames;
+
+            UIMenuListItem hairCuts = new UIMenuListItem("Haircuit", HairNames, 0);
+            UIMenuColorPanel hairCutsColor = new UIMenuColorPanel("Colour", ColorPanelType.Hair);
+            hairCuts.AddPanel(hairCutsColor);
+
+            hairCuts.OnListChanged += (SelectedItem, Index) => {
+                API.SetPedComponentVariation(API.GetPlayerPed(-1), 2, Index, 0, 2);
+            };
+
+            hairCutsColor.OnColorPanelChange += (menu, panel, index) => {
+                API.SetPedHairColor(API.GetPlayerPed(-1), index, 0);
+            };
+
+            menu.AddItem(hairCuts);
+
+            #endregion
+
+            #region Appearance UI
+
+            List<dynamic> beard = new List<dynamic>{
+                "Clean Shaven", "Light Stubble", "Balbo", "Circle Beard", "Goatee", "Chin", "Chin Fuzz",
+                "Pencil Chin Strap", "Scruffy", "Musketeer", "Mustache",
+                "Trimmed Beard", "Stubble", "Thin Circle Beard", "Horseshoe", "Pencil and Chops", "Chin Strap Beard",
+                "Balbo and Sideburns", "Mutton Chops", "Scruffy Beard", "Curly",
+                "Curly and Deep Stranger", "Handlebar", "Faustic", "Otto and Patch", "Otto and Full Stranger",
+                "Light Franz", "The Hampstead", "The Ambrose", "Lincoln Curtain"
+            };
+            AddAppearanceMenu(menu, "Beard", 1, beard);
+
+            List<dynamic> eyebrow = new List<dynamic>{
+                "None", "Balanced", "Fashion", "Cleopatra", "Quizzical", "Femme", "Seductive", "Pinched", "Chola",
+                "Triomphe", "Carefree", "Curvaceous", "Rodent",
+                "Double Tram", "Thin", "Penciled", "Mother Plucker", "Straight and Narrow", "Natural", "Fuzzy",
+                "Unkempt", "Caterpillar", "Regular", "Mediterranean", "Groomed", "Bushels",
+                "Feathered", "Prickly", "Monobrow", "Winged", "Triple Tram", "Arched Tram", "Cutouts", "Fade Away",
+                "Solo Tram"
+            };
+            AddAppearanceMenu(menu, "Eye Brow", 2, eyebrow);
+
+            List<dynamic> blemishes = new List<dynamic>{
+                "None", "Measles", "Pimples", "Spots", "Break Out", "Blackheads", "Build Up", "Pustules", "Zits",
+                "Full Acne", "Acne", "Cheek Rash", "Face Rash",
+                "Picker", "Puberty", "Eyesore", "Chin Rash", "Two Face", "T Zone", "Greasy", "Marked", "Acne Scarring",
+                "Full Acne Scarring", "Cold Sores", "Impetigo"
+            };
+            AddAppearanceMenu(menu, "Skin Blemishes", 11, blemishes);
+
+            List<dynamic> ageing = new List<dynamic>{
+                "None", "Crow's Feet", "First Signs", "Middle Aged", "Worry Lines", "Depression", "Distinguished",
+                "Aged", "Weathered", "Wrinkled", "Sagging", "Tough Life",
+                "Vintage", "Retired", "Junkie", "Geriatric"
+            };
+            AddAppearanceMenu(menu, "Skin Ageing", 3, ageing);
+
+            List<dynamic> complexion = new List<dynamic>{
+                "None", "Rosy Cheeks", "Stubble Rash", "Hot Flush", "Sunburn", "Bruised", "Alchoholic", "Patchy",
+                "Totem", "Blood Vessels", "Damaged", "Pale", "Ghostly"
+            };
+            AddAppearanceMenu(menu, "Skin Complexion", 6, complexion);
+
+            List<dynamic> moleFreckle = new List<dynamic>{
+                "None", "Cherub", "All Over", "Irregular", "Dot Dash", "Over the Bridge", "Baby Doll", "Pixie",
+                "Sun Kissed", "Beauty Marks", "Line Up", "Modelesque",
+                "Occasional", "Speckled", "Rain Drops", "Double Dip", "One Sided", "Pairs", "Growth"
+            };
+            AddAppearanceMenu(menu, "Mole & Freckle", 9, moleFreckle);
+
+            List<dynamic> sunDamage = new List<dynamic>{
+                "None", "Uneven", "Sandpaper", "Patchy", "Rough", "Leathery", "Textured", "Coarse", "Rugged", "Creased",
+                "Cracked", "Gritty"
+            };
+            AddAppearanceMenu(menu, "Skin Damage", 7, sunDamage);
+
+            List<dynamic> makeup = new List<dynamic>{
+                "None", "Smoky Black", "Bronze", "Soft Gray", "Retro Glam", "Natural Look", "Cat Eyes", "Chola", "Vamp",
+                "Vinewood Glamour", "Bubblegum", "Aqua Dream",
+                "Pin up", "Purple Passion", "Smoky Cat Eye", "Smoldering Ruby", "Pop Princess",
+                //face paint
+                "Kiss My Axe", "Panda Pussy", "The Bat", "Skull in Scarlet", "Serpentine", "The Veldt", "Unknown 1",
+                "Unknown 2", "Unknown 3", "Unknown 4", "Tribal Lines", "Tribal Swirls",
+                "Tribal Orange", "Tribal Red", "Trapped in A Box", "Clowning",
+                // makeup pt 2
+                "Guyliner", "Unknown 5", "Blood Tears", "Heavy Metal", "Sorrow", "Prince of Darkness", "Rocker", "Goth",
+                "Punk", "Devastated"
+            };
+            AddAppearanceMenu(menu, "Makeup", 4, makeup, ColorPanelType.Makeup);
+
+            List<dynamic> lipstick = new List<dynamic>{
+                "None", "Color Matte", "Color Gloss", "Lined Matte", "Lined Gloss", "Heavy Lined Matte",
+                "Heavy Lined Gloss", "Lined Nude Matte", "Liner Nude Gloss",
+                "Smudged", "Geisha"
+            };
+            AddAppearanceMenu(menu, "Lipstick", 8, lipstick);
+
+            #endregion
+
+            EditClotheUI(menu);
+
             menu.Visible = true;
             return menu;
+        }
+
+        private static void AddGridToMenu(UIMenu menu, string title, string topText, string leftText, string rightText,
+            string bottomText, int indexOne, int indexTwo){
+            UIMenuItem uiMenuItem = new(title);
+            UIMenuGridPanel uiGrid = new(topText, leftText, rightText, bottomText, new PointF(.5f, .5f));
+            uiMenuItem.AddPanel(uiGrid);
+            menu.AddItem(uiMenuItem);
+            uiGrid.OnGridPanelChange += (menu, panel, value) => {
+                API.SetPedFaceFeature(API.GetPlayerPed(-1), indexOne, value.X);
+                API.SetPedFaceFeature(API.GetPlayerPed(-1), indexTwo, value.Y);
+            };
+        }
+
+        private static void AddHorizontalGridToMenu(UIMenu menu, string title, string leftText, string rightText,
+            int index){
+            UIMenuItem uiMenuItem = new(title);
+            UIMenuGridPanel uiGrid = new(leftText, rightText, new PointF(.5f, .5f));
+            uiMenuItem.AddPanel(uiGrid);
+            menu.AddItem(uiMenuItem);
+            uiGrid.OnGridPanelChange += (menu, panel, value) => {
+                API.SetPedFaceFeature(API.GetPlayerPed(-1), index, value.X);
+            };
+        }
+
+        private static void AddAppearanceMenu(UIMenu menu, String title, int overlayId, List<dynamic> objects,
+            ColorPanelType panelType = ColorPanelType.Hair){
+            UIMenuListItem item = new UIMenuListItem(title, objects, 0);
+            UIMenuColorPanel colorPanel = new UIMenuColorPanel("Colour", panelType);
+            UIMenuPercentagePanel opacityPanel = new UIMenuPercentagePanel("Opacity", "0%", "100%", 100f);
+            item.AddPanel(colorPanel);
+            item.AddPanel(opacityPanel);
+
+            float objectOpacity = 100f;
+            int objectColor = 0;
+            int objectType = 0;
+
+            item.OnListChanged += (sender, index) => {
+                int color = ((UIMenuColorPanel)sender.Panels[0]).CurrentSelection;
+                float opacity = ((UIMenuPercentagePanel)sender.Panels[1]).Percentage / 100;
+                API.SetPedHeadOverlay(API.GetPlayerPed(-1), overlayId, index, opacity);
+                API.SetPedHeadOverlayColor(API.GetPlayerPed(-1), overlayId, 1, color, 0);
+            };
+
+            opacityPanel.OnPercentagePanelChange += (item, panel, value) => {
+                float opacity = value / 100;
+                API.SetPedHeadOverlay(API.GetPlayerPed(-1), overlayId, objectType, opacity);
+                API.SetPedHeadOverlayColor(API.GetPlayerPed(-1), overlayId, 1, objectColor, 0);
+                objectOpacity = opacity;
+            };
+
+            colorPanel.OnColorPanelChange += (item, panel, index) => {
+                API.SetPedHeadOverlay(API.GetPlayerPed(-1), overlayId, objectType, objectOpacity);
+                API.SetPedHeadOverlayColor(API.GetPlayerPed(-1), overlayId, 1, index, 0);
+                objectColor = index;
+            };
+            menu.AddItem(item);
+        }
+
+        private static void EditClotheUI(UIMenu mainMenu){
+            UIMenuItem windowsItem = new UIMenuItem("Change your appearance");
+            windowsItem.SetRightLabel("»");
+            mainMenu.AddItem(windowsItem);
+
+            UIMenuItem back = new("Back to creator");
+            back.SetRightLabel("«");
+
+            UIMenu subMenu = new("Change your appearance", "");
+
+            List<dynamic> mHairNames = new List<dynamic>(){
+                "Close Shave", "Buzzcut", "Faux Hawk", "Hipster", "Side Parting", "Shorter Cut", "Biker", "Ponytail",
+                "Cornrows", "Slicked", "Short Brushed", "Spikey",
+                "Caesar", "Chopped", "Dreads", "Long Hair", "Shaggy Curls", "Surfer Dude", "Short Side Part",
+                "High Slicked Sides", "Long Slicked", "Hipster Youth", "Mullet"
+            }; //Last was: "Nightvision"
+            List<dynamic> fHairNames = new List<dynamic>(){
+                "Close Shave", "Short", "Layered Bob", "Pigtails", "Ponytail", "Braided Mohawk", "Braids", "Bob",
+                "Faux Hawk", "French Twist", "Long Bob", "Loose Tied",
+                "Pixie", "Shaved Bangs", "Top Knot", "Wavy Bob", "Pin Up Girl", "Messy Bun", "Unknown", "Tight Bun",
+                "Twisted Bob", "Big Bangs", "Braided Top Knot", "Mullet"
+            }; //Last was: "Nightvision"
+
+            List<dynamic> HairNames;
+            if (Sex.Equals("Male")){
+                HairNames = mHairNames;
+            }
+            else
+                HairNames = fHairNames;
+
+            UIMenuListItem uiMenuListItem = new UIMenuListItem("Haircuit", HairNames, 0);
+            UIMenuColorPanel uiMenuColorPanel = new UIMenuColorPanel("Colour", ColorPanelType.Hair);
+            uiMenuListItem.AddPanel(uiMenuColorPanel);
+            subMenu.AddItem(uiMenuListItem);
+
+            subMenu.AddItem(back);
+
+            uiMenuListItem.OnListChanged += (SelectedItem, Index) => {
+                API.SetPedComponentVariation(API.GetPlayerPed(-1), 2, Index, 0, 2);
+            };
+
+            uiMenuColorPanel.OnColorPanelChange += (menu, panel, index) => {
+                API.SetPedHairColor(API.GetPlayerPed(-1), index, 0);
+            };
+
+            windowsItem.Activated += (sender, e) => { sender.SwitchTo(subMenu, inheritOldMenuParams: true); };
+            back.Activated += (sender, e) => { sender.SwitchTo(mainMenu, inheritOldMenuParams: true); };
         }
 
         private static void ByParentsCreatorUI(UIMenu mainMenu){
@@ -63,12 +311,12 @@ namespace Client.ScaleformUI{
                 new("Parents resemblance", "Dad:", "Mom:", true, new List<UIDetailStat>());
             windowSubmenu.AddWindow(heritageWindow);
             windowSubmenu.AddWindow(statsWindow);
-            List<dynamic> momfaces = new List<dynamic>(){
+            List<dynamic> momfaces = new List<dynamic>{
                 "Hannah", "Audrey", "Jasmine", "Giselle", "Amelia", "Isabella", "Zoe", "Ava", "Camilla", "Violet",
                 "Sophia", "Eveline", "Nicole", "Ashley", "Grace", "Brianna", "Natalie", "Olivia", "Elizabeth",
                 "Charlotte", "Emma", "Misty"
             };
-            List<dynamic> dadfaces = new List<dynamic>(){
+            List<dynamic> dadfaces = new List<dynamic>{
                 "Benjamin", "Daniel", "Joshua", "Noah", "Andrew", "Joan", "Alex", "Isaac", "Evan", "Ethan", "Vincent",
                 "Angel", "Diego", "Adrian", "Gabriel", "Michael", "Santiago", "Kevin", "Louis", "Samuel", "Anthony",
                 "Claude", "Niko", "John"
@@ -136,25 +384,8 @@ namespace Client.ScaleformUI{
             API.SetPlayerModel(Game.Player.Handle, intHash);
             API.SetPedDefaultComponentVariation(API.GetPlayerPed(-1));
             API.SetModelAsNoLongerNeeded(intHash);
+
+            API.SetPedHeadBlendData(API.GetPlayerPed(-1), 0, 0, 0, 0, 0, 0, 0, 0f, 0f, false);
         }
-
-        private static readonly string[] MaleAmbient ={
-            "a_m_m_afriamer_01", "a_m_m_beach_01", "a_m_m_beach_02", "a_m_m_bevhills_01", "a_m_m_bevhills_02",
-            "a_m_m_business_01",
-            "a_m_m_eastsa_01", "a_m_m_eastsa_02", "a_m_m_farmer_01", "a_m_m_fatlatin_01", "a_m_m_genfat_01",
-            "a_m_m_genfat_02",
-            "a_m_m_golfer_01", "a_m_m_hasjew_01", "a_m_m_hillbilly_01", "a_m_m_hillbilly_02", "a_m_m_indian_01",
-            "a_m_m_ktown_01", "a_m_m_malibu_01", "a_m_m_mexcntry_01",
-            "a_m_m_mexlabor_01", "a_m_m_og_boss_01", "a_m_m_paparazzi_01"
-        };
-
-        private static readonly string[] FemaleAmbient ={
-            "a_f_m_bevhills_01", "a_f_m_bevhills_02", "a_f_m_bodybuild_01", "a_f_m_business_02", "a_f_m_eastsa_01",
-            "a_f_m_eastsa_02", "a_f_m_fatbla_01", "a_f_m_fatcult_01", "a_f_m_fatwhite_01", "a_f_m_ktown_01",
-            "a_f_m_ktown_02", "a_f_m_prolhost_01",
-            "a_f_m_salton_01", "a_f_m_skidrow_01", "a_f_m_soucent_01", "a_f_m_soucent_02", "a_f_m_soucentmc_01",
-            "a_f_m_tourist_01", "a_f_m_tramp_01",
-            "a_f_m_trampbeac_01", "a_f_o_genstreet_01", "a_f_o_indian_01", "a_f_o_salton_01"
-        };
     }
 }

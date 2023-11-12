@@ -32,7 +32,20 @@ namespace Server.Testable{
                 ServiceManager.PlayerService.LoadPlayer(player, Utils.GetLicense(player));
                 player.TriggerEvent("chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
-                    args = new[]{ "[Server]", $"Player saved" }
+                    args = new[]{ "[Server]", $"Player Loaded" }
+                });
+            }), false);
+
+            API.RegisterCommand("mypos", new Action<int, List<object>, string>((source, args, rawCommand) => {
+                Player player = Players[source];
+
+
+                player.TriggerEvent("chat:addMessage", new{
+                    color = new[]{ 16, 43, 76 },
+                    args = new[]{
+                        "[Server]",
+                        $"Position X: {player.Character.Position.X}, Y: {player.Character.Position.Y}, Z: {player.Character.Position.Z}, Head: {player.Character.Heading}"
+                    }
                 });
             }), false);
         }

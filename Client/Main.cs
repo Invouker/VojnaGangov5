@@ -30,6 +30,12 @@ namespace Client{
         }
 
         [Tick]
+        public async Task onSpawnManagerTick(){
+            SpawnManager.tick();
+            await Task.FromResult(true);
+        }
+
+        [Tick]
         public async Task onTickRender(){
             Streamer.stream();
             await Task.FromResult(true);
