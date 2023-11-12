@@ -245,46 +245,167 @@ namespace Client.ScaleformUI{
             UIMenuItem back = new("Back to creator");
             back.SetRightLabel("«");
 
-            UIMenu subMenu = new("Change your appearance", "");
+            UIMenu subMenu = new("Change your skin set", "Skin set of character");
 
-            List<dynamic> mHairNames = new List<dynamic>(){
-                "Close Shave", "Buzzcut", "Faux Hawk", "Hipster", "Side Parting", "Shorter Cut", "Biker", "Ponytail",
-                "Cornrows", "Slicked", "Short Brushed", "Spikey",
-                "Caesar", "Chopped", "Dreads", "Long Hair", "Shaggy Curls", "Surfer Dude", "Short Side Part",
-                "High Slicked Sides", "Long Slicked", "Hipster Youth", "Mullet"
-            }; //Last was: "Nightvision"
-            List<dynamic> fHairNames = new List<dynamic>(){
-                "Close Shave", "Short", "Layered Bob", "Pigtails", "Ponytail", "Braided Mohawk", "Braids", "Bob",
-                "Faux Hawk", "French Twist", "Long Bob", "Loose Tied",
-                "Pixie", "Shaved Bangs", "Top Knot", "Wavy Bob", "Pin Up Girl", "Messy Bun", "Unknown", "Tight Bun",
-                "Twisted Bob", "Big Bangs", "Braided Top Knot", "Mullet"
-            }; //Last was: "Nightvision"
+            List<dynamic> drawed = new List<dynamic>()
+                { "1/10", "2/10", "3/10", "4/10", "5/10", "6/10", "7/10", "8/10", "9/10", "10/10" };
 
-            List<dynamic> HairNames;
-            if (Sex.Equals("Male")){
-                HairNames = mHairNames;
-            }
+            #region Define of skinset for Male
+
+            SkinSet set_m_0 = new SkinSet(0, 8, 0, 24, 44, 6);
+            SkinSet set_m_1 = new SkinSet(0, 15, 0, 26, 44, 16);
+            SkinSet set_m_2 = new SkinSet(0, 23, 0, 14, 16, 7);
+            SkinSet set_m_3 = new SkinSet(0, 26, 0, 24, 16, 16);
+            SkinSet set_m_4 = new SkinSet(14, 47, 0, 32, 20, 37);
+            SkinSet set_m_5 = new SkinSet(5, 62, 0, 48, 40, 63);
+            SkinSet set_m_6 = new SkinSet(0, 25, 0, 1, 4, 69);
+            SkinSet set_m_7 = new SkinSet(5, 39, 0, 1, 12, 70);
+            SkinSet set_m_8 = new SkinSet(5, 37, 0, 22, 15, 105);
+            SkinSet set_m_9 = new SkinSet(1, 72, 0, 24, 21, 118);
+
+            #endregion
+
+            #region Define of skinset for Female
+
+            SkinSet set_fm_0 = new SkinSet(15, 4, 6, 31, 6, 26);
+            SkinSet set_fm_1 = new SkinSet(15, 14, 7, 31, 15, 21);
+            SkinSet set_fm_2 = new SkinSet(5, 16, 6, 31, 30, 35);
+            SkinSet set_fm_3 = new SkinSet(0, 25, 6, 41, 2, 40);
+            SkinSet set_fm_4 = new SkinSet(3, 25, 0, 49, 2, 43);
+            SkinSet set_fm_5 = new SkinSet(15, 32, 0, 49, 2, 46);
+            SkinSet set_fm_6 = new SkinSet(14, 37, 7, 63, 2, 49);
+            SkinSet set_fm_7 = new SkinSet(5, 37, 0, 68, 2, 50);
+            SkinSet set_fm_8 = new SkinSet(15, 47, 3, 70, 2, 79);
+            SkinSet set_fm_9 = new SkinSet(29, 51, 2, 77, 2, 105);
+
+            #endregion
+
+            List<dynamic> skinSetMale = new List<dynamic>
+                { set_m_0, set_m_1, set_m_2, set_m_3, set_m_4, set_m_5, set_m_6, set_m_7, set_m_8, set_m_9 };
+            List<dynamic> skinSetFemale = new List<dynamic>
+                { set_fm_0, set_fm_1, set_fm_2, set_fm_3, set_fm_4, set_fm_5, set_fm_6, set_fm_7, set_fm_8, set_fm_9 };
+
+            List<dynamic> skinSets = new List<dynamic>();
+            if (API.IsPedMale(Game.Player.Character.Handle))
+                skinSets = skinSetMale;
             else
-                HairNames = fHairNames;
+                skinSets = skinSetFemale;
 
-            UIMenuListItem uiMenuListItem = new UIMenuListItem("Haircuit", HairNames, 0);
-            UIMenuColorPanel uiMenuColorPanel = new UIMenuColorPanel("Colour", ColorPanelType.Hair);
-            uiMenuListItem.AddPanel(uiMenuColorPanel);
+            UIMenuListItem uiMenuListItem = new UIMenuListItem("Skin Set", drawed, 0);
             subMenu.AddItem(uiMenuListItem);
 
-            subMenu.AddItem(back);
-
             uiMenuListItem.OnListChanged += (SelectedItem, Index) => {
-                API.SetPedComponentVariation(API.GetPlayerPed(-1), 2, Index, 0, 2);
+                SkinSet skinset = (SkinSet)skinSets.ToArray()[Index];
+                setComp(3, skinset.Torso);
+                setComp(4, skinset.Pants);
+                setComp(6, skinset.Shoes);
+                setComp(7, skinset.Accessory);
+                setComp(8, skinset.UnderShirt);
+                setComp(11, skinset.Torso2);
             };
-
-            uiMenuColorPanel.OnColorPanelChange += (menu, panel, index) => {
-                API.SetPedHairColor(API.GetPlayerPed(-1), index, 0);
-            };
-
+            subMenu.AddItem(back);
             windowsItem.Activated += (sender, e) => { sender.SwitchTo(subMenu, inheritOldMenuParams: true); };
             back.Activated += (sender, e) => { sender.SwitchTo(mainMenu, inheritOldMenuParams: true); };
         }
+
+        private static void setComp(int compId, int index){
+            var max = API.GetNumberOfPedTextureVariations(API.GetPlayerPed(-1), compId, index);
+            API.SetPedComponentVariation(API.GetPlayerPed(-1), compId, index, API.GetRandomIntInRange(0, max - 1), 0);
+        }
+
+        class SkinSet{
+            public int Torso{ get; set; }
+            public int Pants{ get; set; }
+            public int Accessory{ get; set; }
+            public int Shoes{ get; set; }
+            public int UnderShirt{ get; set; }
+            public int Torso2{ get; set; }
+
+            public SkinSet(int torso, int pants, int accessory, int shoes, int underShirt, int torso2){
+                Torso = torso;
+                Pants = pants;
+                Accessory = accessory;
+                Shoes = shoes;
+                UnderShirt = underShirt;
+                Torso2 = torso2;
+            }
+        }
+
+        /*
+          private static void EditClotheUI(UIMenu mainMenu){
+             UIMenuItem windowsItem = new UIMenuItem("Change your appearance");
+             windowsItem.SetRightLabel("»");
+             mainMenu.AddItem(windowsItem);
+
+             UIMenuItem back = new("Back to creator");
+             back.SetRightLabel("«");
+
+             UIMenu subMenu = new("Change your clothes", "");
+
+            // string[] clothingCategoryNames = { "Masks", "Unused (hair)", "Gloves", "Pants", "Bags & Parachutes", "Shoes", "Necklace and Ties", "Under Shirt", "Body Armor", "Decals & Logos", "Shirt & Jackets" };
+             string[] clothingCategoryNames = { "Face", "Mask", "Hair", "Torso", "Pants", "Bags & Parachutes", "Shoes", "Accessory", "Under Shirt", "Kevlar", "Badge", "Torso" };
+
+            // int[] blockedPants ={2, 33, 11, 34,38,39,40,44,56,57,59,67, 72, 74,77, 84, 85, 87,92,93, 95, 97, 106, 107, 108, 109,110, 111};
+             Blocked pants = new Blocked(4,105, new[]{ 2, 33, 11, 34, 38, 39, 40, 44, 56, 57, 59, 67, 72, 74, 77, 84, 85, 87, 92, 93, 95, 97, 106, 107, 108, 109, 110, 111 });
+
+             int[] allowedDrawable ={3, 4, 6, 7, 8, 11 };
+             List<dynamic> drawed = new List<dynamic>();
+             foreach (int allow in allowedDrawable){
+                 int maxDrawables = API.GetNumberOfPedDrawableVariations(API.GetPlayerPed(-1), allow);
+
+
+                 for (var i = 0; i < maxDrawables; i++){
+                    /* if (allow == pants.id){
+                         if (maxDrawables >= pants.maxRender){
+                             continue;
+                         }
+
+                         if (!Utils.IsNumberInArray(pants.blockeds, i)){
+                             Debug.WriteLine($"{i}/{pants.maxRender}");
+                             drawed.Add($"{i}/{pants.maxRender}");
+                         }
+                             //if (API.IsPedComponentVariationValid(API.GetPlayerPed(-1), allow, i, 0))
+
+                     }else * /
+                         if (API.IsPedComponentVariationValid(API.GetPlayerPed(-1), allow, i, 0))
+                             drawed.Add($"{i}/{maxDrawables}");
+                 }
+
+                 UIMenuListItem uiMenuListItem = new UIMenuListItem($"Clothes {allow}:{clothingCategoryNames[allow]}", drawed, 0);
+                 UIMenuColorPanel uiMenuColorPanel = new UIMenuColorPanel("Colour", ColorPanelType.Hair);
+                 uiMenuListItem.AddPanel(uiMenuColorPanel);
+                 subMenu.AddItem(uiMenuListItem);
+
+                 uiMenuListItem.OnListChanged += (SelectedItem, Index) => {
+                     int color = ((UIMenuColorPanel)SelectedItem.Panels[0]).CurrentSelection;
+                     if (allow == pants.id) {
+                         if (!Utils.IsNumberInArray(pants.blockeds, Index))
+                             API.SetPedComponentVariation(API.GetPlayerPed(-1), allow, Index, color, 0);
+                     } else
+                         API.SetPedComponentVariation(API.GetPlayerPed(-1), allow, Index, color, 0);
+
+
+                 };
+             }
+             subMenu.AddItem(back);
+             windowsItem.Activated += (sender, e) => { sender.SwitchTo(subMenu, inheritOldMenuParams: true); };
+             back.Activated += (sender, e) => { sender.SwitchTo(mainMenu, inheritOldMenuParams: true); };
+         }
+
+         class Blocked {
+             public int id{ get; set; }
+             public int maxRender{ get; set; }
+             public int[] blockeds{ get; set; }
+
+
+             public Blocked(int _id, int _maxRender, int[] _blockeds){
+                 id = _id;
+                 maxRender = _maxRender;
+                 blockeds = _blockeds;
+
+             }
+         }
+         */
 
         private static void ByParentsCreatorUI(UIMenu mainMenu){
             int momIndex = 0, dadIndex = 0;

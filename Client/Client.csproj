@@ -62,6 +62,7 @@
     <Compile Include="ScaleformUI\CharacterCreatorUI.cs"/>
     <Compile Include="Streamable\InteractStreamable.cs"/>
     <Compile Include="Streamable\Streamer.cs"/>
+      <Compile Include="Utils.cs"/>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Testable\"/>
