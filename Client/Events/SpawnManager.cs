@@ -110,53 +110,69 @@ namespace Client.Events{
             CharacterCreatorUI.createUI();
         }
 
+        public static async Task spawnPlayer(){
+            IsPlayerInCreator = false;
+            int player = Game.Player.Handle;
+            API.DoScreenFadeOut(500);
+            API.StartPlayerTeleport(player, -543.4418f, -207.0857f, 37.63733f, 206.9291f, false, false, false);
+
+            while (!API.HasPlayerTeleportFinished(player))
+                await BaseScript.Delay(0);
+
+            API.RenderScriptCams(false, true, 500, true, true);
+            FreezePlayer(player, false);
+            API.DisplayRadar(true);
+            API.DoScreenFadeIn(1000);
+        }
+
         private const Control ToLeft = Control.FrontendLb; // Q
         private const Control ToRight = Control.FrontendRb; // E
 
         public static async Task tick(){
-            if (IsPlayerInCreator)
+            if (IsPlayerInCreator){
                 API.BlockWeaponWheelThisFrame();
 
-            if (Game.IsControlJustPressed(0, ToLeft) && CameraPos == PositionOfCamera.Main){
-                Vector3 camOffset =
-                    API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), 1f, 0.3f, 0.65f); // left-side
-                Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
-                API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
-                API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
-                //API.SetCamActive(CameraCreator, true);
-                API.RenderScriptCams(true, true, 1000, true, true);
+                if (Game.IsControlJustPressed(0, ToLeft) && CameraPos == PositionOfCamera.Main){
+                    Vector3 camOffset =
+                        API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), 1f, 0.3f, 0.65f); // left-side
+                    Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
+                    API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
+                    API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
+                    //API.SetCamActive(CameraCreator, true);
+                    API.RenderScriptCams(true, true, 1000, true, true);
 
-                CameraPos = PositionOfCamera.Right;
-                await BaseScript.Delay(1000);
-            }
+                    CameraPos = PositionOfCamera.Right;
+                    await BaseScript.Delay(1000);
+                }
 
-            if (Game.IsControlJustPressed(0, ToRight) && CameraPos == PositionOfCamera.Main){
-                Vector3 camOffset =
-                    API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -1.8f, -0.5f, 0.65f); // right-side
-                Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
-                API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
-                API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
-                //API.SetCamActive(CameraCreator, true);
-                API.RenderScriptCams(true, true, 1000, true, true);
+                if (Game.IsControlJustPressed(0, ToRight) && CameraPos == PositionOfCamera.Main){
+                    Vector3 camOffset =
+                        API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -1.8f, -0.5f, 0.65f); // right-side
+                    Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
+                    API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
+                    API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
+                    //API.SetCamActive(CameraCreator, true);
+                    API.RenderScriptCams(true, true, 1000, true, true);
 
-                CameraPos = PositionOfCamera.Left;
-                await BaseScript.Delay(1000);
-            }
+                    CameraPos = PositionOfCamera.Left;
+                    await BaseScript.Delay(1000);
+                }
 
-            if ((Game.IsControlJustPressed(0, ToLeft) || Game.IsControlJustPressed(0, ToRight)) &&
-                CameraPos != PositionOfCamera.Main){ // 108 - NUMPAD 4  ----  109 - NUMPAD 6
-                //CameraCreator = API.CreateCam("DEFAULT_SCRIPTED_CAMERA", true);
-                Vector3 camOffset =
-                    API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -0.7f, 2.26f,
-                                                         0.65f); // main (zoom 0.5 2,1 ) (unzoom 0.6 2.2 )
-                Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
-                API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
-                API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
-                //API.SetCamActive(CameraCreator, true);
-                API.RenderScriptCams(true, true, 1000, true, true);
+                if ((Game.IsControlJustPressed(0, ToLeft) || Game.IsControlJustPressed(0, ToRight)) &&
+                    CameraPos != PositionOfCamera.Main){ // 108 - NUMPAD 4  ----  109 - NUMPAD 6
+                    //CameraCreator = API.CreateCam("DEFAULT_SCRIPTED_CAMERA", true);
+                    Vector3 camOffset =
+                        API.GetOffsetFromEntityInWorldCoords(API.PlayerPedId(), -0.7f, 2.26f,
+                                                             0.65f); // main (zoom 0.5 2,1 ) (unzoom 0.6 2.2 )
+                    Vector3 playerPosition = API.GetEntityCoords(API.PlayerPedId(), true);
+                    API.SetCamCoord(CameraCreator, camOffset.X, camOffset.Y, camOffset.Z);
+                    API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
+                    //API.SetCamActive(CameraCreator, true);
+                    API.RenderScriptCams(true, true, 1000, true, true);
 
-                CameraPos = PositionOfCamera.Main;
-                await BaseScript.Delay(1000);
+                    CameraPos = PositionOfCamera.Main;
+                    await BaseScript.Delay(1000);
+                }
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Events;
 using ScaleformUI;
 using ScaleformUI.Elements;
 using ScaleformUI.Menu;
@@ -175,6 +176,14 @@ namespace Client.ScaleformUI{
             #endregion
 
             EditClotheUI(menu);
+
+
+            UIMenuItem spawnPlayer = new UIMenuItem("Spawn to world", "");
+            menu.AddItem(spawnPlayer);
+            spawnPlayer.Activated += (sender, item) => {
+                SpawnManager.spawnPlayer();
+                menu.Visible = false;
+            };
 
             menu.Visible = true;
             return menu;
