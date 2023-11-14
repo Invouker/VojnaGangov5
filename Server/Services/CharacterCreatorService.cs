@@ -22,7 +22,7 @@ public class CharacterCreatorService{
             throw new NullReferenceException("Character data is null in dictionary.");
 
         VGPlayer vgPlayer = PlayerService.getVGPlayer(name);
-        character.Id = vgPlayer.Id;
+        character.AccId = vgPlayer.Id;
 
         string InsertQuery = @"INSERT INTO characters
                                    (acc_id, name, sex, first_face_shape, second_face_shape, first_skin_tone, second_skin_tone, 
