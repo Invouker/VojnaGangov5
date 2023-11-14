@@ -25,7 +25,7 @@ public class CharacterCreatorService{
         character.Id = vgPlayer.Id;
 
         string InsertQuery = @"INSERT INTO characters
-                                   (acc_id, name, first_face_shape, second_face_shape, first_skin_tone, second_skin_tone, 
+                                   (acc_id, name, sex, first_face_shape, second_face_shape, first_skin_tone, second_skin_tone, 
                                     parent_face_shape_percent, parent_skin_tone_percent, nose_width, nose_peak, nose_length, 
                                     nose_bone_curvness, nose_tip, nose_bone_twist, eyebrow, eyebrow2, cheek_bones, 
                                     cheek_bones_width,cheek_sideways_bone_size, eye_opening, lip_thickness, jaw_bone_width, jaw_bone_shape, 
@@ -33,7 +33,7 @@ public class CharacterCreatorService{
                                     hair_color, torso, torso_texture, legs, legs_texture, foot, foot_texture, scarfs, 
                                     scarfs_texture, accessories, accessories_texture, torso2, torso2_texture)
                                 VALUES
-                                    (@AccId, @Name, @FirstFaceShape, @SecondFaceShape, @FirstSkinTone, @SecondSkinTone, 
+                                    (@AccId, @Name, @Sex, @FirstFaceShape, @SecondFaceShape, @FirstSkinTone, @SecondSkinTone, 
                                     @ParentFaceShapePercent, @ParentSkinTonePercent, @NoseWidth, @NosePeak, @NoseLength, 
                                     @NoseBoneCurvness, @NoseTip, @NoseBoneTwist, @Eyebrow, @Eyebrow2, @CheekBones, 
                                     @CheekBonesWidth,@CheekSidewaysBoneSize, @EyeOpening, @LipThickness, @JawBoneWidth, @JawBoneShape, 
@@ -45,7 +45,8 @@ public class CharacterCreatorService{
         await dbConnection.CloseAsync();
     }
 
-    public void ClientDataBlend([FromSource] Player player, int firstFaceShape, int secondFaceShape, int firstSkinTone,
+    public void ClientDataBlend([FromSource] Player player, short sex, int firstFaceShape, int secondFaceShape,
+        int firstSkinTone,
         int secondSkinTone, float parentFaceShapePercent, float parentSkinTonePercent){
         if (!characterData.ContainsKey(player.Name))
             characterData.Add(player.Name, new Character(player.Name));
@@ -54,6 +55,7 @@ public class CharacterCreatorService{
         if (character == null)
             throw new NullReferenceException("Character data is null in dictionary.");
 
+        character.Sex = sex;
         character.FirstFaceShape = firstFaceShape;
         character.SecondFaceShape = secondFaceShape;
         character.FirstSkinTone = firstSkinTone;

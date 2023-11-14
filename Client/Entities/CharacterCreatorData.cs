@@ -7,6 +7,7 @@ namespace Client.Entities;
 public class CharacterCreatorData{
     #region HeadBlendData // Player.Local.Character.GetHeadBlendData();
 
+    public short Sex{ get; set; }
     public int FirstFaceShape{ get; set; }
 
     public int SecondFaceShape{ get; set; }
@@ -123,7 +124,11 @@ public class CharacterCreatorData{
 
     private void InitBlendData(){
         Ped ped = Player.Local.Character;
+        short sex = 1;
+        if (API.IsPedMale(ped.Handle))
+            sex = 0;
 
+        Sex = sex;
         FirstFaceShape = ped.GetHeadBlendData().FirstFaceShape;
         SecondFaceShape = ped.GetHeadBlendData().SecondFaceShape;
         FirstSkinTone = ped.GetHeadBlendData().FirstSkinTone;
@@ -139,7 +144,7 @@ public class CharacterCreatorData{
 
         BaseScript.TriggerServerEvent("player:data:character:blend",
                                       //1st
-                                      FirstFaceShape, SecondFaceShape, FirstSkinTone, SecondSkinTone,
+                                      Sex, FirstFaceShape, SecondFaceShape, FirstSkinTone, SecondSkinTone,
                                       ParentFaceShapePercent, ParentSkinTonePercent
                                      );
         BaseScript.TriggerServerEvent("player:data:character:facefeature",

@@ -16,8 +16,8 @@ namespace Server{
             #region CharacterCreator Data
 
             EventHandlers["player:data:character:blend"] +=
-                new Action<Player, int, int, int, int, float, float>(ServiceManager.CharacterCreatorService
-                                                                        .ClientDataBlend);
+                new Action<Player, short, int, int, int, int, float, float>(ServiceManager.CharacterCreatorService
+                                                                               .ClientDataBlend);
             EventHandlers["player:data:character:facefeature"] +=
                 new Action<Player, float, float, float, float, float, float, float, float, float, float, float>
                     (ServiceManager.CharacterCreatorService.ClientDataFaceFeature);
@@ -26,7 +26,7 @@ namespace Server{
                     (ServiceManager.CharacterCreatorService.ClientDataFaceFeature2);
             EventHandlers["player:data:character:drawable"] +=
                 new Action<Player, int, int, int, int, int, int, int, int, int, int, int, int, int, int>(ServiceManager
-                   .CharacterCreatorService.ClientDataDrawable);
+                            .CharacterCreatorService.ClientDataDrawable);
 
             EventHandlers["player:data:character:save"] +=
                 new Action<Player>(ServiceManager.CharacterCreatorService.SaveCharacterData);

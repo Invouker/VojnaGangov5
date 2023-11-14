@@ -10,6 +10,8 @@ public class Character{
         Name = name;
     }
 
+    public short Sex{ get; set; }
+
     #region HeadBlendData // Player.Local.Character.GetHeadBlendData();
 
     public int FirstFaceShape{ get; set; }
