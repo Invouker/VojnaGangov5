@@ -9,7 +9,7 @@ using ScaleformUI.Elements;
 using ScaleformUI.Menu;
 
 namespace Client.ScaleformUI{
-    public class CharacterCreatorUI{
+    public static class CharacterCreatorUI{
         public static void Interact(int id){
             /* if (id == 1)
                  createUI();*/
@@ -177,6 +177,7 @@ namespace Client.ScaleformUI{
 
             EditClotheUI(menu);
 
+            #region Spawn To World
 
             UIMenuItem spawnPlayer = new UIMenuItem("Spawn to world", "");
             menu.AddItem(spawnPlayer);
@@ -184,6 +185,8 @@ namespace Client.ScaleformUI{
                 SpawnManager.spawnPlayer();
                 menu.Visible = false;
             };
+
+            #endregion
 
             menu.Visible = true;
             return menu;
@@ -294,7 +297,7 @@ namespace Client.ScaleformUI{
             List<dynamic> skinSetFemale = new List<dynamic>
                 { set_fm_0, set_fm_1, set_fm_2, set_fm_3, set_fm_4, set_fm_5, set_fm_6, set_fm_7, set_fm_8, set_fm_9 };
 
-            List<dynamic> skinSets = new List<dynamic>();
+            List<dynamic> skinSets;
             if (API.IsPedMale(Game.Player.Character.Handle))
                 skinSets = skinSetMale;
             else
@@ -303,26 +306,26 @@ namespace Client.ScaleformUI{
             UIMenuListItem uiMenuListItem = new UIMenuListItem("Skin Set", drawed, 0);
             subMenu.AddItem(uiMenuListItem);
 
-            uiMenuListItem.OnListChanged += (SelectedItem, Index) => {
+            uiMenuListItem.OnListChanged += (selectedItem, Index) => {
                 SkinSet skinset = (SkinSet)skinSets.ToArray()[Index];
-                setComp(3, skinset.Torso);
-                setComp(4, skinset.Pants);
-                setComp(6, skinset.Shoes);
-                setComp(7, skinset.Accessory);
-                setComp(8, skinset.UnderShirt);
-                setComp(11, skinset.Torso2);
+                SetComp(3, skinset.Torso);
+                SetComp(4, skinset.Pants);
+                SetComp(6, skinset.Shoes);
+                SetComp(7, skinset.Accessory);
+                SetComp(8, skinset.UnderShirt);
+                SetComp(11, skinset.Torso2);
             };
             subMenu.AddItem(back);
             windowsItem.Activated += (sender, e) => { sender.SwitchTo(subMenu, inheritOldMenuParams: true); };
             back.Activated += (sender, e) => { sender.SwitchTo(mainMenu, inheritOldMenuParams: true); };
         }
 
-        private static void setComp(int compId, int index){
+        private static void SetComp(int compId, int index){
             var max = API.GetNumberOfPedTextureVariations(API.GetPlayerPed(-1), compId, index);
-            API.SetPedComponentVariation(API.GetPlayerPed(-1), compId, index, API.GetRandomIntInRange(0, max - 1), 0);
+            API.SetPedComponentVariation(API.GetPlayerPed(-1), compId, index, API.GetRandomIntInRange(0, 1), 0);
         }
 
-        class SkinSet{
+        private class SkinSet{
             public int Torso{ get; set; }
             public int Pants{ get; set; }
             public int Accessory{ get; set; }
@@ -428,7 +431,6 @@ namespace Client.ScaleformUI{
 
             UIMenuItem back = new("Back to creator");
             back.SetRightLabel("«");
-
 
             UIMenu windowSubmenu = new("Parents", "Select your parents");
             windowSubmenu.BuildingAnimation = MenuBuildingAnimation.NONE;

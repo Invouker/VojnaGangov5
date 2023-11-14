@@ -10,7 +10,7 @@ using Server.Database.Entities;
 
 namespace Server.Services{
     class PlayerService : IService{
-        public Dictionary<string, VGPlayer> Players = new();
+        public static readonly Dictionary<string, VGPlayer> Players = new();
 
         public PlayerService(){
             //Autosaving of online players!
@@ -22,6 +22,11 @@ namespace Server.Services{
             Debug.WriteLine("Players counts: " + Players.Count);
 
             CheckPlayer(player);
+        }
+
+        public static VGPlayer getVGPlayer(string name){
+            Players.TryGetValue(name, out VGPlayer vgPlayer);
+            return vgPlayer;
         }
 
         private async void CheckPlayer(Player player){

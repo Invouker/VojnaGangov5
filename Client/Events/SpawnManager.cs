@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Entities;
 using Client.ScaleformUI;
 
 namespace Client.Events{
@@ -111,6 +112,7 @@ namespace Client.Events{
         }
 
         public static async Task spawnPlayer(){
+            CharacterCreatorData.GetCharacterCreatorData().SendDataToServer();
             IsPlayerInCreator = false;
             int player = Game.Player.Handle;
             API.DoScreenFadeOut(500);

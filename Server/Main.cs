@@ -12,6 +12,27 @@ namespace Server{
             EventHandlers["playerDropped"] += new Action<Player, string>(ServiceManager.PlayerService.OnPlayerDropped);
             EventHandlers["onResourceStop"] += new Action<string>(ServiceManager.PlayerService.OnResourceStop);
             EventHandlers["player:interact:marker"] += new Action<int>(StreamerTest.OnMarkerInteract);
+
+            #region CharacterCreator Data
+
+            EventHandlers["player:data:character:blend"] +=
+                new Action<Player, int, int, int, int, float, float>(ServiceManager.CharacterCreatorService
+                                                                        .ClientDataBlend);
+            EventHandlers["player:data:character:facefeature"] +=
+                new Action<Player, float, float, float, float, float, float, float, float, float, float, float>
+                    (ServiceManager.CharacterCreatorService.ClientDataFaceFeature);
+            EventHandlers["player:data:character:facefeature2"] +=
+                new Action<Player, float, float, float, float, float, float, float, float, float>
+                    (ServiceManager.CharacterCreatorService.ClientDataFaceFeature2);
+            EventHandlers["player:data:character:drawable"] +=
+                new Action<Player, int, int, int, int, int, int, int, int, int, int, int, int, int, int>(ServiceManager
+                   .CharacterCreatorService.ClientDataDrawable);
+
+            EventHandlers["player:data:character:save"] +=
+                new Action<Player>(ServiceManager.CharacterCreatorService.SaveCharacterData);
+
+            #endregion
+
             CommandsTest.RegisterCommands(Players);
         }
 

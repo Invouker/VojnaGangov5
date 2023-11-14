@@ -56,6 +56,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\CharacterCreatorData.cs"/>
     <Compile Include="Events\SpawnManager.cs"/>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
