@@ -10,7 +10,7 @@ namespace Server{
             EventHandlers["player:join"] += new Action<Player>(ServiceManager.PlayerService.PlayerJoin);
             EventHandlers["player:post_join"] += new Action<Player>(StreamerTest.PlayerPostJoin);
             EventHandlers["playerDropped"] += new Action<Player, string>(ServiceManager.PlayerService.OnPlayerDropped);
-            EventHandlers["onResourceStop"] += new Action<string>(ServiceManager.PlayerService.OnResourceStop);
+            //EventHandlers["onResourceStop"] += new Action<string>(ServiceManager.PlayerService.OnResourceStop); //Todo: Uncomment this if playerlist and autosave will be ok
             EventHandlers["player:interact:marker"] += new Action<int>(StreamerTest.OnMarkerInteract);
 
             #region CharacterCreator Data
@@ -26,16 +26,19 @@ namespace Server{
                     (ServiceManager.CharacterCreatorService.ClientDataFaceFeature2);
             EventHandlers["player:data:character:drawable"] +=
                 new Action<Player, int, int, int, int, int, int, int, int, int, int, int, int, int, int>(ServiceManager
-                            .CharacterCreatorService.ClientDataDrawable);
+                   .CharacterCreatorService.ClientDataDrawable);
 
             EventHandlers["player:data:character:save"] +=
                 new Action<Player>(ServiceManager.CharacterCreatorService.SaveCharacterData);
 
             #endregion
 
+            EventHandlers["player:post_join"] += new Action<Player>(ServiceManager.CharacterCreatorService.Loader);
+            EventHandlers["player:spawn:to:world:2server"] +=
+                new Action<Player>(ServiceManager.CharacterCreatorService.LoadCharacterData);
+
             CommandsTest.RegisterCommands(Players);
         }
-
 
         public static void sendMessage(string message){
             TriggerEvent("chat:addMessage", new{

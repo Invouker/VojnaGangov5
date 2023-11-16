@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Entities;
 using Client.Events;
 using ScaleformUI;
 using ScaleformUI.Elements;
@@ -18,7 +19,7 @@ namespace Client.ScaleformUI{
         public static string Sex = "Male";
 
         public static UIMenu createUI(){
-            UIMenu menu = new("Character creator", "Change your character", new PointF(20, 20), true);
+            UIMenu menu = new("Character creator", "Change your character", new PointF(20, 20), false);
             menu.BuildingAnimation = MenuBuildingAnimation.NONE;
             menu.EnableAnimation = false;
             menu.MaxItemsOnScreen = 8;
@@ -182,7 +183,12 @@ namespace Client.ScaleformUI{
             UIMenuItem spawnPlayer = new UIMenuItem("Spawn to world", "");
             menu.AddItem(spawnPlayer);
             spawnPlayer.Activated += (sender, item) => {
-                SpawnManager.spawnPlayer();
+                CharacterCreatorData.GetCharacterCreatorData().SendDataToServer();
+                short sexData = 1;
+                if (Sex.Equals("Male"))
+                    sexData = 0;
+
+                SpawnManager.TeleportToWorld(sexData);
                 menu.Visible = false;
             };
 

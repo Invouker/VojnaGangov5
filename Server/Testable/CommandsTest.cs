@@ -11,7 +11,7 @@ namespace Server.Testable{
             API.RegisterCommand("get", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
                 //ServiceManager.PlayerService.Players.TryGetValue(Utils.GetLicense(player), out VGPlayer vgPlayer);
-                VGPlayer vgPlayer = PlayerService.getVGPlayer(player.Name);
+                VGPlayer vgPlayer = PlayerService.GetVgPlayer(player.Name);
                 player.TriggerEvent("chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player get: {vgPlayer.ToString()}" }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
@@ -14,7 +13,7 @@ namespace Server.Services{
 
         public PlayerService(){
             //Autosaving of online players!
-            new Thread(() => { new AutoSaver(); }).Start();
+            //new Thread(() => { new AutoSaver(); }).Start();  //Todo: Uncomment this if playerlist and autosave will be ok
         }
 
         public void PlayerJoin([FromSource] Player player){
@@ -24,9 +23,13 @@ namespace Server.Services{
             CheckPlayer(player);
         }
 
-        public static VGPlayer getVGPlayer(string name){
-            Players.TryGetValue(name, out VGPlayer vgPlayer);
-            return vgPlayer;
+        public static VGPlayer GetVgPlayer(string license){
+            if (Players.TryGetValue(license, out VGPlayer vgPlayer)){
+                return vgPlayer;
+            }
+
+            Debug.WriteLine($"Player with name '{license}' not found.");
+            return null; // Return null if the player with the given name is not found.
         }
 
         private async void CheckPlayer(Player player){
@@ -57,7 +60,7 @@ namespace Server.Services{
             }
         }
 
-        public void OnResourceStop(string resource){
+        /*public void OnResourceStop(string resource){  //Todo: Uncomment this if playerlist and autosave will be ok
             if (resource != "vojnagangov5")
                 return;
             Debug.WriteLine($"Resource {resource} has stopped");
@@ -66,7 +69,7 @@ namespace Server.Services{
                 Debug.WriteLine($"Saving of {player.Name}.");
                 UpdatePlayer(player, Utils.GetLicense(player));
             }
-        }
+        }*/
 
         public async void LoadPlayer(Player player, string license){
             if (Players.ContainsKey(license)){
@@ -133,12 +136,7 @@ namespace Server.Services{
                     vgPlayer.Armour = API.GetPedArmour(player.Character.Handle);
                     vgPlayer.Max_armour = API.GetPlayerMaxArmour(player.Handle);
                     vgPlayer.Dimension = API.GetPlayerRoutingBucket(player.Handle);
-                    int rowsAffected = await connection.ExecuteAsync(updateQuery, vgPlayer);
-                    Debug.WriteLine($"Rows Affected in table {rowsAffected}");
-
-                    Debug.WriteLine("PosX: " + vgPlayer.PosX);
-                    Debug.WriteLine("PosY: " + vgPlayer.PosY);
-                    Debug.WriteLine("PosZ: " + vgPlayer.PosZ);
+                    await connection.ExecuteAsync(updateQuery, vgPlayer);
                 }
 
                 await connection.CloseAsync();
@@ -148,7 +146,7 @@ namespace Server.Services{
         public async Task<bool> CheckIfPlayerExists(Player player){
             using (MySqlConnection connection = Connector.GetConnection()){
                 await connection.OpenAsync();
-                string checkExistenceQuery = $@"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE Licence = @Licence";
+                string checkExistenceQuery = $"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE Licence = @Licence";
                 int recordCount =
                     await connection.QueryFirstAsync<int>(checkExistenceQuery,
                                                           new{ Licence = Utils.GetLicense(player) });
@@ -175,64 +173,27 @@ namespace Server.Services{
             return false;
         }
     }
+
+    //Todo: Uncomment this if playerlist and autosave will be ok
+    //Todo: Create PlayerList
     /*
-        internal class PlayerClone {
-            public String Name{ get; set; }
-            public String Licence { get; set; }
-            public int Hp { get; set; }
-            public int MaxHp { get; set; }
-            public int Armour { get; set; }
-            public int MaxArmour { get; set; }
-            public int WantedLevel { get; set; }
-            public long Money { get; set; }
-            public long BankMoney { get; set; }
-            public int Level { get; set; }
-            public int Xp { get; set; }
-            public float PosX { get; set; }
-            public float PosY { get; set; }
-            public float PosZ { get; set; }
-            public int Dimension { get; set; }
-           // public Player Player{ get; set; }
-
-            public PlayerClone(Player player){
-                Name = player.Name;
-                Licence = Utils.GetLicense(player);
-                Hp = API.GetEntityHealth(player.Character.Handle);
-                MaxHp = API.GetEntityMaxHealth(player.Character.Handle);
-                Armour = API.GetPedArmour(player.Character.Handle);
-                MaxArmour =  API.GetPlayerMaxArmour(player.Handle);
-                WantedLevel = API.GetPlayerWantedLevel(player.Handle);
-                //money
-                //bankMoney
-                //level
-                //xp
-                PosX = player.Character.Position.X;
-                PosY = player.Character.Position.Y;
-                PosZ = player.Character.Position.Z;
-                Dimension = API.GetPlayerRoutingBucket(player.Handle);
-                //Player = player;
-            }
-        }*/
-
-    class AutoSaver{
-        public AutoSaver(){
-            System.Timers.Timer timer = new System.Timers.Timer();
-            timer.Elapsed += (s, e) => OnTimedEvent(); //new ElapsedEventHandler(OnTimedEvent);
-            timer.Interval = 1000 * 60 * 5;
-            timer.Enabled = true;
-        }
-
-        // Specify what you want to happen when the Elapsed event is raised.
-        private void OnTimedEvent(){
-            PlayerList players = new PlayerList();
-            foreach (Player player in players){
-                if (player == null)
-                    continue;
-
-                ServiceManager.PlayerService.UpdatePlayer(player, Utils.GetLicense(player));
-            }
-
-            Debug.WriteLine("[Server] Autosave of players [Every 5 minutes];");
-        }
+class AutoSaver{
+    public AutoSaver(){
+        System.Timers.Timer timer = new System.Timers.Timer();
+        timer.Elapsed += (s, e) => OnTimedEvent(); //new ElapsedEventHandler(OnTimedEvent);
+        timer.Interval = 1000 * 60 * 5;
+        timer.Enabled = true;
     }
+
+    private void OnTimedEvent(){
+        foreach (Player player in new PlayerList()){
+            if (player == null)
+                continue;
+
+            ServiceManager.PlayerService.UpdatePlayer(player, Utils.GetLicense(player));
+        }
+
+        Debug.WriteLine("[Server] Autosave of players [Every 5 minutes];");
+    }
+    }*/
 }

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
-using Client.Entities;
 using Client.ScaleformUI;
 
 namespace Client.Events{
@@ -14,17 +13,20 @@ namespace Client.Events{
      */
 
     public class SpawnManager{
-        public static bool IsPlayerInCreator = false;
-        public static int CameraCreator = -1;
-        public static PositionOfCamera CameraPos = PositionOfCamera.Main;
+        private static bool IsPlayerInCreator;
+        private static int CameraCreator = -1;
+        private static PositionOfCamera CameraPos = PositionOfCamera.Main;
 
-        public enum PositionOfCamera{
+        private const Control ToLeft = Control.FrontendLb; // Q
+        private const Control ToRight = Control.FrontendRb; // E
+
+        private enum PositionOfCamera{
             Left = 0,
             Main = 1,
             Right = 2
         }
 
-
+        /*
         public static async Task SpawnPlayer(){
             API.DoScreenFadeOut(500);
 
@@ -53,16 +55,21 @@ namespace Client.Events{
             API.ShutdownLoadingScreen();
             API.DoScreenFadeIn(500);
 
+            while (!API.IsScreenFadedIn())
+                await BaseScript.Delay(1);
+
             FreezePlayer(player, false);
             await Task.FromResult(true);
         }
-
-        public static async void SpawnToCreator(){
+*/
+        public static async void TeleportToCreator(){
             API.DoScreenFadeOut(500);
+
+            while (!API.IsScreenFadedOut())
+                await BaseScript.Delay(1);
 
             var player = Player.Local.Handle;
             var playerPed = API.GetPlayerPed(-1);
-            //FreezePlayer(player, true);
 
             uint hash = (uint)API.GetHashKey("mp_m_freemode_01"); // mp_f_freemode_01
             API.RequestModel(hash);
@@ -86,6 +93,10 @@ namespace Client.Events{
             API.ShutdownLoadingScreen();
             API.DoScreenFadeIn(500);
 
+            while (!API.IsScreenFadedIn())
+                await BaseScript.Delay(1);
+
+
             if (!API.IsEntityVisible(playerPed))
                 API.SetEntityVisible(playerPed, true, false);
 
@@ -101,7 +112,6 @@ namespace Client.Events{
             API.SetCamActive(CameraCreator, true);
             API.RenderScriptCams(true, false, 1, true, true);
 
-
             if (API.IsEntityVisible(playerPed))
                 API.SetEntityVisible(API.PlayerPedId(), false, false);
 
@@ -111,26 +121,56 @@ namespace Client.Events{
             CharacterCreatorUI.createUI();
         }
 
-        public static async Task spawnPlayer(){
-            CharacterCreatorData.GetCharacterCreatorData().SendDataToServer();
+        public static async void TeleportToWorld(short sex){
             IsPlayerInCreator = false;
-            int player = Game.Player.Handle;
+            API.ShutdownLoadingScreen();
             API.DoScreenFadeOut(500);
+
+            int player = Game.Player.Handle;
+
             API.StartPlayerTeleport(player, -543.4418f, -207.0857f, 37.63733f, 206.9291f, false, false, false);
-
             while (!API.HasPlayerTeleportFinished(player))
-                await BaseScript.Delay(0);
+                await BaseScript.Delay(1);
 
-            API.RenderScriptCams(false, true, 500, true, true);
-            FreezePlayer(player, false);
-            API.DisplayRadar(true);
-            API.DoScreenFadeIn(1000);
+            uint hash = (uint)API.GetHashKey($"mp_{(sex == 0 ? "m" : "f")}_freemode_01");
+            API.RequestModel(hash);
+            Debug.WriteLine($"Hash {hash}, sex: {sex}, mp_{(sex == 0 ? "m" : "f")}_freemode_01");
+
+            while (!API.HasModelLoaded(hash))
+                await BaseScript.Delay(1);
+
+            API.SetPlayerModel(player, hash);
+            API.SetModelAsNoLongerNeeded(hash);
+
+            Debug.WriteLine($"API.HasModelLoaded(hash): {API.HasModelLoaded(hash)} and load data!");
+            BaseScript.TriggerServerEvent("player:spawn:to:world:2server");
         }
 
-        private const Control ToLeft = Control.FrontendLb; // Q
-        private const Control ToRight = Control.FrontendRb; // E
+        public static async void TeleportToWorld2(){
+            var playerPed = API.PlayerPedId();
+            API.RequestCollisionAtCoord(-2246.927f, 269.0242f, 174.6095f);
+            API.SetEntityCoordsNoOffset(playerPed, -2246.927f, 269.0242f, 174.6095f, false, false, true);
+            API.NetworkResurrectLocalPlayer(-2246.927f, 269.0242f, 174.6095f, 110, true, true);
+            API.ClearPedTasksImmediately(playerPed);
 
-        public static async Task tick(){
+            Debug.WriteLine("Teleport to world2");
+
+            var pid = API.PlayerPedId();
+            if (!API.IsEntityVisible(pid)){
+                Debug.WriteLine("!visible set to true");
+                API.SetEntityVisible(pid, true, false);
+            }
+
+            API.DoScreenFadeIn(1000);
+            while (!API.IsScreenFadedIn())
+                await BaseScript.Delay(1);
+
+            API.DisplayRadar(true);
+            API.RenderScriptCams(false, true, 500, true, true);
+        }
+
+
+        public static async Task CreatorTick(){
             if (IsPlayerInCreator){
                 API.BlockWeaponWheelThisFrame();
 

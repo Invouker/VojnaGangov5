@@ -1,4 +1,3 @@
-using System;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 
@@ -70,13 +69,10 @@ public class CharacterCreatorData{
 
     #endregion
 
-    private bool IsInitialized = false;
-
     public CharacterCreatorData(){
         InitBlendData();
         InitFaceFeature();
         InitDrawable();
-        IsInitialized = true;
     }
 
     private void InitDrawable(){
@@ -138,27 +134,27 @@ public class CharacterCreatorData{
     }
 
     public void SendDataToServer(){
-        if (!IsInitialized)
-            throw new
-                NullReferenceException("You should create instance of CharacterCreatorData and initialize it before calling this.");
-
+        Debug.WriteLine("Sending to the server! 0/6");
         BaseScript.TriggerServerEvent("player:data:character:blend",
                                       //1st
                                       Sex, FirstFaceShape, SecondFaceShape, FirstSkinTone, SecondSkinTone,
                                       ParentFaceShapePercent, ParentSkinTonePercent
                                      );
+        Debug.WriteLine("Sending to the server! 1/6");
         BaseScript.TriggerServerEvent("player:data:character:facefeature",
                                       //2nd
                                       NoseWidth, NosePeak, NoseLength, NoseBoneCurvness, NoseTip, NoseBoneTwist,
                                       Eyebrow, Eyebrow2, CheekBones, CheekBonesWidth,
                                       CheekSidewaysBoneSize
                                      );
+        Debug.WriteLine("Sending to the server! 2/6");
         BaseScript.TriggerServerEvent("player:data:character:facefeature2",
                                       //2nd
                                       EyeOpening, LipThickness, JawBoneWidth, JawBoneShape, ChinBone, ChinBoneLength,
                                       ChinBoneShape,
                                       ChinHole, NeckThickness
                                      );
+        Debug.WriteLine("Sending to the server! 3/6");
         BaseScript.TriggerServerEvent("player:data:character:drawable",
                                       //3st
                                       HairType, HairColor, Torso, TorsoTexture, Legs, LegsTexture, Foot, FootTexture,
@@ -166,7 +162,9 @@ public class CharacterCreatorData{
                                       AccesoriesTexture, Torso2, Torso2Texture
                                      );
 
+        Debug.WriteLine("Sending to the server! 5/6");
         BaseScript.TriggerServerEvent("player:data:character:save");
+        Debug.WriteLine("Sending to the server! 6/6");
     }
 
     private static CharacterCreatorData characterCreatorDataInstance;

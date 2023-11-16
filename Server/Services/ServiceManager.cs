@@ -1,6 +1,4 @@
-﻿using Server.Entities;
-
-namespace Server.Services{
+﻿namespace Server.Services{
     class ServiceManager{
         public static PlayerService PlayerService{ get; private set; }
         public static StreamerService StreamerService{ get; private set; }
