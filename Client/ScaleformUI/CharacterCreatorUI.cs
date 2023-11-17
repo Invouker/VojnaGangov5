@@ -16,25 +16,22 @@ namespace Client.ScaleformUI{
                  createUI();*/
         }
 
-        public static string Sex = "Male";
+        private static readonly CharacterCreatorData CharacterData = new CharacterCreatorData();
 
         public static UIMenu createUI(){
-            UIMenu menu = new("Character creator", "Change your character", new PointF(20, 20), false);
-            menu.BuildingAnimation = MenuBuildingAnimation.NONE;
-            menu.EnableAnimation = false;
-            menu.MaxItemsOnScreen = 8;
-            menu.ScrollingType = ScrollingType.CLASSIC;
-            menu.CanPlayerCloseMenu = false;
+            UIMenu menu = new UIMenu("Character creator", "Change your character", new PointF(20, 20)){
+                BuildingAnimation = MenuBuildingAnimation.NONE,
+                EnableAnimation = false,
+                MaxItemsOnScreen = 8,
+                ScrollingType = ScrollingType.CLASSIC,
+                CanPlayerCloseMenu = false
+            };
 
             UIMenuListItem sexListItem =
                 new UIMenuListItem("Sex", new List<dynamic>{ "Male", "Female" }, 0, "Select your gender");
             menu.AddItem(sexListItem);
 
-            menu.OnListChange += (sender, item, index) => {
-                if (item != sexListItem) return;
-                ChangeSex(item.Items[index].ToString());
-                Sex = item.Items[index].ToString();
-            };
+            sexListItem.OnListChanged += (sender, index) => ChangeSex(index);
 
             ByParentsCreatorUI(menu);
 
@@ -74,18 +71,14 @@ namespace Client.ScaleformUI{
                 "Twisted Bob", "Big Bangs", "Braided Top Knot", "Mullet"
             }; //Last was: "Nightvision"
 
-            List<dynamic> HairNames;
-            if (Sex.Equals("Male"))
-                HairNames = mHairNames;
-            else
-                HairNames = fHairNames;
+            List<dynamic> hairNames = CharacterData.Sex == 0 ? mHairNames : fHairNames;
 
-            UIMenuListItem hairCuts = new UIMenuListItem("Haircut", HairNames, 0);
+            UIMenuListItem hairCuts = new UIMenuListItem("Haircut", hairNames, 0);
             UIMenuColorPanel hairCutsColor = new UIMenuColorPanel("Colour", ColorPanelType.Hair);
             hairCuts.AddPanel(hairCutsColor);
 
-            hairCuts.OnListChanged += (SelectedItem, Index) => {
-                API.SetPedComponentVariation(API.GetPlayerPed(-1), 2, Index, 0, 2);
+            hairCuts.OnListChanged += (selectedItem, index) => {
+                API.SetPedComponentVariation(API.GetPlayerPed(-1), 2, index, 0, 2);
             };
 
             hairCutsColor.OnColorPanelChange += (menu, panel, index) => {
@@ -183,11 +176,7 @@ namespace Client.ScaleformUI{
             menu.AddItem(spawnPlayer);
             spawnPlayer.Activated += (sender, item) => {
                 CharacterCreatorData.GetCharacterCreatorData().SendDataToServer();
-                short sexData = 1;
-                if (Sex.Equals("Male"))
-                    sexData = 0;
-
-                SpawnManager.TeleportToWorld(sexData, -2246.927f, 269.0242f, 174.6095f, 110f);
+                SpawnManager.TeleportToWorld(CharacterData.Sex, -2246.927f, 269.0242f, 174.6095f, 110f);
                 menu.Visible = false;
             };
 
@@ -254,6 +243,7 @@ namespace Client.ScaleformUI{
             menu.AddItem(item);
         }
 
+
         private static void EditClotheUI(UIMenu mainMenu){
             UIMenuItem windowsItem = new UIMenuItem("Change your appearance");
             windowsItem.SetRightLabel("»");
@@ -264,61 +254,57 @@ namespace Client.ScaleformUI{
 
             UIMenu subMenu = new("Change your skin set", "Skin set of character");
 
-            List<dynamic> drawed = new List<dynamic>
+            List<dynamic> Draweble = new List<dynamic>
                 { "1/10", "2/10", "3/10", "4/10", "5/10", "6/10", "7/10", "8/10", "9/10", "10/10" };
 
             #region Define of skinset for Male
 
-            SkinSet set_m_0 = new SkinSet(0, 8, 0, 24, 44, 6);
-            SkinSet set_m_1 = new SkinSet(0, 15, 0, 26, 44, 16);
-            SkinSet set_m_2 = new SkinSet(0, 23, 0, 14, 16, 7);
-            SkinSet set_m_3 = new SkinSet(0, 26, 0, 24, 16, 16);
-            SkinSet set_m_4 = new SkinSet(14, 47, 0, 32, 20, 37);
-            SkinSet set_m_5 = new SkinSet(5, 62, 0, 48, 40, 63);
-            SkinSet set_m_6 = new SkinSet(0, 25, 0, 1, 4, 69);
-            SkinSet set_m_7 = new SkinSet(5, 39, 0, 1, 12, 70);
-            SkinSet set_m_8 = new SkinSet(5, 37, 0, 22, 15, 105);
-            SkinSet set_m_9 = new SkinSet(1, 72, 0, 24, 21, 118);
+            SkinSet setM0 = new SkinSet(0, 8, 0, 24, 44, 6);
+            SkinSet setM1 = new SkinSet(0, 15, 0, 26, 44, 16);
+            SkinSet setM2 = new SkinSet(0, 23, 0, 14, 16, 7);
+            SkinSet setM3 = new SkinSet(0, 26, 0, 24, 16, 16);
+            SkinSet setM4 = new SkinSet(14, 47, 0, 32, 20, 37);
+            SkinSet setM5 = new SkinSet(5, 62, 0, 48, 40, 63);
+            SkinSet setM6 = new SkinSet(0, 25, 0, 1, 4, 69);
+            SkinSet setM7 = new SkinSet(5, 39, 0, 1, 12, 70);
+            SkinSet setM8 = new SkinSet(5, 37, 0, 22, 15, 105);
+            SkinSet setM9 = new SkinSet(1, 72, 0, 24, 21, 118);
 
             #endregion
 
             #region Define of skinset for Female
 
-            SkinSet set_fm_0 = new SkinSet(15, 4, 6, 31, 6, 26);
-            SkinSet set_fm_1 = new SkinSet(15, 14, 7, 31, 15, 21);
-            SkinSet set_fm_2 = new SkinSet(5, 16, 6, 31, 30, 35);
-            SkinSet set_fm_3 = new SkinSet(0, 25, 6, 41, 2, 40);
-            SkinSet set_fm_4 = new SkinSet(3, 25, 0, 49, 2, 43);
-            SkinSet set_fm_5 = new SkinSet(15, 32, 0, 49, 2, 46);
-            SkinSet set_fm_6 = new SkinSet(14, 37, 7, 63, 2, 49);
-            SkinSet set_fm_7 = new SkinSet(5, 37, 0, 68, 2, 50);
-            SkinSet set_fm_8 = new SkinSet(15, 47, 3, 70, 2, 79);
-            SkinSet set_fm_9 = new SkinSet(29, 51, 2, 77, 2, 105);
+            SkinSet setFm0 = new SkinSet(15, 4, 6, 31, 6, 26);
+            SkinSet setFm1 = new SkinSet(15, 14, 7, 31, 15, 21);
+            SkinSet setFm2 = new SkinSet(5, 16, 6, 31, 30, 35);
+            SkinSet setFm3 = new SkinSet(0, 25, 6, 41, 2, 40);
+            SkinSet setFm4 = new SkinSet(3, 25, 0, 49, 2, 43);
+            SkinSet setFm5 = new SkinSet(15, 32, 0, 49, 2, 46);
+            SkinSet setFm6 = new SkinSet(14, 37, 7, 63, 2, 49);
+            SkinSet setFm7 = new SkinSet(5, 37, 0, 68, 2, 50);
+            SkinSet setFm8 = new SkinSet(15, 47, 3, 70, 2, 79);
+            SkinSet setFm9 = new SkinSet(29, 51, 2, 77, 2, 105);
 
             #endregion
 
             List<dynamic> skinSetMale = new List<dynamic>
-                { set_m_0, set_m_1, set_m_2, set_m_3, set_m_4, set_m_5, set_m_6, set_m_7, set_m_8, set_m_9 };
+                { setM0, setM1, setM2, setM3, setM4, setM5, setM6, setM7, setM8, setM9 };
             List<dynamic> skinSetFemale = new List<dynamic>
-                { set_fm_0, set_fm_1, set_fm_2, set_fm_3, set_fm_4, set_fm_5, set_fm_6, set_fm_7, set_fm_8, set_fm_9 };
+                { setFm0, setFm1, setFm2, setFm3, setFm4, setFm5, setFm6, setFm7, setFm8, setFm9 };
 
-            List<dynamic> skinSets;
-            if (API.IsPedMale(Game.Player.Character.Handle))
-                skinSets = skinSetMale;
-            else
-                skinSets = skinSetFemale;
+            List<dynamic> skinSets = API.IsPedMale(Game.Player.Character.Handle) ? skinSetMale : skinSetFemale;
 
-            UIMenuListItem uiMenuListItem = new UIMenuListItem("Skin Set", drawed, 0);
+            UIMenuListItem uiMenuListItem = new UIMenuListItem("Skin Set", Draweble, 0);
             subMenu.AddItem(uiMenuListItem);
 
-            uiMenuListItem.OnListChanged += (selectedItem, Index) => {
-                SkinSet skinset = (SkinSet)skinSets.ToArray()[Index];
-                SetComp(3, skinset.Torso);
-                SetComp(4, skinset.Pants);
-                SetComp(6, skinset.Shoes);
-                SetComp(7, skinset.Accessory);
-                SetComp(8, skinset.UnderShirt);
-                SetComp(11, skinset.Torso2);
+            uiMenuListItem.OnListChanged += (selectedItem, index) => {
+                SkinSet skinSet = (SkinSet)skinSets.ToArray()[index];
+                SetComp(3, skinSet.Torso);
+                SetComp(4, skinSet.Pants);
+                SetComp(6, skinSet.Shoes);
+                SetComp(7, skinSet.Accessory);
+                SetComp(8, skinSet.UnderShirt);
+                SetComp(11, skinSet.Torso2);
             };
             subMenu.AddItem(back);
             windowsItem.Activated += (sender, e) => { sender.SwitchTo(subMenu, inheritOldMenuParams: true); };
@@ -326,17 +312,17 @@ namespace Client.ScaleformUI{
         }
 
         private static void SetComp(int compId, int index){
-            var max = API.GetNumberOfPedTextureVariations(API.GetPlayerPed(-1), compId, index);
+            //var max = API.GetNumberOfPedTextureVariations(API.GetPlayerPed(-1), compId, index);
             API.SetPedComponentVariation(API.GetPlayerPed(-1), compId, index, API.GetRandomIntInRange(0, 1), 0);
         }
 
         private class SkinSet{
-            public int Torso{ get; set; }
-            public int Pants{ get; set; }
-            public int Accessory{ get; set; }
-            public int Shoes{ get; set; }
-            public int UnderShirt{ get; set; }
-            public int Torso2{ get; set; }
+            public int Torso{ get; }
+            public int Pants{ get; }
+            public int Accessory{ get; }
+            public int Shoes{ get; }
+            public int UnderShirt{ get; }
+            public int Torso2{ get; }
 
             public SkinSet(int torso, int pants, int accessory, int shoes, int underShirt, int torso2){
                 Torso = torso;
@@ -425,9 +411,7 @@ namespace Client.ScaleformUI{
          */
 
         private static void ByParentsCreatorUI(UIMenu mainMenu){
-            int momIndex = 0, dadIndex = 0;
             double[] amount ={ 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 };
-            double shapeMixData = .5d, skinMixData = .5d;
 
             UIMenuItem windowsItem = new("Change your parents", "You can change your face by your parents.");
             windowsItem.SetRightLabel("»");
@@ -437,32 +421,32 @@ namespace Client.ScaleformUI{
             UIMenuItem back = new("Back to creator");
             back.SetRightLabel("«");
 
-            UIMenu windowSubmenu = new("Parents", "Select your parents");
-            windowSubmenu.BuildingAnimation = MenuBuildingAnimation.NONE;
-            windowSubmenu.EnableAnimation = false;
-            windowSubmenu.MaxItemsOnScreen = 7;
-            windowSubmenu.ScrollingType = ScrollingType.ENDLESS;
+            UIMenu windowSubmenu = new UIMenu("Parents", "Select your parents"){
+                BuildingAnimation = MenuBuildingAnimation.NONE,
+                EnableAnimation = false,
+                MaxItemsOnScreen = 7,
+                ScrollingType = ScrollingType.ENDLESS
+            };
 
             UIMenuHeritageWindow heritageWindow = new(0, 0);
             UIMenuDetailsWindow statsWindow =
                 new("Parents resemblance", "Dad:", "Mom:", true, new List<UIDetailStat>());
             windowSubmenu.AddWindow(heritageWindow);
             windowSubmenu.AddWindow(statsWindow);
-            List<dynamic> momfaces = new List<dynamic>{
+            List<dynamic> momFaces = new List<dynamic>{
                 "Hannah", "Audrey", "Jasmine", "Giselle", "Amelia", "Isabella", "Zoe", "Ava", "Camilla", "Violet",
                 "Sophia", "Eveline", "Nicole", "Ashley", "Grace", "Brianna", "Natalie", "Olivia", "Elizabeth",
                 "Charlotte", "Emma", "Misty"
             };
-            List<dynamic> dadfaces = new List<dynamic>{
+            List<dynamic> dadFaces = new List<dynamic>{
                 "Benjamin", "Daniel", "Joshua", "Noah", "Andrew", "Joan", "Alex", "Isaac", "Evan", "Ethan", "Vincent",
                 "Angel", "Diego", "Adrian", "Gabriel", "Michael", "Santiago", "Kevin", "Louis", "Samuel", "Anthony",
                 "Claude", "Niko", "John"
             };
-            UIMenuListItem mom = new("Mother", momfaces, 0);
-            UIMenuListItem dad = new("Father", dadfaces, 0);
+            UIMenuListItem mom = new("Mother", momFaces, 0);
+            UIMenuListItem dad = new("Father", dadFaces, 0);
             UIMenuSliderItem ShapeMixItem = new("Shape Mix Slider", "This is Useful on Shape mix", 10, 1, 5, true);
             UIMenuSliderItem SkinMixItem = new("Skin Mix Slider", "This is Useful on Skin mix", 10, 1, 5, true);
-            //UIMenuSliderItem SkinMixItem = new("Heritage Slider", "This is Useful on heritage", 100, 5, 50, true);
             windowSubmenu.AddItem(mom);
             windowSubmenu.AddItem(dad);
             windowSubmenu.AddItem(ShapeMixItem);
@@ -478,40 +462,42 @@ namespace Client.ScaleformUI{
 
             windowSubmenu.OnListChange += (sender, item, index) => {
                 if (item == mom)
-                    momIndex = index;
+                    CharacterData.FirstFaceShape = index;
                 else if (item == dad)
-                    dadIndex = index;
+                    CharacterData.SecondFaceShape = index;
 
-                heritageWindow.Index(momIndex, dadIndex);
-                API.SetPedHeadBlendData(API.GetPlayerPed(-1), momIndex, dadIndex, 0, momIndex, dadIndex, 0,
-                                        (float)shapeMixData,
-                                        (float)skinMixData, .5f, true);
+                heritageWindow.Index(CharacterData.FirstFaceShape, CharacterData.SecondFaceShape);
+                API.SetPedHeadBlendData(API.GetPlayerPed(-1), CharacterData.FirstFaceShape,
+                                        CharacterData.SecondFaceShape, 0, CharacterData.FirstFaceShape,
+                                        CharacterData.SecondFaceShape, 0,
+                                        CharacterData.ParentFaceShapePercent,
+                                        CharacterData.ParentSkinTonePercent, .5f, true);
             };
             windowSubmenu.OnSliderChange += (sender, item, index) => {
                 if (item == ShapeMixItem){
-                    shapeMixData = amount[index];
+                    CharacterData.ParentFaceShapePercent = (float)amount[index];
                 }
                 else if (item == SkinMixItem)
-                    skinMixData = amount[index];
+                    CharacterData.ParentSkinTonePercent = (float)amount[index];
 
-                Debug.WriteLine($"Index: {index}, amount: {amount[index]}, amount.Count: {amount}");
-                API.SetPedHeadBlendData(API.GetPlayerPed(-1), momIndex, dadIndex, 0, momIndex, dadIndex, 0,
-                                        (float)shapeMixData,
-                                        (float)skinMixData, .5f, true);
+                API.SetPedHeadBlendData(API.GetPlayerPed(-1), CharacterData.FirstFaceShape,
+                                        CharacterData.SecondFaceShape, 0, CharacterData.FirstFaceShape,
+                                        CharacterData.SecondSkinTone, 0,
+                                        CharacterData.ParentFaceShapePercent,
+                                        CharacterData.ParentSkinTonePercent, .5f, true);
             };
             windowsItem.Activated += (sender, e) => { sender.SwitchTo(windowSubmenu, inheritOldMenuParams: true); };
 
             back.Activated += (sender, e) => { sender.SwitchTo(mainMenu, inheritOldMenuParams: true); };
         }
 
-        private static async void ChangeSex(string hash){
-            string sexHash = hash switch{
-                "Male" => "mp_m_freemode_01",
-                "Female" => "mp_f_freemode_01",
+        private static async void ChangeSex(int sexIndex){
+            string sexHash = sexIndex switch{
+                0 => "mp_m_freemode_01",
+                1 => "mp_f_freemode_01",
                 _ => null
             };
-            if (sexHash == null)
-                throw new NullReferenceException("SexHash cannot be null!");
+
             uint intHash = (uint)API.GetHashKey(sexHash);
             API.RequestModel(intHash);
 
