@@ -121,14 +121,21 @@ namespace Client.Events{
             CharacterCreatorUI.createUI();
         }
 
-        public static async void TeleportToWorld(short sex){
+        public static async void TeleportToWorld(short sex, float posX, float posY, float posZ, float heading){
             IsPlayerInCreator = false;
             API.ShutdownLoadingScreen();
             API.DoScreenFadeOut(500);
 
             int player = Game.Player.Handle;
+            var playerPed = API.PlayerPedId();
 
-            API.StartPlayerTeleport(player, -543.4418f, -207.0857f, 37.63733f, 206.9291f, false, false, false);
+            //-2246.927f, 269.0242f, 174.6095f
+            API.RequestCollisionAtCoord(posX, posY, posZ);
+            API.SetEntityCoordsNoOffset(playerPed, posX, posY, posZ, false, false, true);
+            API.NetworkResurrectLocalPlayer(posX, posY, posZ, heading, true, false);
+            API.ClearPedTasksImmediately(playerPed);
+
+            API.StartPlayerTeleport(player, posX, posY, posZ, heading, false, false, false);
             while (!API.HasPlayerTeleportFinished(player))
                 await BaseScript.Delay(1);
 
@@ -141,25 +148,10 @@ namespace Client.Events{
 
             API.SetPlayerModel(player, hash);
             API.SetModelAsNoLongerNeeded(hash);
+            API.SetPedDefaultComponentVariation(playerPed);
 
             Debug.WriteLine($"API.HasModelLoaded(hash): {API.HasModelLoaded(hash)} and load data!");
             BaseScript.TriggerServerEvent("player:spawn:to:world:2server");
-        }
-
-        public static async void TeleportToWorld2(){
-            var playerPed = API.PlayerPedId();
-            API.RequestCollisionAtCoord(-2246.927f, 269.0242f, 174.6095f);
-            API.SetEntityCoordsNoOffset(playerPed, -2246.927f, 269.0242f, 174.6095f, false, false, true);
-            API.NetworkResurrectLocalPlayer(-2246.927f, 269.0242f, 174.6095f, 110, true, true);
-            API.ClearPedTasksImmediately(playerPed);
-
-            Debug.WriteLine("Teleport to world2");
-
-            var pid = API.PlayerPedId();
-            if (!API.IsEntityVisible(pid)){
-                Debug.WriteLine("!visible set to true");
-                API.SetEntityVisible(pid, true, false);
-            }
 
             API.DoScreenFadeIn(1000);
             while (!API.IsScreenFadedIn())
@@ -167,6 +159,19 @@ namespace Client.Events{
 
             API.DisplayRadar(true);
             API.RenderScriptCams(false, true, 500, true, true);
+        }
+
+        public static async void TeleportToWorld2(){
+            /* var playerPed = API.PlayerPedId();
+
+
+             Debug.WriteLine("Teleport to world2");
+
+             var pid = API.PlayerPedId();
+             if (!API.IsEntityVisible(pid)){
+                 Debug.WriteLine("!visible set to true");
+                 API.SetEntityVisible(pid, true, false);
+             }*/
         }
 
 

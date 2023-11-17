@@ -61,13 +61,13 @@ namespace Client.ScaleformUI{
 
             #region Appearance UI
 
-            List<dynamic> mHairNames = new List<dynamic>(){
+            List<dynamic> mHairNames = new List<dynamic>{
                 "Close Shave", "Buzzcut", "Faux Hawk", "Hipster", "Side Parting", "Shorter Cut", "Biker", "Ponytail",
                 "Cornrows", "Slicked", "Short Brushed", "Spikey",
                 "Caesar", "Chopped", "Dreads", "Long Hair", "Shaggy Curls", "Surfer Dude", "Short Side Part",
                 "High Slicked Sides", "Long Slicked", "Hipster Youth", "Mullet"
             }; //Last was: "Nightvision"
-            List<dynamic> fHairNames = new List<dynamic>(){
+            List<dynamic> fHairNames = new List<dynamic>{
                 "Close Shave", "Short", "Layered Bob", "Pigtails", "Ponytail", "Braided Mohawk", "Braids", "Bob",
                 "Faux Hawk", "French Twist", "Long Bob", "Loose Tied",
                 "Pixie", "Shaved Bangs", "Top Knot", "Wavy Bob", "Pin Up Girl", "Messy Bun", "Unknown", "Tight Bun",
@@ -75,13 +75,12 @@ namespace Client.ScaleformUI{
             }; //Last was: "Nightvision"
 
             List<dynamic> HairNames;
-            if (Sex.Equals("Male")){
+            if (Sex.Equals("Male"))
                 HairNames = mHairNames;
-            }
             else
                 HairNames = fHairNames;
 
-            UIMenuListItem hairCuts = new UIMenuListItem("Haircuit", HairNames, 0);
+            UIMenuListItem hairCuts = new UIMenuListItem("Haircut", HairNames, 0);
             UIMenuColorPanel hairCutsColor = new UIMenuColorPanel("Colour", ColorPanelType.Hair);
             hairCuts.AddPanel(hairCutsColor);
 
@@ -188,7 +187,7 @@ namespace Client.ScaleformUI{
                 if (Sex.Equals("Male"))
                     sexData = 0;
 
-                SpawnManager.TeleportToWorld(sexData);
+                SpawnManager.TeleportToWorld(sexData, -2246.927f, 269.0242f, 174.6095f, 110f);
                 menu.Visible = false;
             };
 
@@ -265,7 +264,7 @@ namespace Client.ScaleformUI{
 
             UIMenu subMenu = new("Change your skin set", "Skin set of character");
 
-            List<dynamic> drawed = new List<dynamic>()
+            List<dynamic> drawed = new List<dynamic>
                 { "1/10", "2/10", "3/10", "4/10", "5/10", "6/10", "7/10", "8/10", "9/10", "10/10" };
 
             #region Define of skinset for Male

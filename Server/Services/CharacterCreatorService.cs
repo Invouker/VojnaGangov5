@@ -119,7 +119,7 @@ namespace Server.Services{
             API.SetPedFaceFeature(playerPed, 17, character.ChinBoneShape);
             API.SetPedFaceFeature(playerPed, 18, character.ChinHole);
             API.SetPedFaceFeature(playerPed, 19, character.NeckThickness);
-            API.SetPedComponentVariation(playerPed, 2, character.HairType, 0, 0);
+            API.SetPedComponentVariation(playerPed, 2, character.HairType, 0, 2);
             API.SetPedHairColor(playerPed, character.HairColor, 0);
             API.SetPedComponentVariation(playerPed, 3, character.Torso, character.TorsoTexture, 0);
             API.SetPedComponentVariation(playerPed, 4, character.Legs, character.LegsTexture, 0);
@@ -217,9 +217,11 @@ namespace Server.Services{
         public async void Loader([FromSource] Player player){
             var tasks = await CheckIfCharacterExist(player.Name);
             var character = await GetCharacter(player.Name);
+            var vgPlayer = PlayerService.GetVgPlayer(Utils.GetLicense(player));
             if (tasks){
                 //Character character = await LoadCharacterData(player);
-                BaseScript.TriggerClientEvent("player:spawn:to:world", character.Sex);
+                BaseScript.TriggerClientEvent("player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY,
+                                              vgPlayer.PosZ, 110f);
                 //Todo: Load Data
             }
             else
