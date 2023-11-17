@@ -50,6 +50,10 @@
     <Reference Include="System.Xml" />
     <PackageReference Include="CitizenFX.Core.Client" Version="1.0.6947"/>
     <PackageReference Include="FxEvents.FiveM.Client" Version="2.5.4"/>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2"/>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(PkgNewtonsoft_Json)\lib\portable-net40+sl5+win8+wp8+wpa81\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <PackageReference Include="ScaleformUI" Version="4.7.0"/>
     <PackageReference Include="Confuser.MSBuild" Version="1.6.0">
       <PrivateAssets>all</PrivateAssets>

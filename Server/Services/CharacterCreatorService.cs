@@ -227,5 +227,9 @@ namespace Server.Services{
             else
                 BaseScript.TriggerClientEvent("player:spawn:to:creator");
         }
+
+        public void DataLoader(Player player, string json){
+            Debug.WriteLine($"Player: {player.Name},Data: {json}");
+        }
     }
 }

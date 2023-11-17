@@ -1,5 +1,6 @@
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Newtonsoft.Json;
 
 namespace Client.Entities;
 
@@ -8,20 +9,11 @@ public class CharacterCreatorData{
 
     public short Sex{ get; set; }
     public int FirstFaceShape{ get; set; }
-
     public int SecondFaceShape{ get; set; }
-
-    //public int ThirdFaceShape{ get; set; }
     public int FirstSkinTone{ get; set; }
-
     public int SecondSkinTone{ get; set; }
-
-    //public int ThirdSkinTone{ get; set; }
     public float ParentFaceShapePercent{ get; set; }
-
     public float ParentSkinTonePercent{ get; set; }
-    //public float ParentThirdUnkPercent{ get; set; }
-    //public bool IsParentInheritance{ get; set; }
 
     #endregion
 
@@ -52,20 +44,20 @@ public class CharacterCreatorData{
 
     #region HairCut and MakeUp //  GetPedDrawableVariation, GetPedHairColor // GetNumMakeupColors // 2,3,4,6,7,8,11
 
-    private int HairType{ get; set; } // 2
-    private int HairColor{ get; set; } // 2
-    private int Torso{ get; set; } // 3
-    private int TorsoTexture{ get; set; } // 3
-    private int Legs{ get; set; } // 4
-    private int LegsTexture{ get; set; } // 4
-    private int Foot{ get; set; } // 6
-    private int FootTexture{ get; set; } // 6
-    private int Scarfs{ get; set; } // 7
-    private int ScarfsTexture{ get; set; } // 7
-    private int Accesories{ get; set; } // 8
-    private int AccesoriesTexture{ get; set; } // 8
-    private int Torso2{ get; set; } // 11
-    private int Torso2Texture{ get; set; } // 11
+    public int HairType{ get; set; } // 2
+    public int HairColor{ get; set; } // 2
+    public int Torso{ get; set; } // 3
+    public int TorsoTexture{ get; set; } // 3
+    public int Legs{ get; set; } // 4
+    public int LegsTexture{ get; set; } // 4
+    public int Foot{ get; set; } // 6
+    public int FootTexture{ get; set; } // 6
+    public int Scarfs{ get; set; } // 7
+    public int ScarfsTexture{ get; set; } // 7
+    public int Accesories{ get; set; } // 8
+    public int AccesoriesTexture{ get; set; } // 8
+    public int Torso2{ get; set; } // 11
+    public int Torso2Texture{ get; set; } // 11
 
     #endregion
 
@@ -73,6 +65,9 @@ public class CharacterCreatorData{
         InitBlendData();
         InitFaceFeature();
         InitDrawable();
+
+
+        Debug.WriteLine("SerializeToJson(): " + SerializeToJson());
     }
 
     private void InitDrawable(){
@@ -133,7 +128,17 @@ public class CharacterCreatorData{
         ParentSkinTonePercent = ped.GetHeadBlendData().ParentSkinTonePercent;
     }
 
+    public string SerializeToJson(){
+        return JsonConvert.SerializeObject(this);
+    }
+
+    // Deserialization method
+    public static CharacterCreatorData DeserializeFromJson(string json){
+        return JsonConvert.DeserializeObject<CharacterCreatorData>(json);
+    }
+
     public void SendDataToServer(){
+        BaseScript.TriggerLatentServerEvent("player:data:character", 5000, SerializeToJson());
         Debug.WriteLine("Sending to the server! 0/6");
         BaseScript.TriggerServerEvent("player:data:character:blend",
                                       //1st

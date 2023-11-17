@@ -1,10 +1,12 @@
+using Newtonsoft.Json;
+
 namespace Server.Database.Entities;
 
 //"characters" Table
 public class Character{
-    public int Id{ get; set; }
-    public int AccId{ get; set; }
-    public string Name{ get; set; }
+    [JsonIgnore] public int Id{ get; set; }
+    [JsonIgnore] public int AccId{ get; set; }
+    [JsonIgnore] public string Name{ get; set; }
 
     public Character(string name){
         Name = name;
@@ -50,21 +52,6 @@ public class Character{
 
     #region HairCut and MakeUp //  GetPedDrawableVariation, GetPedHairColor // GetNumMakeupColors // 2,3,4,6,7,8,11
 
-    /* public int HairType{ get; set; } // 2
-     public int HairColor{ get; set; } // 2
-     public int Torso{ get; set; } // 3
-     public int TorsoTexture{ get; set; } // 3
-     public int Legs{ get; set; } // 4
-     public int LegsTexture{ get; set; } // 4
-     public int Foot{ get; set; } // 6
-     public int FootTexture{ get; set; } // 6
-     public int Scarfs{ get; set; } // 7
-     public int ScarfsTexture{ get; set; } // 7
-     public int Accessories{ get; set; } // 8
-     public int AccessoriesTexture{ get; set; } // 8
-     public int Torso2{ get; set; } // 11
-     public int Torso2Texture{ get; set; } // 11
-     */
     public int HairType{ get; set; }
     public int HairColor{ get; set; }
     public int Torso{ get; set; }
@@ -79,6 +66,15 @@ public class Character{
     public int AccessoriesTexture{ get; set; }
     public int Torso2{ get; set; }
     public int Torso2Texture{ get; set; }
+
+    public string SerializeToJson(){
+        return JsonConvert.SerializeObject(this);
+    }
+
+    // Deserialization method
+    public static Character DeserializeFromJson(string json){
+        return JsonConvert.DeserializeObject<Character>(json);
+    }
 
     #endregion
 
