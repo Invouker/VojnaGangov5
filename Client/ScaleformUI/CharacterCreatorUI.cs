@@ -326,8 +326,6 @@ namespace Client.ScaleformUI{
                 objectType = index;
 
                 updateData(overlayId, objectType, objectColor, objectOpacity);
-
-                Debug.WriteLine($"Selected index: {item.Index}");
             };
 
             opacityPanel.OnPercentagePanelChange += (item, panel, value) => {

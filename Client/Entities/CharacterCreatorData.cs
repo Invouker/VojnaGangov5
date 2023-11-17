@@ -111,8 +111,6 @@ public class CharacterCreatorData{
 
     public void SendDataToServer(){
         string data = SerializeToJson();
-        Debug.WriteLine($"Data before sent to server: {data}");
         BaseScript.TriggerLatentServerEvent("player:data:character", 6000, data);
-        Debug.WriteLine("Sending to the server!");
     }
 }

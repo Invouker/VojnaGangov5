@@ -38,7 +38,6 @@ namespace Server.Services{
 
             string name = player.Name;
 
-            Debug.WriteLine($"Saving Json data: {data}");
             Character character = Character.DeserializeFromJson(data);
             VGPlayer vgPlayer = PlayerService.GetVgPlayer(Utils.GetLicense(player));
             character.AccId = vgPlayer.Id;
@@ -76,7 +75,6 @@ namespace Server.Services{
             const string SelectQuery = "SELECT * FROM characters WHERE name = @Name";
             Character character = await dbConnection.QueryFirstAsync<Character>(SelectQuery, new{ Name = name });
             await dbConnection.CloseAsync();
-            Debug.WriteLine($"Character loading: {character}");
 
             BaseScript.TriggerClientEvent(player, "player:character:data", character.SerializeToJson());
         }
