@@ -11,11 +11,6 @@ using ScaleformUI.Menu;
 
 namespace Client.ScaleformUI{
     public static class CharacterCreatorUI{
-        public static void Interact(int id){
-            /* if (id == 1)
-                 createUI();*/
-        }
-
         private static readonly CharacterCreatorData CharacterData = new CharacterCreatorData();
 
         public static UIMenu createUI(){

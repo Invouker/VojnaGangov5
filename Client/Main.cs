@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Events;
-using Client.ScaleformUI;
 using Client.Streamable;
 
 namespace Client{
@@ -21,7 +20,7 @@ namespace Client{
                 new Action<string, float, float, float, int, int, int, int>(Streamer.Create3dText);
 
 
-            EventHandlers["player:interact:marker"] += new Action<int>(CharacterCreatorUI.Interact);
+            //EventHandlers["player:interact:marker"] += new Action<int>(CharacterCreatorUI.Interact);
 
             EventHandlers["player:spawn:to:world"] +=
                 new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
