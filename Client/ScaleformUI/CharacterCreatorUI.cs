@@ -90,12 +90,12 @@ namespace Client.ScaleformUI{
             #region Appearance UI
 
             List<dynamic> beard = new List<dynamic>{
-                "Clean Shaven", "Light Stubble", "Balbo", "Circle Beard", "Goatee", "Chin", "Chin Fuzz",
+                "Light Stubble", "Balbo", "Circle Beard", "Goatee", "Chin", "Chin Fuzz",
                 "Pencil Chin Strap", "Scruffy", "Musketeer", "Mustache",
                 "Trimmed Beard", "Stubble", "Thin Circle Beard", "Horseshoe", "Pencil and Chops", "Chin Strap Beard",
                 "Balbo and Sideburns", "Mutton Chops", "Scruffy Beard", "Curly",
                 "Curly and Deep Stranger", "Handlebar", "Faustic", "Otto and Patch", "Otto and Full Stranger",
-                "Light Franz", "The Hampstead", "The Ambrose", "Lincoln Curtain"
+                "Light Franz", "The Hampstead", "The Ambrose", "Lincoln Curtain", "Clean Shaven"
             };
             AddAppearanceMenu(menu, "Beard", 1, beard);
 
@@ -173,7 +173,7 @@ namespace Client.ScaleformUI{
             UIMenuItem spawnPlayer = new UIMenuItem("Spawn to world", "");
             menu.AddItem(spawnPlayer);
             spawnPlayer.Activated += (sender, item) => {
-                CharacterCreatorData.GetCharacterCreatorData().SendDataToServer();
+                CharacterData.SendDataToServer();
                 SpawnManager.TeleportToWorld(CharacterData.Sex, -2246.927f, 269.0242f, 174.6095f, 110f);
                 menu.Visible = false;
             };
@@ -280,7 +280,7 @@ namespace Client.ScaleformUI{
         private static void AddAppearanceMenu(UIMenu menu, string title, int overlayId, List<dynamic> objects,
             ColorPanelType panelType = ColorPanelType.Hair){
             int playerPid = API.PlayerPedId();
-            UIMenuListItem item = new UIMenuListItem(title, objects, 0);
+            UIMenuListItem item = new UIMenuListItem(title, objects, 0); // overlayId == 1 ? 1:0
             UIMenuColorPanel colorPanel = new UIMenuColorPanel("Colour", panelType);
             UIMenuPercentagePanel opacityPanel = new UIMenuPercentagePanel("Opacity", "0%", "100%", 100f);
             item.AddPanel(colorPanel);
@@ -297,53 +297,7 @@ namespace Client.ScaleformUI{
                 API.SetPedHeadOverlayColor(playerPid, overlayId, 1, objectColor, 0);
                 objectType = index;
 
-                switch (overlayId){ // 1,2,3,4,6,7,8,9,11
-                    case 1:
-                        CharacterData.FacialHair = objectType;
-                        CharacterData.FacialHairColor = objectColor;
-                        CharacterData.FacialHairOpacity = objectOpacity;
-                        break;
-                    case 2:
-                        CharacterData.Eyebrows = objectType;
-                        CharacterData.EyebrowsColor = objectColor;
-                        CharacterData.EyebrowsOpacity = objectOpacity;
-                        break;
-                    case 3:
-                        CharacterData.Ageing = objectType;
-                        CharacterData.AgeingColor = objectColor;
-                        CharacterData.AgeingOpacity = objectOpacity;
-                        break;
-                    case 4:
-                        CharacterData.Makeup = objectType;
-                        CharacterData.MakeupColor = objectColor;
-                        CharacterData.MakeupOpacity = objectOpacity;
-                        break;
-                    case 6:
-                        CharacterData.Complexion = objectType;
-                        CharacterData.ComplexionColor = objectColor;
-                        CharacterData.ComplexionOpacity = objectOpacity;
-                        break;
-                    case 7:
-                        CharacterData.SunDamage = objectType;
-                        CharacterData.SunDamageColor = objectColor;
-                        CharacterData.SunDamageOpacity = objectOpacity;
-                        break;
-                    case 8:
-                        CharacterData.Lipstick = objectType;
-                        CharacterData.LipstickColor = objectColor;
-                        CharacterData.LipstickOpacity = objectOpacity;
-                        break;
-                    case 9:
-                        CharacterData.MolesFreckles = objectType;
-                        CharacterData.MolesFrecklesColor = objectColor;
-                        CharacterData.MolesFrecklesOpacity = objectOpacity;
-                        break;
-                    case 11:
-                        CharacterData.BodyBlemishes = objectType;
-                        CharacterData.BodyBlemishesColor = objectColor;
-                        CharacterData.BodyBlemishesOpacity = objectOpacity;
-                        break;
-                }
+                updateData(overlayId, objectType, objectColor, objectOpacity);
             };
 
             opacityPanel.OnPercentagePanelChange += (item, panel, value) => {
@@ -351,18 +305,72 @@ namespace Client.ScaleformUI{
                 API.SetPedHeadOverlay(playerPid, overlayId, objectType, opacity);
                 API.SetPedHeadOverlayColor(playerPid, overlayId, 1, objectColor, 0);
                 objectOpacity = opacity;
+
+                updateData(overlayId, objectType, objectColor, objectOpacity);
             };
 
             colorPanel.OnColorPanelChange += (item, panel, index) => {
                 API.SetPedHeadOverlay(playerPid, overlayId, objectType, objectOpacity);
                 API.SetPedHeadOverlayColor(playerPid, overlayId, 1, index, 0);
                 objectColor = index;
+
+                updateData(overlayId, objectType, objectColor, objectOpacity);
             };
             menu.AddItem(item);
         }
 
+        private static void updateData(int overlayId, int objectType, int objectColor, float objectOpacity){
+            switch (overlayId){ // 1,2,3,4,6,7,8,9,11
+                case 1:
+                    CharacterData.FacialHair = objectType;
+                    CharacterData.FacialHairColor = objectColor;
+                    CharacterData.FacialHairOpacity = objectOpacity;
+                    break;
+                case 2:
+                    CharacterData.Eyebrows = objectType;
+                    CharacterData.EyebrowsColor = objectColor;
+                    CharacterData.EyebrowsOpacity = objectOpacity;
+                    break;
+                case 3:
+                    CharacterData.Ageing = objectType;
+                    CharacterData.AgeingColor = objectColor;
+                    CharacterData.AgeingOpacity = objectOpacity;
+                    break;
+                case 4:
+                    CharacterData.Makeup = objectType;
+                    CharacterData.MakeupColor = objectColor;
+                    CharacterData.MakeupOpacity = objectOpacity;
+                    break;
+                case 6:
+                    CharacterData.Complexion = objectType;
+                    CharacterData.ComplexionColor = objectColor;
+                    CharacterData.ComplexionOpacity = objectOpacity;
+                    break;
+                case 7:
+                    CharacterData.SunDamage = objectType;
+                    CharacterData.SunDamageColor = objectColor;
+                    CharacterData.SunDamageOpacity = objectOpacity;
+                    break;
+                case 8:
+                    CharacterData.Lipstick = objectType;
+                    CharacterData.LipstickColor = objectColor;
+                    CharacterData.LipstickOpacity = objectOpacity;
+                    break;
+                case 9:
+                    CharacterData.MolesFreckles = objectType;
+                    CharacterData.MolesFrecklesColor = objectColor;
+                    CharacterData.MolesFrecklesOpacity = objectOpacity;
+                    break;
+                case 11:
+                    CharacterData.BodyBlemishes = objectType;
+                    CharacterData.BodyBlemishesColor = objectColor;
+                    CharacterData.BodyBlemishesOpacity = objectOpacity;
+                    break;
+            }
+        }
+
         private static void EditClotheUI(UIMenu mainMenu){
-            int playerPid = API.PlayerPedId();
+            int playerPid = API.GetPlayerPed(-1);
 
             UIMenuItem windowsItem = new UIMenuItem("Change your appearance");
             windowsItem.SetRightLabel("»");
@@ -431,6 +439,8 @@ namespace Client.ScaleformUI{
         }
 
         private static void SetComp(int playerPid, int compId, int index){
+            API.SetPedComponentVariation(playerPid, compId, index, 0, 0);
+
             switch (compId){
                 case 3:
                     CharacterData.Torso = index;
@@ -457,8 +467,6 @@ namespace Client.ScaleformUI{
                     CharacterData.Torso2Texture = 0;
                     break;
             }
-
-            API.SetPedComponentVariation(playerPid, compId, index, 0, 0);
         }
 
         private class SkinSet{
@@ -557,9 +565,9 @@ namespace Client.ScaleformUI{
 
         private static void ByParentsCreatorUI(UIMenu mainMenu){
             double[] amount ={ 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 };
-            var playerPid = API.PlayerPedId();
+            var playerPid = API.GetPlayerPed(-1);
 
-            UIMenuItem windowsItem = new("Change your parents", "You can change your face by your parents.");
+            UIMenuItem windowsItem = new UIMenuItem("Change your parents", "You can change your face by your parents.");
             windowsItem.SetRightLabel("»");
             mainMenu.AddItem(windowsItem);
 

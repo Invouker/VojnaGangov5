@@ -24,8 +24,9 @@ namespace Client{
 
             EventHandlers["player:spawn:to:world"] +=
                 new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
-            EventHandlers["player:spawn:to:world2"] +=
-                new Action(SpawnManager.TeleportToWorld2); //Todo: probably delete this, and method too.
+            EventHandlers["player:character:data"] += new Action<string>(SpawnManager.AssignCharacterData);
+            /*EventHandlers["player:spawn:to:world2"] +=
+                new Action(SpawnManager.TeleportToWorld2); //Todo: probably delete this, and method too.*/
             EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
             //EventHandlers["player:loaded:teleport"] += new Action(SpawnManager.RequestTeleport);
 

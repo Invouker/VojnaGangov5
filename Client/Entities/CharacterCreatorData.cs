@@ -95,74 +95,6 @@ public class CharacterCreatorData{
 
     #endregion
 
-    /*
-        public CharacterCreatorData(){
-            InitBlendData();
-            InitFaceFeature();
-            InitDrawable();
-
-
-            Debug.WriteLine("SerializeToJson(): " + SerializeToJson());
-        }
-
-        private void InitDrawable(){
-            int pedId = API.PlayerPedId();
-            HairType = API.GetPedDrawableVariation(pedId, 2);
-            HairColor = API.GetPedHairColor(pedId);
-            Torso = API.GetPedDrawableVariation(pedId, 3);
-            TorsoTexture = API.GetPedTextureVariation(pedId, 3);
-            Legs = API.GetPedDrawableVariation(pedId, 4);
-            LegsTexture = API.GetPedTextureVariation(pedId, 4);
-            Foot = API.GetPedDrawableVariation(pedId, 6);
-            FootTexture = API.GetPedTextureVariation(pedId, 6);
-            Scarfs = API.GetPedDrawableVariation(pedId, 7);
-            ScarfsTexture = API.GetPedTextureVariation(pedId, 7);
-            Accesories = API.GetPedDrawableVariation(pedId, 8);
-            AccesoriesTexture = API.GetPedTextureVariation(pedId, 8);
-            Torso2 = API.GetPedDrawableVariation(pedId, 11);
-            Torso2Texture = API.GetPedTextureVariation(pedId, 11);
-        }
-
-        private void InitFaceFeature(){
-            int pedId = API.PlayerPedId();
-
-            NoseWidth = API.GetPedFaceFeature(pedId, 0);
-            NosePeak = API.GetPedFaceFeature(pedId, 1);
-            NoseLength = API.GetPedFaceFeature(pedId, 2);
-            NoseBoneCurvness = API.GetPedFaceFeature(pedId, 3);
-            NoseTip = API.GetPedFaceFeature(pedId, 4);
-            NoseBoneTwist = API.GetPedFaceFeature(pedId, 5);
-            Eyebrow = API.GetPedFaceFeature(pedId, 6);
-            Eyebrow2 = API.GetPedFaceFeature(pedId, 7);
-            CheekBones = API.GetPedFaceFeature(pedId, 8);
-            CheekSidewaysBoneSize = API.GetPedFaceFeature(pedId, 9);
-            CheekBonesWidth = API.GetPedFaceFeature(pedId, 10);
-            EyeOpening = API.GetPedFaceFeature(pedId, 11);
-            LipThickness = API.GetPedFaceFeature(pedId, 12);
-            JawBoneWidth = API.GetPedFaceFeature(pedId, 13);
-            JawBoneShape = API.GetPedFaceFeature(pedId, 14);
-            ChinBone = API.GetPedFaceFeature(pedId, 15);
-            ChinBoneLength = API.GetPedFaceFeature(pedId, 16);
-            ChinBoneShape = API.GetPedFaceFeature(pedId, 17);
-            ChinHole = API.GetPedFaceFeature(pedId, 18);
-            NeckThickness = API.GetPedFaceFeature(pedId, 19);
-        }
-
-        private void InitBlendData(){
-            Ped ped = Player.Local.Character;
-            short sex = 1;
-            if (API.IsPedMale(ped.Handle))
-                sex = 0;
-
-            Sex = sex;
-            FirstFaceShape = ped.GetHeadBlendData().FirstFaceShape;
-            SecondFaceShape = ped.GetHeadBlendData().SecondFaceShape;
-            FirstSkinTone = ped.GetHeadBlendData().FirstSkinTone;
-            SecondSkinTone = ped.GetHeadBlendData().SecondSkinTone;
-            ParentFaceShapePercent = ped.GetHeadBlendData().ParentFaceShapePercent;
-            ParentSkinTonePercent = ped.GetHeadBlendData().ParentSkinTonePercent;
-        }
-    */
     public string SerializeToJson(){
         return JsonConvert.SerializeObject(this);
     }
@@ -173,45 +105,9 @@ public class CharacterCreatorData{
     }
 
     public void SendDataToServer(){
-        BaseScript.TriggerLatentServerEvent("player:data:character", 5000, SerializeToJson());
-        Debug.WriteLine("Sending to the server! 0/6");
-        /* BaseScript.TriggerServerEvent("player:data:character:blend",
-                                       //1st
-                                       Sex, FirstFaceShape, SecondFaceShape, FirstSkinTone, SecondSkinTone,
-                                       ParentFaceShapePercent, ParentSkinTonePercent
-                                      );
-         Debug.WriteLine("Sending to the server! 1/6");
-         BaseScript.TriggerServerEvent("player:data:character:facefeature",
-                                       //2nd
-                                       NoseWidth, NosePeak, NoseLength, NoseBoneCurvness, NoseTip, NoseBoneTwist,
-                                       Eyebrow, Eyebrow2, CheekBones, CheekBonesWidth,
-                                       CheekSidewaysBoneSize
-                                      );
-         Debug.WriteLine("Sending to the server! 2/6");
-         BaseScript.TriggerServerEvent("player:data:character:facefeature2",
-                                       //2nd
-                                       EyeOpening, LipThickness, JawBoneWidth, JawBoneShape, ChinBone, ChinBoneLength,
-                                       ChinBoneShape,
-                                       ChinHole, NeckThickness
-                                      );
-         Debug.WriteLine("Sending to the server! 3/6");
-         BaseScript.TriggerServerEvent("player:data:character:drawable",
-                                       //3st
-                                       HairType, HairColor, Torso, TorsoTexture, Legs, LegsTexture, Foot, FootTexture,
-                                       Scarfs, ScarfsTexture, Accesories,
-                                       AccesoriesTexture, Torso2, Torso2Texture
-                                      );
-
-         Debug.WriteLine("Sending to the server! 5/6");*/
-        BaseScript.TriggerServerEvent("player:data:character:save");
-        Debug.WriteLine("Sending to the server! 6/6");
-    }
-
-    private static CharacterCreatorData characterCreatorDataInstance;
-
-    public static CharacterCreatorData GetCharacterCreatorData(){
-        if (characterCreatorDataInstance == null)
-            return characterCreatorDataInstance = new CharacterCreatorData();
-        return characterCreatorDataInstance;
+        string data = SerializeToJson();
+        Debug.WriteLine($"Data before sent to server: {data}");
+        BaseScript.TriggerLatentServerEvent("player:data:character", 6000, data);
+        Debug.WriteLine("Sending to the server!");
     }
 }

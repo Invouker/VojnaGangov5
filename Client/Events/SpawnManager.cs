@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Entities;
 using Client.ScaleformUI;
 
 namespace Client.Events{
@@ -124,10 +125,26 @@ namespace Client.Events{
         public static async void TeleportToWorld(short sex, float posX, float posY, float posZ, float heading){
             IsPlayerInCreator = false;
             API.ShutdownLoadingScreen();
-            API.DoScreenFadeOut(500);
+            API.DoScreenFadeOut(1000);
+
+            await BaseScript.Delay(3000);
 
             int player = Game.Player.Handle;
+
+
+            while (!API.HasPlayerTeleportFinished(player))
+                await BaseScript.Delay(1);
+
+            uint hash = (uint)API.GetHashKey($"mp_{(sex == 0 ? "m" : "f")}_freemode_01");
+            API.RequestModel(hash);
+
+            while (!API.HasModelLoaded(hash))
+                await BaseScript.Delay(1);
+
+            API.SetPlayerModel(player, hash);
             var playerPed = API.PlayerPedId();
+            API.SetPedDefaultComponentVariation(playerPed);
+            API.SetModelAsNoLongerNeeded(hash);
 
             //-2246.927f, 269.0242f, 174.6095f
             API.RequestCollisionAtCoord(posX, posY, posZ);
@@ -135,45 +152,22 @@ namespace Client.Events{
             API.NetworkResurrectLocalPlayer(posX, posY, posZ, heading, true, false);
             API.ClearPedTasksImmediately(playerPed);
 
+            API.ClearPedTasksImmediately(playerPed);
+            API.RemoveAllPedWeapons(playerPed, true);
+            API.ClearPlayerWantedLevel(player);
+
             API.StartPlayerTeleport(player, posX, posY, posZ, heading, false, false, false);
-            while (!API.HasPlayerTeleportFinished(player))
-                await BaseScript.Delay(1);
 
-            uint hash = (uint)API.GetHashKey($"mp_{(sex == 0 ? "m" : "f")}_freemode_01");
-            API.RequestModel(hash);
-            Debug.WriteLine($"Hash {hash}, sex: {sex}, mp_{(sex == 0 ? "m" : "f")}_freemode_01");
+            BaseScript.TriggerServerEvent("player:spawn:to:world:server", playerPed);
 
-            while (!API.HasModelLoaded(hash))
-                await BaseScript.Delay(1);
-
-            API.SetPlayerModel(player, hash);
-            API.SetModelAsNoLongerNeeded(hash);
-            API.SetPedDefaultComponentVariation(playerPed);
-
-            Debug.WriteLine($"API.HasModelLoaded(hash): {API.HasModelLoaded(hash)} and load data!");
-            BaseScript.TriggerServerEvent("player:spawn:to:world:2server");
-
+            //API.SetPedComponentVariation(playerPed, 2, 2, 0, 0);
             API.DoScreenFadeIn(1000);
             while (!API.IsScreenFadedIn())
                 await BaseScript.Delay(1);
 
             API.DisplayRadar(true);
-            API.RenderScriptCams(false, true, 500, true, true);
+            API.RenderScriptCams(false, false, 1, true, true);
         }
-
-        public static async void TeleportToWorld2(){
-            /* var playerPed = API.PlayerPedId();
-
-
-             Debug.WriteLine("Teleport to world2");
-
-             var pid = API.PlayerPedId();
-             if (!API.IsEntityVisible(pid)){
-                 Debug.WriteLine("!visible set to true");
-                 API.SetEntityVisible(pid, true, false);
-             }*/
-        }
-
 
         public static async Task CreatorTick(){
             if (IsPlayerInCreator){
@@ -223,7 +217,7 @@ namespace Client.Events{
             }
         }
 
-        private static void FreezePlayer(int player, bool freeze){
+        private static void FreezePlayer2(int player, bool freeze){
             var ped = API.GetPlayerPed(-1);
             if (freeze){
                 if (API.IsEntityVisible(ped))
@@ -246,6 +240,64 @@ namespace Client.Events{
 
                 API.NetworkSetEntityVisibleToNetwork(player, false);
             }
+        }
+
+        public static void AssignCharacterData(string data){
+            int playerPed = API.PlayerPedId();
+            CharacterCreatorData character = CharacterCreatorData.DeserializeFromJson(data);
+            API.SetPedHeadBlendData(playerPed, character.FirstFaceShape, character.SecondFaceShape, 0,
+                                    character.FirstSkinTone, character.SecondSkinTone, 0,
+                                    character.ParentFaceShapePercent, character.ParentSkinTonePercent, 0, true);
+
+            API.SetPedFaceFeature(playerPed, 0, character.NoseWidth);
+            API.SetPedFaceFeature(playerPed, 1, character.NosePeak);
+            API.SetPedFaceFeature(playerPed, 2, character.NoseLength);
+            API.SetPedFaceFeature(playerPed, 3, character.NoseBoneCurvness);
+            API.SetPedFaceFeature(playerPed, 4, character.NoseTip);
+            API.SetPedFaceFeature(playerPed, 5, character.NoseBoneTwist);
+            API.SetPedFaceFeature(playerPed, 6, character.Eyebrow);
+            API.SetPedFaceFeature(playerPed, 7, character.Eyebrow2);
+            API.SetPedFaceFeature(playerPed, 8, character.CheekBones);
+            API.SetPedFaceFeature(playerPed, 9, character.CheekSidewaysBoneSize);
+            API.SetPedFaceFeature(playerPed, 10, character.CheekBonesWidth);
+            API.SetPedFaceFeature(playerPed, 11, character.EyeOpening);
+            API.SetPedFaceFeature(playerPed, 12, character.LipThickness);
+            API.SetPedFaceFeature(playerPed, 13, character.JawBoneWidth);
+            API.SetPedFaceFeature(playerPed, 14, character.JawBoneShape);
+            API.SetPedFaceFeature(playerPed, 15, character.ChinBone);
+            API.SetPedFaceFeature(playerPed, 16, character.ChinBoneLength);
+            API.SetPedFaceFeature(playerPed, 17, character.ChinBoneShape);
+            API.SetPedFaceFeature(playerPed, 18, character.ChinHole);
+            API.SetPedFaceFeature(playerPed, 19, character.NeckThickness);
+
+
+            API.SetPedHeadOverlay(playerPed, 1, character.FacialHair, character.FacialHairOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 1, 1, character.FacialHairColor, character.FacialHairColor);
+            API.SetPedHeadOverlay(playerPed, 2, character.Eyebrows, character.EyebrowsOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 2, 1, character.EyebrowsColor, character.EyebrowsColor);
+            API.SetPedHeadOverlay(playerPed, 3, character.Ageing, character.AgeingOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 3, 1, character.AgeingColor, character.AgeingColor);
+            API.SetPedHeadOverlay(playerPed, 4, character.Makeup, character.MakeupOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 4, 1, character.MakeupColor, character.MakeupColor);
+            API.SetPedHeadOverlay(playerPed, 6, character.Complexion, character.ComplexionOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 6, 1, character.ComplexionColor, character.ComplexionColor);
+            API.SetPedHeadOverlay(playerPed, 7, character.SunDamage, character.SunDamageOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 7, 1, character.SunDamageColor, character.SunDamageColor);
+            API.SetPedHeadOverlay(playerPed, 8, character.Lipstick, character.LipstickOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 8, 1, character.LipstickColor, character.LipstickColor);
+            API.SetPedHeadOverlay(playerPed, 9, character.MolesFreckles, character.MolesFrecklesOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 9, 1, character.MolesFrecklesColor, character.MolesFrecklesColor);
+            API.SetPedHeadOverlay(playerPed, 11, character.BodyBlemishes, character.BodyBlemishesOpacity);
+            API.SetPedHeadOverlayColor(playerPed, 11, 1, character.BodyBlemishesColor, character.BodyBlemishesColor);
+
+            API.SetPedComponentVariation(playerPed, 2, 2, 0, 2);
+            API.SetPedHairColor(playerPed, character.HairColor, character.HairColor);
+            API.SetPedComponentVariation(playerPed, 3, character.Torso, character.TorsoTexture, 0);
+            API.SetPedComponentVariation(playerPed, 4, character.Legs, character.LegsTexture, 0);
+            API.SetPedComponentVariation(playerPed, 6, character.Foot, character.FootTexture, 0);
+            API.SetPedComponentVariation(playerPed, 7, character.Scarfs, character.ScarfsTexture, 0);
+            API.SetPedComponentVariation(playerPed, 8, character.Accesories, character.AccesoriesTexture, 0);
+            API.SetPedComponentVariation(playerPed, 11, character.Torso2, character.Torso2Texture, 0);
         }
     }
 }

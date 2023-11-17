@@ -13,31 +13,12 @@ namespace Server{
             //EventHandlers["onResourceStop"] += new Action<string>(ServiceManager.PlayerService.OnResourceStop); //Todo: Uncomment this if playerlist and autosave will be ok
             EventHandlers["player:interact:marker"] += new Action<int>(StreamerTest.OnMarkerInteract);
 
-            #region CharacterCreator Data
-
-            EventHandlers["player:data:character:blend"] +=
-                new Action<Player, short, int, int, int, int, float, float>(ServiceManager.CharacterCreatorService
-                                                                               .ClientDataBlend);
             EventHandlers["player:data:character"] +=
-                new Action<Player, string>(ServiceManager.CharacterCreatorService.DataLoader);
-            EventHandlers["player:data:character:facefeature"] +=
-                new Action<Player, float, float, float, float, float, float, float, float, float, float, float>
-                    (ServiceManager.CharacterCreatorService.ClientDataFaceFeature);
-            EventHandlers["player:data:character:facefeature2"] +=
-                new Action<Player, float, float, float, float, float, float, float, float, float>
-                    (ServiceManager.CharacterCreatorService.ClientDataFaceFeature2);
-            EventHandlers["player:data:character:drawable"] +=
-                new Action<Player, int, int, int, int, int, int, int, int, int, int, int, int, int, int>(ServiceManager
-                            .CharacterCreatorService.ClientDataDrawable);
-
-            EventHandlers["player:data:character:save"] +=
-                new Action<Player>(ServiceManager.CharacterCreatorService.SaveCharacterData);
-
-            #endregion
+                new Action<Player, string>(ServiceManager.CharacterCreatorService.SaveCharacterData);
+            EventHandlers["player:spawn:to:world:server"] +=
+                new Action<Player, int>(ServiceManager.CharacterCreatorService.LoadCharacterData);
 
             EventHandlers["player:post_join"] += new Action<Player>(ServiceManager.CharacterCreatorService.Loader);
-            EventHandlers["player:spawn:to:world:2server"] +=
-                new Action<Player>(ServiceManager.CharacterCreatorService.LoadCharacterData);
 
             CommandsTest.RegisterCommands(Players);
         }
