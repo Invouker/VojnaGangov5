@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
@@ -13,7 +12,7 @@ namespace Client.ScaleformUI{
     public static class CharacterCreatorUI{
         private static readonly CharacterCreatorData CharacterData = new CharacterCreatorData();
 
-        public static UIMenu createUI(){
+        public static void createUI(){
             UIMenu menu = new UIMenu("Character creator", "Change your character", new PointF(20, 20)){
                 BuildingAnimation = MenuBuildingAnimation.NONE,
                 EnableAnimation = false,
@@ -22,11 +21,12 @@ namespace Client.ScaleformUI{
                 CanPlayerCloseMenu = false
             };
 
+            int playerPid = API.PlayerPedId();
+
             UIMenuListItem sexListItem =
                 new UIMenuListItem("Sex", new List<dynamic>{ "Male", "Female" }, 0, "Select your gender");
-            menu.AddItem(sexListItem);
-
             sexListItem.OnListChanged += (sender, index) => ChangeSex(index);
+            menu.AddItem(sexListItem);
 
             ByParentsCreatorUI(menu);
 
@@ -34,14 +34,15 @@ namespace Client.ScaleformUI{
 
             AddGridToMenu(menu, "Nose", "Up", "Narrow", "Wide", "Down", 0, 1);
             AddGridToMenu(menu, "Nose Profile", "Crooked", "Short", "Long", "Curved", 2, 3);
-            AddGridToMenu(menu, "Nose Tip", "Tip Up", "Broken Left", "Broken Right", "Tip Down", 3, 4);
-            AddGridToMenu(menu, "Eye Brows", "Up", "In", "Out", "Down", 7, 6);
-            AddGridToMenu(menu, "Cheeks Bones", "Up", "In", "Out", "Down", 9, 8);
+            AddGridToMenu(menu, "Nose Tip", "Tip Up", "Broken Left", "Broken Right", "Tip Down", 4, 5);
+            AddGridToMenu(menu, "Eye Brows", "Up", "In", "Out", "Down", 6, 7);
+            AddGridToMenu(menu, "Cheeks Bones", "Up", "In", "Out", "Down", 8, 9);
 
             #endregion
 
             #region Other UI
 
+            AddHorizontalGridToMenu(menu, "Cheeks", "Gaunt", "Puffed", 10);
             AddHorizontalGridToMenu(menu, "Eyes", "Squint", "Wide", 11);
             AddHorizontalGridToMenu(menu, "Lips", "Thin", "Fat", 12);
             AddGridToMenu(menu, "Jaw", "Round", "Narrow", "Wide", "Square", 13, 14);
@@ -73,11 +74,13 @@ namespace Client.ScaleformUI{
             hairCuts.AddPanel(hairCutsColor);
 
             hairCuts.OnListChanged += (selectedItem, index) => {
-                API.SetPedComponentVariation(API.GetPlayerPed(-1), 2, index, 0, 2);
+                API.SetPedComponentVariation(playerPid, 2, index, 0, 2);
+                CharacterData.HairType = index;
             };
 
             hairCutsColor.OnColorPanelChange += (menu, panel, index) => {
-                API.SetPedHairColor(API.GetPlayerPed(-1), index, 0);
+                API.SetPedHairColor(playerPid, index, 0);
+                CharacterData.HairColor = index;
             };
 
             menu.AddItem(hairCuts);
@@ -106,39 +109,12 @@ namespace Client.ScaleformUI{
             };
             AddAppearanceMenu(menu, "Eye Brow", 2, eyebrow);
 
-            List<dynamic> blemishes = new List<dynamic>{
-                "None", "Measles", "Pimples", "Spots", "Break Out", "Blackheads", "Build Up", "Pustules", "Zits",
-                "Full Acne", "Acne", "Cheek Rash", "Face Rash",
-                "Picker", "Puberty", "Eyesore", "Chin Rash", "Two Face", "T Zone", "Greasy", "Marked", "Acne Scarring",
-                "Full Acne Scarring", "Cold Sores", "Impetigo"
-            };
-            AddAppearanceMenu(menu, "Skin Blemishes", 11, blemishes);
-
             List<dynamic> ageing = new List<dynamic>{
                 "None", "Crow's Feet", "First Signs", "Middle Aged", "Worry Lines", "Depression", "Distinguished",
                 "Aged", "Weathered", "Wrinkled", "Sagging", "Tough Life",
                 "Vintage", "Retired", "Junkie", "Geriatric"
             };
             AddAppearanceMenu(menu, "Skin Ageing", 3, ageing);
-
-            List<dynamic> complexion = new List<dynamic>{
-                "None", "Rosy Cheeks", "Stubble Rash", "Hot Flush", "Sunburn", "Bruised", "Alchoholic", "Patchy",
-                "Totem", "Blood Vessels", "Damaged", "Pale", "Ghostly"
-            };
-            AddAppearanceMenu(menu, "Skin Complexion", 6, complexion);
-
-            List<dynamic> moleFreckle = new List<dynamic>{
-                "None", "Cherub", "All Over", "Irregular", "Dot Dash", "Over the Bridge", "Baby Doll", "Pixie",
-                "Sun Kissed", "Beauty Marks", "Line Up", "Modelesque",
-                "Occasional", "Speckled", "Rain Drops", "Double Dip", "One Sided", "Pairs", "Growth"
-            };
-            AddAppearanceMenu(menu, "Mole & Freckle", 9, moleFreckle);
-
-            List<dynamic> sunDamage = new List<dynamic>{
-                "None", "Uneven", "Sandpaper", "Patchy", "Rough", "Leathery", "Textured", "Coarse", "Rugged", "Creased",
-                "Cracked", "Gritty"
-            };
-            AddAppearanceMenu(menu, "Skin Damage", 7, sunDamage);
 
             List<dynamic> makeup = new List<dynamic>{
                 "None", "Smoky Black", "Bronze", "Soft Gray", "Retro Glam", "Natural Look", "Cat Eyes", "Chola", "Vamp",
@@ -154,12 +130,39 @@ namespace Client.ScaleformUI{
             };
             AddAppearanceMenu(menu, "Makeup", 4, makeup, ColorPanelType.Makeup);
 
+            List<dynamic> complexion = new List<dynamic>{
+                "None", "Rosy Cheeks", "Stubble Rash", "Hot Flush", "Sunburn", "Bruised", "Alchoholic", "Patchy",
+                "Totem", "Blood Vessels", "Damaged", "Pale", "Ghostly"
+            };
+            AddAppearanceMenu(menu, "Skin Complexion", 6, complexion);
+
+            List<dynamic> sunDamage = new List<dynamic>{
+                "None", "Uneven", "Sandpaper", "Patchy", "Rough", "Leathery", "Textured", "Coarse", "Rugged", "Creased",
+                "Cracked", "Gritty"
+            };
+            AddAppearanceMenu(menu, "Skin Damage", 7, sunDamage);
+
             List<dynamic> lipstick = new List<dynamic>{
                 "None", "Color Matte", "Color Gloss", "Lined Matte", "Lined Gloss", "Heavy Lined Matte",
                 "Heavy Lined Gloss", "Lined Nude Matte", "Liner Nude Gloss",
                 "Smudged", "Geisha"
             };
             AddAppearanceMenu(menu, "Lipstick", 8, lipstick);
+
+            List<dynamic> moleFreckle = new List<dynamic>{
+                "None", "Cherub", "All Over", "Irregular", "Dot Dash", "Over the Bridge", "Baby Doll", "Pixie",
+                "Sun Kissed", "Beauty Marks", "Line Up", "Modelesque",
+                "Occasional", "Speckled", "Rain Drops", "Double Dip", "One Sided", "Pairs", "Growth"
+            };
+            AddAppearanceMenu(menu, "Mole & Freckle", 9, moleFreckle);
+
+            List<dynamic> blemishes = new List<dynamic>{
+                "None", "Measles", "Pimples", "Spots", "Break Out", "Blackheads", "Build Up", "Pustules", "Zits",
+                "Full Acne", "Acne", "Cheek Rash", "Face Rash",
+                "Picker", "Puberty", "Eyesore", "Chin Rash", "Two Face", "T Zone", "Greasy", "Marked", "Acne Scarring",
+                "Full Acne Scarring", "Cold Sores", "Impetigo"
+            };
+            AddAppearanceMenu(menu, "Skin Blemishes", 11, blemishes);
 
             #endregion
 
@@ -178,7 +181,6 @@ namespace Client.ScaleformUI{
             #endregion
 
             menu.Visible = true;
-            return menu;
         }
 
         private static void AddGridToMenu(UIMenu menu, string title, string topText, string leftText, string rightText,
@@ -188,24 +190,96 @@ namespace Client.ScaleformUI{
             uiMenuItem.AddPanel(uiGrid);
             menu.AddItem(uiMenuItem);
             uiGrid.OnGridPanelChange += (menu, panel, value) => {
-                API.SetPedFaceFeature(API.GetPlayerPed(-1), indexOne, value.X);
-                API.SetPedFaceFeature(API.GetPlayerPed(-1), indexTwo, value.Y);
+                int playerPid = API.PlayerPedId();
+                switch (indexOne){
+                    case 0:
+                        CharacterData.NoseWidth = value.X;
+                        break;
+                    case 2:
+                        CharacterData.NoseLength = value.X;
+                        break;
+                    case 4:
+                        CharacterData.NoseTip = value.X;
+                        break;
+                    case 6:
+                        CharacterData.Eyebrow = value.X;
+                        break;
+                    case 8:
+                        CharacterData.CheekBones = value.X;
+                        break;
+                    case 13:
+                        CharacterData.JawBoneWidth = value.X;
+                        break;
+                    case 15:
+                        CharacterData.ChinBone = value.X;
+                        break;
+                    case 17:
+                        CharacterData.ChinBoneShape = value.X;
+                        break;
+                }
+
+                switch (indexTwo){
+                    case 1:
+                        CharacterData.NosePeak = value.Y;
+                        break;
+                    case 3:
+                        CharacterData.NoseBoneCurvness = value.Y;
+                        break;
+                    case 5:
+                        CharacterData.NoseBoneTwist = value.Y;
+                        break;
+                    case 7:
+                        CharacterData.Eyebrow2 = value.Y;
+                        break;
+                    case 9:
+                        CharacterData.CheekSidewaysBoneSize = value.Y;
+                        break;
+                    case 14:
+                        CharacterData.JawBoneShape = value.Y;
+                        break;
+                    case 16:
+                        CharacterData.ChinBoneLength = value.Y;
+                        break;
+                    case 18:
+                        CharacterData.ChinHole = value.Y;
+                        break;
+                }
+
+                API.SetPedFaceFeature(playerPid, indexOne, value.X);
+                API.SetPedFaceFeature(playerPid, indexTwo, value.Y);
             };
         }
 
         private static void AddHorizontalGridToMenu(UIMenu menu, string title, string leftText, string rightText,
             int index){
+            int playerPid = API.PlayerPedId();
             UIMenuItem uiMenuItem = new(title);
             UIMenuGridPanel uiGrid = new(leftText, rightText, new PointF(.5f, .5f));
             uiMenuItem.AddPanel(uiGrid);
             menu.AddItem(uiMenuItem);
             uiGrid.OnGridPanelChange += (menu, panel, value) => {
-                API.SetPedFaceFeature(API.GetPlayerPed(-1), index, value.X);
+                switch (index){
+                    case 10:
+                        CharacterData.CheekBonesWidth = value.X;
+                        break;
+                    case 11:
+                        CharacterData.EyeOpening = value.X;
+                        break;
+                    case 12:
+                        CharacterData.LipThickness = value.X;
+                        break;
+                    case 19:
+                        CharacterData.NeckThickness = value.X;
+                        break;
+                }
+
+                API.SetPedFaceFeature(playerPid, index, value.X);
             };
         }
 
-        private static void AddAppearanceMenu(UIMenu menu, String title, int overlayId, List<dynamic> objects,
+        private static void AddAppearanceMenu(UIMenu menu, string title, int overlayId, List<dynamic> objects,
             ColorPanelType panelType = ColorPanelType.Hair){
+            int playerPid = API.PlayerPedId();
             UIMenuListItem item = new UIMenuListItem(title, objects, 0);
             UIMenuColorPanel colorPanel = new UIMenuColorPanel("Colour", panelType);
             UIMenuPercentagePanel opacityPanel = new UIMenuPercentagePanel("Opacity", "0%", "100%", 100f);
@@ -217,29 +291,79 @@ namespace Client.ScaleformUI{
             int objectType = 0;
 
             item.OnListChanged += (sender, index) => {
-                int color = ((UIMenuColorPanel)sender.Panels[0]).CurrentSelection;
-                float opacity = ((UIMenuPercentagePanel)sender.Panels[1]).Percentage / 100;
-                API.SetPedHeadOverlay(API.GetPlayerPed(-1), overlayId, index, opacity);
-                API.SetPedHeadOverlayColor(API.GetPlayerPed(-1), overlayId, 1, color, 0);
+                int objectColor = ((UIMenuColorPanel)sender.Panels[0]).CurrentSelection;
+                float objectOpacity = ((UIMenuPercentagePanel)sender.Panels[1]).Percentage / 100;
+                API.SetPedHeadOverlay(playerPid, overlayId, index, objectOpacity);
+                API.SetPedHeadOverlayColor(playerPid, overlayId, 1, objectColor, 0);
+                objectType = index;
+
+                switch (overlayId){ // 1,2,3,4,6,7,8,9,11
+                    case 1:
+                        CharacterData.FacialHair = objectType;
+                        CharacterData.FacialHairColor = objectColor;
+                        CharacterData.FacialHairOpacity = objectOpacity;
+                        break;
+                    case 2:
+                        CharacterData.Eyebrows = objectType;
+                        CharacterData.EyebrowsColor = objectColor;
+                        CharacterData.EyebrowsOpacity = objectOpacity;
+                        break;
+                    case 3:
+                        CharacterData.Ageing = objectType;
+                        CharacterData.AgeingColor = objectColor;
+                        CharacterData.AgeingOpacity = objectOpacity;
+                        break;
+                    case 4:
+                        CharacterData.Makeup = objectType;
+                        CharacterData.MakeupColor = objectColor;
+                        CharacterData.MakeupOpacity = objectOpacity;
+                        break;
+                    case 6:
+                        CharacterData.Complexion = objectType;
+                        CharacterData.ComplexionColor = objectColor;
+                        CharacterData.ComplexionOpacity = objectOpacity;
+                        break;
+                    case 7:
+                        CharacterData.SunDamage = objectType;
+                        CharacterData.SunDamageColor = objectColor;
+                        CharacterData.SunDamageOpacity = objectOpacity;
+                        break;
+                    case 8:
+                        CharacterData.Lipstick = objectType;
+                        CharacterData.LipstickColor = objectColor;
+                        CharacterData.LipstickOpacity = objectOpacity;
+                        break;
+                    case 9:
+                        CharacterData.MolesFreckles = objectType;
+                        CharacterData.MolesFrecklesColor = objectColor;
+                        CharacterData.MolesFrecklesOpacity = objectOpacity;
+                        break;
+                    case 11:
+                        CharacterData.BodyBlemishes = objectType;
+                        CharacterData.BodyBlemishesColor = objectColor;
+                        CharacterData.BodyBlemishesOpacity = objectOpacity;
+                        break;
+                }
             };
 
             opacityPanel.OnPercentagePanelChange += (item, panel, value) => {
                 float opacity = value / 100;
-                API.SetPedHeadOverlay(API.GetPlayerPed(-1), overlayId, objectType, opacity);
-                API.SetPedHeadOverlayColor(API.GetPlayerPed(-1), overlayId, 1, objectColor, 0);
+                API.SetPedHeadOverlay(playerPid, overlayId, objectType, opacity);
+                API.SetPedHeadOverlayColor(playerPid, overlayId, 1, objectColor, 0);
                 objectOpacity = opacity;
             };
 
             colorPanel.OnColorPanelChange += (item, panel, index) => {
-                API.SetPedHeadOverlay(API.GetPlayerPed(-1), overlayId, objectType, objectOpacity);
-                API.SetPedHeadOverlayColor(API.GetPlayerPed(-1), overlayId, 1, index, 0);
+                API.SetPedHeadOverlay(playerPid, overlayId, objectType, objectOpacity);
+                API.SetPedHeadOverlayColor(playerPid, overlayId, 1, index, 0);
                 objectColor = index;
             };
             menu.AddItem(item);
         }
 
-
         private static void EditClotheUI(UIMenu mainMenu){
+            int playerPid = API.PlayerPedId();
+
             UIMenuItem windowsItem = new UIMenuItem("Change your appearance");
             windowsItem.SetRightLabel("»");
             mainMenu.AddItem(windowsItem);
@@ -294,21 +418,47 @@ namespace Client.ScaleformUI{
 
             uiMenuListItem.OnListChanged += (selectedItem, index) => {
                 SkinSet skinSet = (SkinSet)skinSets.ToArray()[index];
-                SetComp(3, skinSet.Torso);
-                SetComp(4, skinSet.Pants);
-                SetComp(6, skinSet.Shoes);
-                SetComp(7, skinSet.Accessory);
-                SetComp(8, skinSet.UnderShirt);
-                SetComp(11, skinSet.Torso2);
+                SetComp(playerPid, 3, skinSet.Torso);
+                SetComp(playerPid, 4, skinSet.Pants);
+                SetComp(playerPid, 6, skinSet.Shoes);
+                SetComp(playerPid, 7, skinSet.Accessory);
+                SetComp(playerPid, 8, skinSet.UnderShirt);
+                SetComp(playerPid, 11, skinSet.Torso2);
             };
             subMenu.AddItem(back);
             windowsItem.Activated += (sender, e) => { sender.SwitchTo(subMenu, inheritOldMenuParams: true); };
             back.Activated += (sender, e) => { sender.SwitchTo(mainMenu, inheritOldMenuParams: true); };
         }
 
-        private static void SetComp(int compId, int index){
-            //var max = API.GetNumberOfPedTextureVariations(API.GetPlayerPed(-1), compId, index);
-            API.SetPedComponentVariation(API.GetPlayerPed(-1), compId, index, API.GetRandomIntInRange(0, 1), 0);
+        private static void SetComp(int playerPid, int compId, int index){
+            switch (compId){
+                case 3:
+                    CharacterData.Torso = index;
+                    CharacterData.TorsoTexture = 0;
+                    break;
+                case 4:
+                    CharacterData.Legs = index;
+                    CharacterData.LegsTexture = 0;
+                    break;
+                case 6:
+                    CharacterData.Foot = index;
+                    CharacterData.FootTexture = 0;
+                    break;
+                case 7:
+                    CharacterData.Accesories = index;
+                    CharacterData.AccesoriesTexture = 0;
+                    break;
+                case 8:
+                    CharacterData.Scarfs = index;
+                    CharacterData.ScarfsTexture = 0;
+                    break;
+                case 11:
+                    CharacterData.Torso2 = index;
+                    CharacterData.Torso2Texture = 0;
+                    break;
+            }
+
+            API.SetPedComponentVariation(playerPid, compId, index, 0, 0);
         }
 
         private class SkinSet{
@@ -349,7 +499,7 @@ namespace Client.ScaleformUI{
              int[] allowedDrawable ={3, 4, 6, 7, 8, 11 };
              List<dynamic> drawed = new List<dynamic>();
              foreach (int allow in allowedDrawable){
-                 int maxDrawables = API.GetNumberOfPedDrawableVariations(API.GetPlayerPed(-1), allow);
+                 int maxDrawables = API.GetNumberOfPedDrawableVariations(playerPid, allow);
 
 
                  for (var i = 0; i < maxDrawables; i++){
@@ -362,10 +512,10 @@ namespace Client.ScaleformUI{
                              Debug.WriteLine($"{i}/{pants.maxRender}");
                              drawed.Add($"{i}/{pants.maxRender}");
                          }
-                             //if (API.IsPedComponentVariationValid(API.GetPlayerPed(-1), allow, i, 0))
+                             //if (API.IsPedComponentVariationValid(playerPid, allow, i, 0))
 
                      }else * /
-                         if (API.IsPedComponentVariationValid(API.GetPlayerPed(-1), allow, i, 0))
+                         if (API.IsPedComponentVariationValid(playerPid, allow, i, 0))
                              drawed.Add($"{i}/{maxDrawables}");
                  }
 
@@ -378,9 +528,9 @@ namespace Client.ScaleformUI{
                      int color = ((UIMenuColorPanel)SelectedItem.Panels[0]).CurrentSelection;
                      if (allow == pants.id) {
                          if (!Utils.IsNumberInArray(pants.blockeds, Index))
-                             API.SetPedComponentVariation(API.GetPlayerPed(-1), allow, Index, color, 0);
+                             API.SetPedComponentVariation(playerPid, allow, Index, color, 0);
                      } else
-                         API.SetPedComponentVariation(API.GetPlayerPed(-1), allow, Index, color, 0);
+                         API.SetPedComponentVariation(playerPid, allow, Index, color, 0);
 
 
                  };
@@ -407,6 +557,7 @@ namespace Client.ScaleformUI{
 
         private static void ByParentsCreatorUI(UIMenu mainMenu){
             double[] amount ={ 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 };
+            var playerPid = API.PlayerPedId();
 
             UIMenuItem windowsItem = new("Change your parents", "You can change your face by your parents.");
             windowsItem.SetRightLabel("»");
@@ -456,15 +607,19 @@ namespace Client.ScaleformUI{
             windowSubmenu.AddItem(back);
 
             windowSubmenu.OnListChange += (sender, item, index) => {
-                if (item == mom)
+                if (item == mom){
                     CharacterData.FirstFaceShape = index;
-                else if (item == dad)
+                    CharacterData.FirstSkinTone = index;
+                }
+                else if (item == dad){
                     CharacterData.SecondFaceShape = index;
+                    CharacterData.SecondSkinTone = index;
+                }
 
                 heritageWindow.Index(CharacterData.FirstFaceShape, CharacterData.SecondFaceShape);
-                API.SetPedHeadBlendData(API.GetPlayerPed(-1), CharacterData.FirstFaceShape,
-                                        CharacterData.SecondFaceShape, 0, CharacterData.FirstFaceShape,
-                                        CharacterData.SecondFaceShape, 0,
+                API.SetPedHeadBlendData(playerPid, CharacterData.FirstFaceShape,
+                                        CharacterData.SecondFaceShape, 0, CharacterData.FirstSkinTone,
+                                        CharacterData.SecondSkinTone, 0,
                                         CharacterData.ParentFaceShapePercent,
                                         CharacterData.ParentSkinTonePercent, .5f, true);
             };
@@ -475,8 +630,8 @@ namespace Client.ScaleformUI{
                 else if (item == SkinMixItem)
                     CharacterData.ParentSkinTonePercent = (float)amount[index];
 
-                API.SetPedHeadBlendData(API.GetPlayerPed(-1), CharacterData.FirstFaceShape,
-                                        CharacterData.SecondFaceShape, 0, CharacterData.FirstFaceShape,
+                API.SetPedHeadBlendData(playerPid, CharacterData.FirstFaceShape,
+                                        CharacterData.SecondFaceShape, 0, CharacterData.FirstSkinTone,
                                         CharacterData.SecondSkinTone, 0,
                                         CharacterData.ParentFaceShapePercent,
                                         CharacterData.ParentSkinTonePercent, .5f, true);
@@ -487,6 +642,7 @@ namespace Client.ScaleformUI{
         }
 
         private static async void ChangeSex(int sexIndex){
+            CharacterData.Sex = (short)sexIndex;
             string sexHash = sexIndex switch{
                 0 => "mp_m_freemode_01",
                 1 => "mp_f_freemode_01",
@@ -500,10 +656,11 @@ namespace Client.ScaleformUI{
                 await BaseScript.Delay(0);
 
             API.SetPlayerModel(Game.Player.Handle, intHash);
-            API.SetPedDefaultComponentVariation(API.GetPlayerPed(-1));
+            int playerPid = API.PlayerPedId();
+            API.SetPedDefaultComponentVariation(playerPid);
             API.SetModelAsNoLongerNeeded(intHash);
 
-            API.SetPedHeadBlendData(API.GetPlayerPed(-1), 0, 0, 0, 0, 0, 0, 0, 0f, 0f, false);
+            API.SetPedHeadBlendData(playerPid, 0, 0, 0, 0, 0, 0, 0, 0f, 0f, false);
         }
     }
 }
