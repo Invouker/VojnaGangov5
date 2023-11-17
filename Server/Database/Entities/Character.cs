@@ -15,10 +15,14 @@ public class Character{
     #region HeadBlendData // Player.Local.Character.GetHeadBlendData();
 
     public short Sex{ get; set; }
-    public int FirstFaceShape{ get; set; }
-    public int SecondFaceShape{ get; set; }
-    public int FirstSkinTone{ get; set; }
-    public int SecondSkinTone{ get; set; }
+    public int Mother{ get; set; }
+
+    public int Father{ get; set; }
+
+    /* public int FirstFaceShape{ get; set; }
+     public int SecondFaceShape{ get; set; }
+     public int FirstSkinTone{ get; set; }
+     public int SecondSkinTone{ get; set; }*/
     public float ParentFaceShapePercent{ get; set; }
     public float ParentSkinTonePercent{ get; set; }
 
@@ -114,8 +118,7 @@ public class Character{
 
     public override string ToString(){
         return $"Id: {Id}, AccId: {AccId}, Name: {Name}, Sex: {Sex}, " +
-               $"FirstFaceShape: {FirstFaceShape}, SecondFaceShape: {SecondFaceShape}, " +
-               $"FirstSkinTone: {FirstSkinTone}, SecondSkinTone: {SecondSkinTone}, " +
+               $"Mother: {Mother}, Father: {Father}, " +
                $"ParentFaceShapePercent: {ParentFaceShapePercent}, ParentSkinTonePercent: {ParentSkinTonePercent}, " +
                $"NoseWidth: {NoseWidth}, NosePeak: {NosePeak}, NoseLength: {NoseLength}, " +
                $"NoseBoneCurvness: {NoseBoneCurvness}, NoseTip: {NoseTip}, NoseBoneTwist: {NoseBoneTwist}, " +

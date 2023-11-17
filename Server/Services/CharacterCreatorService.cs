@@ -47,7 +47,7 @@ namespace Server.Services{
             const string InsertQuery = """
                                        INSERT INTO characters (
                                                          Id, AccId, Name, Sex,
-                                                         FirstFaceShape, SecondFaceShape, FirstSkinTone, SecondSkinTone, ParentFaceShapePercent, ParentSkinTonePercent,
+                                                         Mother, Father, ParentFaceShapePercent, ParentSkinTonePercent,
                                                          NoseWidth, NosePeak, NoseLength, NoseBoneCurvness, NoseTip, NoseBoneTwist, Eyebrow, Eyebrow2, CheekBones, CheekBonesWidth, CheekSidewaysBoneSize,
                                                          EyeOpening, LipThickness, JawBoneWidth, JawBoneShape, ChinBone, ChinBoneLength, ChinBoneShape, ChinHole, NeckThickness, FacialHair, FacialHairColor,
                                                          FacialHairOpacity, Eyebrows, EyebrowsColor, EyebrowsOpacity, Ageing, AgeingColor, AgeingOpacity, Makeup, MakeupColor, MakeupOpacity, Complexion,
@@ -56,7 +56,7 @@ namespace Server.Services{
                                                          LegsTexture, Foot, FootTexture, Scarfs, ScarfsTexture, Accesories, AccesoriesTexture, Torso2, Torso2Texture)
                                                        VALUES (
                                                          @Id, @AccId, @Name, @Sex,
-                                                         @FirstFaceShape, @SecondFaceShape, @FirstSkinTone, @SecondSkinTone, @ParentFaceShapePercent, @ParentSkinTonePercent,
+                                                         @Mother, @Father, @ParentFaceShapePercent, @ParentSkinTonePercent,
                                                          @NoseWidth, @NosePeak, @NoseLength, @NoseBoneCurvness, @NoseTip, @NoseBoneTwist, @Eyebrow, @Eyebrow2, @CheekBones, @CheekBonesWidth, @CheekSidewaysBoneSize,
                                                          @EyeOpening, @LipThickness, @JawBoneWidth, @JawBoneShape, @ChinBone, @ChinBoneLength, @ChinBoneShape, @ChinHole, @NeckThickness, @FacialHair, @FacialHairColor,
                                                          @FacialHairOpacity, @Eyebrows, @EyebrowsColor, @EyebrowsOpacity, @Ageing, @AgeingColor, @AgeingOpacity, @Makeup, @MakeupColor, @MakeupOpacity, @Complexion,

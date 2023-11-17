@@ -3,6 +3,7 @@ using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Entities;
 using Client.ScaleformUI;
+using ScaleformUI.Menu;
 
 namespace Client.Events{
     /*
@@ -97,7 +98,6 @@ namespace Client.Events{
             while (!API.IsScreenFadedIn())
                 await BaseScript.Delay(1);
 
-
             if (!API.IsEntityVisible(playerPed))
                 API.SetEntityVisible(playerPed, true, false);
 
@@ -119,18 +119,20 @@ namespace Client.Events{
             IsPlayerInCreator = true;
             API.DisplayRadar(false);
             API.SetPedHeadBlendData(API.GetPlayerPed(-1), 0, 0, 0, 0, 0, 0, 0, 0f, 0f, false);
-            CharacterCreatorUI.createUI();
+            UIMenu menu = CharacterCreatorUI.SelectSexUI();
+            menu.Visible = true;
+
+            API.TaskStandStill(Game.Player.Character.Handle, int.MaxValue);
+            API.FreezeEntityPosition(playerPed, true);
         }
 
         public static async void TeleportToWorld(short sex, float posX, float posY, float posZ, float heading){
             IsPlayerInCreator = false;
             API.ShutdownLoadingScreen();
-            API.DoScreenFadeOut(1000);
+            API.DoScreenFadeOut(600);
 
-            await BaseScript.Delay(3000);
-
+            await BaseScript.Delay(2000);
             int player = Game.Player.Handle;
-
 
             while (!API.HasPlayerTeleportFinished(player))
                 await BaseScript.Delay(1);
@@ -245,8 +247,8 @@ namespace Client.Events{
         public static void AssignCharacterData(string data){
             int playerPed = API.PlayerPedId();
             CharacterCreatorData character = CharacterCreatorData.DeserializeFromJson(data);
-            API.SetPedHeadBlendData(playerPed, character.FirstFaceShape, character.SecondFaceShape, 0,
-                                    character.FirstSkinTone, character.SecondSkinTone, 0,
+            API.SetPedHeadBlendData(playerPed, character.Mother, character.Father, 0,
+                                    character.Mother, character.Father, 0,
                                     character.ParentFaceShapePercent, character.ParentSkinTonePercent, 0, true);
 
             API.SetPedFaceFeature(playerPed, 0, character.NoseWidth);
