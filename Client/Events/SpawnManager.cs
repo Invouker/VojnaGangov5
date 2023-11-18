@@ -285,8 +285,8 @@ namespace Client.Events{
             API.SetPedComponentVariation(playerPed, 3, character.Torso, character.TorsoTexture, 0);
             API.SetPedComponentVariation(playerPed, 4, character.Legs, character.LegsTexture, 0);
             API.SetPedComponentVariation(playerPed, 6, character.Foot, character.FootTexture, 0);
-            API.SetPedComponentVariation(playerPed, 7, character.Scarfs, character.ScarfsTexture, 0);
-            API.SetPedComponentVariation(playerPed, 8, character.Accesories, character.AccesoriesTexture, 0);
+            API.SetPedComponentVariation(playerPed, 7, character.Accesories, character.AccesoriesTexture, 0);
+            API.SetPedComponentVariation(playerPed, 8, character.Scarfs, character.ScarfsTexture, 0);
             API.SetPedComponentVariation(playerPed, 11, character.Torso2, character.Torso2Texture, 0);
         }
     }
