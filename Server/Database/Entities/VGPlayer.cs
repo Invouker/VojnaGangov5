@@ -88,17 +88,24 @@ namespace Server.Database.Entities{
                 $"Id: {Id}, Name: {Name}, License: {Licence}, Hp: {Hp}, Max HP: {Max_hp}, Armour: {Armour}, Max Armour: {Max_armour}, WantedLevel: {WantedLevel}, Money: {Money}, BankMoney: {BankMoney}, Level: {Level},Xp: {Xp}, PosX: {PosX}, PosY: {PosY}, PosZ: {PosZ}, Dimension: {Dimension}";
         }
 
-
         /*
-         Weapon data should be saved with:
-        https://docs.fivem.net/natives/?_0x3A87E44BB9A01D54 // GetCurrentPedWeapon
-        https://docs.fivem.net/natives/?_0x7FEAD38B326B9F74 // GetPedAmmoTypeFromWeapon
+                internal class Weapon {
+                    private string WeaponHash { get; set; }
+                    private int Ammo { get; set; }   // int GetAmmoInPedWeapon(int   ped, uint weaponhash);
+                    private int Livery { get; set; } // int GetPedWeaponLiveryColor(int  ped, uint weaponHash, uint camoComponentHash);
+                    private int Tint { get; set; }   // int GetPedWeaponTintIndex(int ped, uint weaponHash);
 
-        https://docs.fivem.net/natives/?_0x5FD1E1F011E76D7E // SetPedAmmoByType
+                }
 
-        https://docs.fivem.net/natives/?_0xF0A60040BE558F2D // GetPedWeaponLiveryColor
-        https://docs.fivem.net/natives/?_0x2B9EEDC07BD06B9F // GetPedWeaponTintIndex
-        https://docs.fivem.net/natives/?_0xD966D51AA5B28BB9 // GiveWeaponComponentToPed
-         */
+                 Weapon data should be saved with:
+                https://docs.fivem.net/natives/?_0x3A87E44BB9A01D54 // GetCurrentPedWeapon
+                https://docs.fivem.net/natives/?_0x7FEAD38B326B9F74 // GetPedAmmoTypeFromWeapon
+
+                https://docs.fivem.net/natives/?_0x5FD1E1F011E76D7E // SetPedAmmoByType
+
+                https://docs.fivem.net/natives/?_0xF0A60040BE558F2D // GetPedWeaponLiveryColor
+                https://docs.fivem.net/natives/?_0x2B9EEDC07BD06B9F // GetPedWeaponTintIndex
+                https://docs.fivem.net/natives/?_0xD966D51AA5B28BB9 // GiveWeaponComponentToPed
+                 */
     }
 }

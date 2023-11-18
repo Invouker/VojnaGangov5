@@ -48,6 +48,19 @@ namespace Server.Testable{
                     }
                 });
             }), false);
+
+            API.RegisterCommand("test", new Action<int, List<object>, string>((source, args, rawCommand) => {
+                Player player = Players[source];
+                player.TriggerEvent("cmd:test");
+
+                player.TriggerEvent("chat:addMessage", new{
+                    color = new[]{ 16, 43, 76 },
+                    args = new[]{
+                        "[Server]",
+                        $"Position X: {player.Character.Position.X}, Y: {player.Character.Position.Y}, Z: {player.Character.Position.Z}, Head: {player.Character.Heading}"
+                    }
+                });
+            }), false);
         }
     }
 }

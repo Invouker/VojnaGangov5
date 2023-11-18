@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Entities;
 using Client.Events;
 using Client.Streamable;
 
@@ -23,9 +24,9 @@ namespace Client{
                 new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
             EventHandlers["player:character:data"] += new Action<string>(SpawnManager.AssignCharacterData);
             EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
+            EventHandlers["cmd:test"] += new Action(WeaponLoader.LoadWeaponsData);
 
             Tick += InteractStreamable.OnInteractTick;
-
             Tick += async () => {
                 Vector3 camPos = API.GetGameplayCamCoord();
                 API.SetTextFont(1);
