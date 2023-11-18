@@ -19,18 +19,30 @@ namespace Client{
             EventHandlers["streamer:create3dText"] +=
                 new Action<string, float, float, float, int, int, int, int>(Streamer.Create3dText);
 
-
-            //EventHandlers["player:interact:marker"] += new Action<int>(CharacterCreatorUI.Interact);
-
             EventHandlers["player:spawn:to:world"] +=
                 new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
             EventHandlers["player:character:data"] += new Action<string>(SpawnManager.AssignCharacterData);
-            /*EventHandlers["player:spawn:to:world2"] +=
-                new Action(SpawnManager.TeleportToWorld2); //Todo: probably delete this, and method too.*/
             EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
-            //EventHandlers["player:loaded:teleport"] += new Action(SpawnManager.RequestTeleport);
 
             Tick += InteractStreamable.OnInteractTick;
+
+            Tick += async () => {
+                Vector3 camPos = API.GetGameplayCamCoord();
+                API.SetTextFont(1);
+                API.SetTextProportional(true);
+                API.SetTextScale(0.0f, 0.3f);
+                API.SetTextColour(128, 128, 128, 255);
+                API.SetTextDropshadow(0, 0, 0, 0, 255);
+                API.SetTextEdge(1, 0, 0, 0, 150);
+
+                API.SetTextOutline();
+                API.SetTextEntry("String");
+                API.AddTextComponentString($"X: {camPos.X}, Y: {camPos.Y}, X: {camPos.Z}");
+                API.DrawText(20, 20);
+                await Delay(5000);
+                //await Task.FromResult(true);
+                Debug.WriteLine($"X: {camPos.X}, Y: {camPos.Y}, X: {camPos.Z}");
+            };
             TriggerServerEvent("player:post_join");
         }
 

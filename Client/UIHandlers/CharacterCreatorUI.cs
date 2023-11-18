@@ -7,7 +7,7 @@ using Client.Events;
 using ScaleformUI;
 using ScaleformUI.Menu;
 
-namespace Client.ScaleformUI{
+namespace Client.UIHandlers{
     public static class CharacterCreatorUI{
         private static readonly CharacterCreatorData CharacterData = new CharacterCreatorData();
 
@@ -678,6 +678,11 @@ namespace Client.ScaleformUI{
             API.SetPlayerModel(Game.Player.Handle, intHash);
             API.SetPedDefaultComponentVariation(Game.Player.Character.Handle);
             API.SetModelAsNoLongerNeeded(intHash);
+
+            API.SetPedCanHeadIk(Game.Player.Character.Handle, true);
+            API.TaskStandStill(Game.Player.Character.Handle, int.MaxValue);
+            Game.Player.Character.IsPositionFrozen = true;
+            Game.Player.Character.IsInvincible = true;
 
             API.SetPedHeadBlendData(Game.Player.Character.Handle, 0, 0, 0, 0, 0, 0, 0, 0f, 0f, false);
         }
