@@ -25,24 +25,6 @@ namespace Client{
             EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
 
             Tick += InteractStreamable.OnInteractTick;
-
-            Tick += async () => {
-                Vector3 camPos = API.GetGameplayCamCoord();
-                API.SetTextFont(1);
-                API.SetTextProportional(true);
-                API.SetTextScale(0.0f, 0.3f);
-                API.SetTextColour(128, 128, 128, 255);
-                API.SetTextDropshadow(0, 0, 0, 0, 255);
-                API.SetTextEdge(1, 0, 0, 0, 150);
-
-                API.SetTextOutline();
-                API.SetTextEntry("String");
-                API.AddTextComponentString($"X: {camPos.X}, Y: {camPos.Y}, X: {camPos.Z}");
-                API.DrawText(20, 20);
-                await Delay(5000);
-                //await Task.FromResult(true);
-                Debug.WriteLine($"X: {camPos.X}, Y: {camPos.Y}, X: {camPos.Z}");
-            };
             TriggerServerEvent("player:post_join");
         }
 
