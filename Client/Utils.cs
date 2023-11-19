@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Client;
 
 public static class Utils{
@@ -8,5 +10,13 @@ public static class Utils{
         }
 
         return false;
+    }
+
+    public static int CountDigits(int number){
+        return number.ToString().Length;
+    }
+
+    public static string FormatWithDotSeparator(int number){
+        return number.ToString("N0", CultureInfo.InvariantCulture);
     }
 }

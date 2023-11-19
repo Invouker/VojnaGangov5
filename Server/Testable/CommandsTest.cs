@@ -42,7 +42,9 @@ namespace Server.Testable{
 
             API.RegisterCommand("test", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                player.TriggerEvent("test:rankup");
+                //player.TriggerEvent("test:rankup");
+                PlayerService.SetMoney(player, PlayerService.MoneyType.Wallet, 32503536);
+                PlayerService.SetMoney(player, PlayerService.MoneyType.Bank, 1503536);
                 Debug.WriteLine("test:rankup");
             }), false);
         }

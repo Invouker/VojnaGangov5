@@ -47,8 +47,8 @@ namespace Server.Services{
         #region MoneyMethods
 
         public enum MoneyType{
-            Bank,
-            Wallet
+            Wallet = 0,
+            Bank = 1
         }
 
         public static void SetMoney(Player player, MoneyType moneyType, uint value){
@@ -61,8 +61,11 @@ namespace Server.Services{
                     vgPlayer.Money = value;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType, null);
+                    throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
+                                                          "There is no other registred MoneyType than (Wallet,Bank).");
             }
+
+            BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, value);
         }
 
         public static void AddMoney(Player player, MoneyType moneyType, uint value){
@@ -75,8 +78,11 @@ namespace Server.Services{
                     vgPlayer.Money += value;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType, null);
+                    throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
+                                                          "There is no other registred MoneyType than (Wallet,Bank).");
             }
+
+            BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, value);
         }
 
         public static void TakeMoney(Player player, MoneyType moneyType, uint value){
@@ -91,6 +97,8 @@ namespace Server.Services{
                 default:
                     throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType, null);
             }
+
+            BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, value);
         }
 
         #endregion

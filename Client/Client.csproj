@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\CharacterCreatorData.cs"/>
+    <Compile Include="Events\Hud.cs"/>
     <Compile Include="Events\SpawnManager.cs"/>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Streamable\InteractStreamable.cs"/>
     <Compile Include="Streamable\Streamer.cs"/>
       <Compile Include="Utils.cs"/>
+    <Compile Include="Var.cs"/>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Testable\"/>

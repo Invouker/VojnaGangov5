@@ -31,7 +31,11 @@ namespace Client{
             //EventHandlers["test:rankup"] += new Action(Hud.rankUp(10, 1, 100, 1));
 
             Tick += InteractStreamable.OnInteractTick;
+            Tick += Hud.OnRender;
             TriggerServerEvent("player:post_join");
+
+
+            AddEventHandler("player:hud:update:money", new Action<int, int>(Hud.ChangeMoney));
         }
 
         [Tick]
@@ -50,6 +54,10 @@ namespace Client{
         public async Task OnTickInteract(){
             await InteractStreamable.OnInteractTick();
             await Task.FromResult(true);
+        }
+
+        public void AddEventHandler(string handler, Delegate action){
+            EventHandlers[handler] += action;
         }
 
         private void LoadPlayerData(long money, long bankMoney, float x, float y, float z, int dimension, int hp,
