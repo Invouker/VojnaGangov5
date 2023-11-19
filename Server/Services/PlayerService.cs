@@ -51,6 +51,26 @@ namespace Server.Services{
             Bank = 1
         }
 
+        public static bool HasMoreThanMoney(Player player, MoneyType moneyType, int value){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            return moneyType switch{
+                MoneyType.Bank => vgPlayer.BankMoney >= value,
+                MoneyType.Wallet => vgPlayer.Money >= value,
+                _ => throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
+                                                           "There is no other registred MoneyType than (Wallet,Bank).")
+            };
+        }
+
+        public static long GetMoney(Player player, MoneyType moneyType){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            return moneyType switch{
+                MoneyType.Bank => vgPlayer.BankMoney,
+                MoneyType.Wallet => vgPlayer.Money,
+                _ => throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
+                                                           "There is no other registred MoneyType than (Wallet,Bank).")
+            };
+        }
+
         public static void SetMoney(Player player, MoneyType moneyType, uint value){
             VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
             switch (moneyType){
