@@ -54,7 +54,6 @@ namespace Server.Services{
 
             int nextLevel = vgPlayer.Level + 1;
             int requiredXPForNextLevel = GetReputationToLevel(nextLevel);
-            int xp = GetXP(player);
             while (vgPlayer.Xp >= requiredXPForNextLevel){
                 vgPlayer.Xp -= requiredXPForNextLevel;
                 vgPlayer.Level++;
