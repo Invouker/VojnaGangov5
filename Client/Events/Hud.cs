@@ -5,11 +5,22 @@ using static CitizenFX.Core.Native.API;
 
 namespace Client.Events{
     public static class Hud{
-        public static Task OnRender(){
+        private static bool IsRadarExtended;
+
+        public static async Task OnRender(){
             renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.01f, 153, 255, 153); // Wallet
             renderMoney($"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}", 0.83f, 0.04f, 0, 155, 0); // Bank
 
-            return Task.FromResult(true);
+            renderMap();
+        }
+
+        private static async void renderMap(){
+            if (!IsControlJustPressed(0, 20) || IsRadarExtended) return;
+            IsRadarExtended = true;
+            SetRadarBigmapEnabled(true, false);
+            await BaseScript.Delay(7000);
+            SetRadarBigmapEnabled(false, false);
+            IsRadarExtended = false;
         }
 
         private static void renderMoney(string text, float x, float y, int r, int g, int b){
