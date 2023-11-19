@@ -31,7 +31,6 @@ namespace Server{
 
         public void AddEventHandler(string handler, Delegate action){
             EventHandlers[handler] += action;
-            Debug.WriteLine($"Handler: {handler}, delgate: {action.ToString()}");
         }
 
         public static void sendMessage(string message){
