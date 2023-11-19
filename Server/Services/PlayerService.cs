@@ -248,15 +248,17 @@ namespace Server.Services{
             timer.Enabled = true;
         }
 
-        private void OnTimedEvent(){
+        private static void OnTimedEvent(){
+            int TotalSaved = 0;
             foreach (Player player in Main.Instance.PlayerList()){
                 if (player == null)
                     continue;
 
                 PlayerService.UpdatePlayer(player, Utils.GetLicense(player));
+                TotalSaved++;
             }
 
-            Debug.WriteLine("[Server] Autosave of players [Every 5 minutes];");
+            Debug.WriteLine($"[Server] Auto-save of players ({TotalSaved})");
         }
     }
 }
