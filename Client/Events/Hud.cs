@@ -24,6 +24,11 @@ namespace Client.Events{
             DrawText(x, y);
         }
 
+        public static void ShowRankBar(int giveXP, int maxXP){
+            ScaleformUI.Main.RankBarInstance.OverrideAnimationSpeed(2000);
+            ScaleformUI.Main.RankBarInstance.SetScores(0, maxXP, Var.XP, (Var.XP + giveXP), Var.Level);
+        }
+
         public static async void ChangeMoney(int moneyType, int value){
             int currentMoney = moneyType switch{
                 0 => Var.Money,
@@ -32,7 +37,7 @@ namespace Client.Events{
             };
 
             if (currentMoney == -1){
-                Console.WriteLine("Invalid money type.");
+                Debug.WriteLine("Invalid money type.");
                 return;
             }
 
@@ -55,8 +60,17 @@ namespace Client.Events{
                         break;
                 }
 
-                await BaseScript.Delay(50);
+                await BaseScript.Delay(40);
             }
+        }
+
+        public static void Rank(){
+            ShowRankBar(1000, 100);
+        }
+
+        public static void ChangeXp(int xp, int level){
+            Var.XP = xp;
+            Var.Level = level;
         }
     }
 }

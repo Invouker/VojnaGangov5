@@ -7,6 +7,10 @@ namespace Server{
     public class Main : BaseScript{
         public static Main Instance{ get; set; }
 
+        public PlayerList PlayerList(){
+            return Players;
+        }
+
         public Main(){
             Instance = this;
             new ServiceManager();
@@ -23,10 +27,6 @@ namespace Server{
             EventHandlers["player:post_join"] += new Action<Player>(ServiceManager.CharacterCreatorService.Loader);
 
             CommandsTest.RegisterCommands(Players);
-        }
-
-        public PlayerList PlayerList(){
-            return Players;
         }
 
         public void AddEventHandler(string handler, Delegate action){

@@ -13,8 +13,7 @@ namespace Client{
             Instance = this;
 
             TriggerServerEvent("player:join");
-            EventHandlers["player:load:data"] +=
-                new Action<long, long, float, float, float, int, int, int, int, int>(LoadPlayerData);
+            EventHandlers["player:load:data"] += new Action<long, long, int, int, int, int, int>(LoadPlayerData);
 
             EventHandlers["streamer:createBlip"] +=
                 new Action<string, float, float, float, int, int, int, int, float, bool>(Streamer.CreateBlip);
@@ -27,15 +26,15 @@ namespace Client{
                 new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
             EventHandlers["player:character:data"] += new Action<string>(SpawnManager.AssignCharacterData);
             EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
-            EventHandlers["player:money:update"] += new Action<int, int>(Var.MoneyUpdate);
-            //EventHandlers["test:rankup"] += new Action(Hud.rankUp(10, 1, 100, 1));
+            //EventHandlers["test:rankup"] += new Action(Hud.Rank);
 
             Tick += InteractStreamable.OnInteractTick;
             Tick += Hud.OnRender;
             TriggerServerEvent("player:post_join");
 
-
             AddEventHandler("player:hud:update:money", new Action<int, int>(Hud.ChangeMoney));
+            AddEventHandler("player:hud:update:show:rank", new Action<int, int>(Hud.ShowRankBar));
+            AddEventHandler("player:hud:update:xp", new Action<int, int>(Hud.ChangeXp));
         }
 
         [Tick]
@@ -60,8 +59,8 @@ namespace Client{
             EventHandlers[handler] += action;
         }
 
-        private void LoadPlayerData(long money, long bankMoney, float x, float y, float z, int dimension, int hp,
-            int maxHp, int armour, int maxArmour){
+        private void LoadPlayerData(long money, long bankMoney, int dimension, int hp, int maxHp, int armour,
+            int maxArmour){
             int playerPed = API.PlayerPedId();
             API.SetEntityHealth(playerPed, hp);
             API.SetEntityMaxHealth(playerPed, maxHp);

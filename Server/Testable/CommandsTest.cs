@@ -42,10 +42,24 @@ namespace Server.Testable{
 
             API.RegisterCommand("test", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                //player.TriggerEvent("test:rankup");
+                player.TriggerEvent("test:rankup");
                 PlayerService.SetMoney(player, PlayerService.MoneyType.Wallet, 32503536);
                 PlayerService.SetMoney(player, PlayerService.MoneyType.Bank, 1503536);
                 Debug.WriteLine("test:rankup");
+            }), false);
+            API.RegisterCommand("test2", new Action<int, List<object>, string>((source, args, rawCommand) => {
+                Player player = Players[source];
+                player.TriggerEvent("test:rankup");
+                PlayerService.TakeMoney(player, PlayerService.MoneyType.Wallet, 25300);
+                PlayerService.AddMoney(player, PlayerService.MoneyType.Bank, 5700);
+                Debug.WriteLine("test:rankup");
+            }), false);
+
+            API.RegisterCommand("test3", new Action<int, List<object>, string>((source, args, rawCommand) => {
+                Player player = Players[source];
+                PlayerService.GiveXP(player, 60);
+                Debug.WriteLine($"XP: {PlayerService.GetXP(player)}, Level: {PlayerService.GetLevel(player)}");
+                Debug.WriteLine($"XP: {PlayerService.GetXP(player)},XpToNextLevel: {PlayerService.GetReputationToLevel(PlayerService.GetLevel(player) + 1)} ,Level: {PlayerService.GetLevel(player)}");
             }), false);
         }
     }

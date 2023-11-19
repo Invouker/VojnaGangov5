@@ -43,6 +43,67 @@ namespace Server.Services{
             return null; // Return null if the player with the given name is not found.
         }
 
+        #region Reputation
+
+        public static int GetReputationToLevel(int level){
+            return level * 827 + 1734 + level * 86;
+        }
+
+        private static void UpdateLevel(Player player){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+
+            int nextLevel = vgPlayer.Level + 1;
+            int requiredXPForNextLevel = GetReputationToLevel(nextLevel);
+            int xp = GetXP(player);
+            while (vgPlayer.Xp >= requiredXPForNextLevel){
+                vgPlayer.Xp -= requiredXPForNextLevel;
+                vgPlayer.Level++;
+
+                nextLevel++;
+                requiredXPForNextLevel = GetReputationToLevel(nextLevel);
+            }
+
+            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+        }
+
+        public static int GetXP(Player player){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            return vgPlayer.Xp;
+        }
+
+        public static void GiveXP(Player player, uint value){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            vgPlayer.Xp += (int)value;
+            UpdateLevel(player);
+            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+            player.TriggerEvent("player:hud:update:show:rank", value, GetReputationToLevel(vgPlayer.Level + 1));
+        }
+
+        public static void TakeXP(Player player, uint value){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            vgPlayer.Xp -= (int)value;
+            UpdateLevel(player);
+            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+        }
+
+        public static int GetLevel(Player player){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            return vgPlayer.Level;
+        }
+
+        public static void GiveLevel(Player player, uint value){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            vgPlayer.Level += (int)value;
+            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+        }
+
+        public static void TakeLevel(Player player, uint value){
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            vgPlayer.Level -= (int)value;
+            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+        }
+
+        #endregion
 
         #region MoneyMethods
 
@@ -93,16 +154,17 @@ namespace Server.Services{
             switch (moneyType){
                 case MoneyType.Bank:
                     vgPlayer.BankMoney += value;
+                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType,
+                                                  vgPlayer.BankMoney);
                     break;
                 case MoneyType.Wallet:
                     vgPlayer.Money += value;
+                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
                                                           "There is no other registred MoneyType than (Wallet,Bank).");
             }
-
-            BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, value);
         }
 
         public static void TakeMoney(Player player, MoneyType moneyType, uint value){
@@ -110,15 +172,16 @@ namespace Server.Services{
             switch (moneyType){
                 case MoneyType.Bank:
                     vgPlayer.BankMoney -= value;
+                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType,
+                                                  vgPlayer.BankMoney);
                     break;
                 case MoneyType.Wallet:
                     vgPlayer.Money -= value;
+                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType, null);
             }
-
-            BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, value);
         }
 
         #endregion
@@ -147,7 +210,7 @@ namespace Server.Services{
             Players.Remove(license);
         }
 
-        public void OnResourceStop(string resource){ //Todo: Uncomment this if playerlist and autosave will be ok
+        public void OnResourceStop(string resource){
             if (resource != "vojnagangov5")
                 return;
             Debug.WriteLine($"Resource {resource} has stopped");
@@ -175,14 +238,17 @@ namespace Server.Services{
 
                 API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, false);
 
-                player.TriggerEvent("player:load:data", vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.PosX,
-                                    vgPlayer.PosY, vgPlayer.PosZ, vgPlayer.Dimension, vgPlayer.Hp, vgPlayer.Max_hp,
+                player.TriggerEvent("player:load:data", vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.Dimension,
+                                    vgPlayer.Hp, vgPlayer.Max_hp,
                                     vgPlayer.Armour, vgPlayer.Max_armour);
                 //   (long money, long bankMoney, float x, float y, float z, int dimension, int hp, int maxHp, int armour, int maxArmour){
                 //   new Action<long, long, float, float, float, int, int, int, int, int>(LoadPlayerData);
                 Debug.WriteLine($"Loaded data: {vgPlayer}");
 
                 Players.Add(license, vgPlayer);
+                player.TriggerEvent("player:hud:update:money", 0, vgPlayer.Money);
+                player.TriggerEvent("player:hud:update:money", 1, vgPlayer.BankMoney);
+
                 await connection.CloseAsync();
             }
         }
