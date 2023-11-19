@@ -39,7 +39,7 @@ namespace Server.Services{
             string name = player.Name;
 
             Character character = Character.DeserializeFromJson(data);
-            VGPlayer vgPlayer = PlayerService.GetVgPlayer(Utils.GetLicense(player));
+            VGPlayer vgPlayer = PlayerService.GetVgPlayerByPlayer(player);
             character.AccId = vgPlayer.Id;
             character.Name = name;
 
@@ -82,7 +82,7 @@ namespace Server.Services{
         public async void Loader([FromSource] Player player){
             bool tasks = await CheckIfCharacterExist(player.Name);
             Character character = await GetCharacter(player.Name);
-            VGPlayer vgPlayer = PlayerService.GetVgPlayer(Utils.GetLicense(player));
+            VGPlayer vgPlayer = PlayerService.GetVgPlayerByPlayer(player);
             if (tasks)
                 BaseScript.TriggerClientEvent("player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY,
                                               vgPlayer.PosZ, 110f);

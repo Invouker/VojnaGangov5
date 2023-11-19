@@ -11,7 +11,7 @@ namespace Server.Testable{
             API.RegisterCommand("get", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
                 //ServiceManager.PlayerService.Players.TryGetValue(Utils.GetLicense(player), out VGPlayer vgPlayer);
-                VGPlayer vgPlayer = PlayerService.GetVgPlayer(player.Name);
+                VGPlayer vgPlayer = PlayerService.GetVgPlayerByLicense(player.Name);
                 player.TriggerEvent("chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player get: {vgPlayer.ToString()}" }
@@ -20,19 +20,10 @@ namespace Server.Testable{
 
             API.RegisterCommand("save", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                ServiceManager.PlayerService.UpdatePlayer(player, Utils.GetLicense(player));
+                PlayerService.UpdatePlayer(player, Utils.GetLicense(player));
                 player.TriggerEvent("chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player saved" }
-                });
-            }), false);
-
-            API.RegisterCommand("load", new Action<int, List<object>, string>((source, args, rawCommand) => {
-                Player player = Players[source];
-                ServiceManager.PlayerService.LoadPlayer(player, Utils.GetLicense(player));
-                player.TriggerEvent("chat:addMessage", new{
-                    color = new[]{ 16, 43, 76 },
-                    args = new[]{ "[Server]", $"Player Loaded" }
                 });
             }), false);
 
@@ -47,6 +38,12 @@ namespace Server.Testable{
                         $"Position X: {player.Character.Position.X}, Y: {player.Character.Position.Y}, Z: {player.Character.Position.Z}, Head: {player.Character.Heading}"
                     }
                 });
+            }), false);
+
+            API.RegisterCommand("test", new Action<int, List<object>, string>((source, args, rawCommand) => {
+                Player player = Players[source];
+                player.TriggerEvent("test:rankup");
+                Debug.WriteLine("test:rankup");
             }), false);
         }
     }

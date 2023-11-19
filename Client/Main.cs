@@ -7,7 +7,11 @@ using Client.Streamable;
 
 namespace Client{
     public class Main : BaseScript{
+        public static Main Instance{ get; set; }
+
         public Main(){
+            Instance = this;
+
             TriggerServerEvent("player:join");
             EventHandlers["player:load:data"] +=
                 new Action<long, long, float, float, float, int, int, int, int, int>(LoadPlayerData);
@@ -23,6 +27,8 @@ namespace Client{
                 new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
             EventHandlers["player:character:data"] += new Action<string>(SpawnManager.AssignCharacterData);
             EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
+            EventHandlers["player:money:update"] += new Action<int, int>(Var.MoneyUpdate);
+            //EventHandlers["test:rankup"] += new Action(Hud.rankUp(10, 1, 100, 1));
 
             Tick += InteractStreamable.OnInteractTick;
             TriggerServerEvent("player:post_join");

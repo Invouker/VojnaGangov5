@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 
@@ -9,12 +10,7 @@ namespace Server{
         }
 
         public static bool IsNumberInArray(IEnumerable<int> array, int number){
-            foreach (var numberArray in array){
-                if (numberArray == number)
-                    return true;
-            }
-
-            return false;
+            return array.Any(numberArray => numberArray == number);
         }
     }
 }
