@@ -25,7 +25,8 @@ namespace Client.Events{
         }
 
         public static void ShowRankBar(int giveXP, int maxXP){
-            ScaleformUI.Main.RankBarInstance.OverrideAnimationSpeed(2000);
+            ScaleformUI.Main.RankBarInstance.OverrideAnimationSpeed(3000);
+            ScaleformUI.Main.RankBarInstance.OverrideOnscreenDuration(7000);
             ScaleformUI.Main.RankBarInstance.SetScores(0, maxXP, Var.XP, (Var.XP + giveXP), Var.Level);
         }
 
