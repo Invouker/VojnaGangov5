@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using CitizenFX.Core;
+using Client.UIHandlers;
 using Newtonsoft.Json;
 using ScaleformUI;
 using ScaleformUI.Elements;
@@ -16,6 +17,10 @@ namespace Client.Events{
         private static readonly PlayerListHandler PlayerListInstance = ScaleformUI.Main.PlayerListInstance;
 
         public static Task OnRender(){
+            if (IsControlJustPressed(0, Control.InteractionMenu.GetHashCode()))
+                InteractiveUI.GetInteractiveUI().Visible = !InteractiveUI.GetInteractiveUI().Visible;
+
+
             if (Var.HideAllHud)
                 return Task.FromResult(true);
 

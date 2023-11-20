@@ -69,6 +69,7 @@
       <Compile Include="UIHandlers\CharacterCreatorUI.cs"/>
     <Compile Include="Streamable\InteractStreamable.cs"/>
     <Compile Include="Streamable\Streamer.cs"/>
+    <Compile Include="UIHandlers\InteractiveUI.cs"/>
       <Compile Include="Utils.cs"/>
     <Compile Include="Var.cs"/>
   </ItemGroup>
