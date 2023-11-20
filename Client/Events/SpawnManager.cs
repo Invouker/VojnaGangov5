@@ -137,6 +137,8 @@ namespace Client.Events{
             API.TaskStandStill(Game.Player.Character.Handle, 0);
             Game.Player.Character.IsPositionFrozen = false;
             Game.Player.Character.IsInvincible = false;
+
+            Var.HideAllHud = false;
         }
 
 

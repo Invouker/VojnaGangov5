@@ -8,6 +8,9 @@ namespace Client.Events{
         private static bool IsRadarExtended;
 
         public static async Task OnRender(){
+            if (Var.HideAllHud)
+                return;
+
             renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.01f, 153, 255, 153); // Wallet
             renderMoney($"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}", 0.83f, 0.04f, 0, 155, 0); // Bank
 
