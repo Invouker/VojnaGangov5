@@ -19,4 +19,8 @@ public static class Utils{
     public static string FormatWithDotSeparator(int number){
         return number.ToString("N0", CultureInfo.InvariantCulture);
     }
+
+    public static int GetReputationToLevel(int level){
+        return level * 827 + 1734 + level * 86;
+    }
 }

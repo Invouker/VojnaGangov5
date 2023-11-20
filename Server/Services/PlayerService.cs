@@ -85,7 +85,7 @@ namespace Server.Services{
             vgPlayer.Xp += (int)value;
             UpdateLevel(player);
             player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
-            player.TriggerEvent("player:hud:update:show:rank", value, GetReputationToLevel(vgPlayer.Level + 1));
+            player.TriggerEvent("player:hud:update:show:rank", value);
         }
 
         public static void TakeXP(Player player, uint value){
@@ -253,7 +253,7 @@ namespace Server.Services{
 
                 player.TriggerEvent("player:load:data", vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.Dimension,
                                     vgPlayer.Hp, vgPlayer.Max_hp,
-                                    vgPlayer.Armour, vgPlayer.Max_armour);
+                                    vgPlayer.Armour, vgPlayer.Max_armour, vgPlayer.Level, vgPlayer.Xp);
                 //   (long money, long bankMoney, float x, float y, float z, int dimension, int hp, int maxHp, int armour, int maxArmour){
                 //   new Action<long, long, float, float, float, int, int, int, int, int>(LoadPlayerData);
                 Debug.WriteLine($"Loaded data: {vgPlayer}");

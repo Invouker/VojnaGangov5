@@ -22,7 +22,7 @@ namespace Client.Events{
             renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.01f, 153, 255, 153); // Wallet
             renderMoney($"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}", 0.83f, 0.04f, 0, 155, 0); // Bank
 
-            renderMap();
+            RenderProps();
 
             return Task.FromResult(true);
         }
@@ -95,16 +95,19 @@ namespace Client.Events{
             }
         }
 
-        private static async void renderMap(){
+        private static async void RenderProps(){
             if (MenuHandler.IsAnyMenuOpen) return;
             if (!IsControlJustPressed(0, 20) || IsRadarExtended) return;
             IsRadarExtended = true;
             renderPlayerList();
             SetRadarBigmapEnabled(true, false);
+            ShowRankBar(0);
+            Debug.WriteLine($"Xp: {Var.XP}, Level: {Var.Level}");
             await BaseScript.Delay(7000);
             SetRadarBigmapEnabled(false, false);
             PlayerListInstance.Enabled = false;
             IsRadarExtended = false;
+            ScaleformUI.Main.RankBarInstance.Remove();
         }
 
         private static void renderMoney(string text, float x, float y, int r, int g, int b){
@@ -119,10 +122,11 @@ namespace Client.Events{
             DrawText(x, y);
         }
 
-        public static void ShowRankBar(int giveXP, int maxXP){
+        public static void ShowRankBar(int giveXP){
             ScaleformUI.Main.RankBarInstance.OverrideAnimationSpeed(3000);
             ScaleformUI.Main.RankBarInstance.OverrideOnscreenDuration(7000);
-            ScaleformUI.Main.RankBarInstance.SetScores(0, maxXP, Var.XP, (Var.XP + giveXP), Var.Level);
+            ScaleformUI.Main.RankBarInstance.SetScores(0, Utils.GetReputationToLevel(Var.Level + 1), Var.XP,
+                                                       (Var.XP + giveXP), Var.Level);
         }
 
         public static async void ChangeMoney(int moneyType, int value){

@@ -13,7 +13,8 @@ namespace Client{
             Instance = this;
 
             TriggerServerEvent("player:join");
-            EventHandlers["player:load:data"] += new Action<long, long, int, int, int, int, int>(LoadPlayerData);
+            EventHandlers["player:load:data"] +=
+                new Action<long, long, int, int, int, int, int, int, int>(LoadPlayerData);
 
             EventHandlers["streamer:createBlip"] +=
                 new Action<string, float, float, float, int, int, int, int, float, bool>(Streamer.CreateBlip);
@@ -33,7 +34,7 @@ namespace Client{
             TriggerServerEvent("player:post_join");
 
             AddEventHandler("player:hud:update:money", new Action<int, int>(Hud.ChangeMoney));
-            AddEventHandler("player:hud:update:show:rank", new Action<int, int>(Hud.ShowRankBar));
+            AddEventHandler("player:hud:update:show:rank", new Action<int>(Hud.ShowRankBar));
             AddEventHandler("player:hud:update:xp", new Action<int, int>(Hud.ChangeXp));
 
             TriggerServerEvent("playerlist:list:max", new Action<int, string>((max, serverName) => {
@@ -69,7 +70,7 @@ namespace Client{
         }
 
         private void LoadPlayerData(long money, long bankMoney, int dimension, int hp, int maxHp, int armour,
-            int maxArmour){
+            int maxArmour, int level, int xp){
             int playerPed = API.PlayerPedId();
             API.SetEntityHealth(playerPed, hp);
             API.SetEntityMaxHealth(playerPed, maxHp);
@@ -78,6 +79,8 @@ namespace Client{
 
             API.SetMaxHealthHudDisplay(maxHp);
             API.SetMaxArmourHudDisplay(maxArmour);
+            Var.XP = xp;
+            Var.Level = level;
         }
     }
 }
