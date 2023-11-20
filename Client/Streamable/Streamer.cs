@@ -26,9 +26,10 @@ namespace Client.Streamable{
         }
 
         public static void CreateBlip(string blipName, float x, float y, float z, int colour = 0, int alpha = 255,
-            int blipSprite = 84, int blipDisplay = 2, float blipScale = 1f, bool showAsShortRange = false){
+            int blipSprite = 84, int blipDisplay = 2, float blipScale = 1f, bool showAsShortRange = false,
+            bool quickGps = false){
             var mapBlip = new MapBlip(blipName, x, y, z, colour, alpha, blipSprite, blipDisplay, blipScale,
-                                      showAsShortRange);
+                                      showAsShortRange, quickGps);
             Streamed.Add(mapBlip);
             mapBlip.Render();
         }
@@ -152,11 +153,12 @@ namespace Client.Streamable{
         private readonly int _colour;
         private readonly int _alpha;
         private readonly bool _showAsShortRange;
+        private bool QuickGPS{ get; }
 
         private readonly String _blipName;
 
         public MapBlip(string blipName, float x, float y, float z, int colour = 0, int alpha = 255, int blipSprite = 1,
-            int blipDisplay = 2, float blipScale = 1f, bool showAsShortRange = false){
+            int blipDisplay = 2, float blipScale = 1f, bool showAsShortRange = false, bool quickGps = false){
             _x = x;
             _y = y;
             _z = z;
@@ -167,6 +169,7 @@ namespace Client.Streamable{
             _alpha = alpha;
             _showAsShortRange = showAsShortRange;
             _blipName = blipName;
+            QuickGPS = quickGps;
         }
 
         public void Render(){

@@ -17,7 +17,7 @@ namespace Client{
                 new Action<long, long, int, int, int, int, int, int, int>(LoadPlayerData);
 
             EventHandlers["streamer:createBlip"] +=
-                new Action<string, float, float, float, int, int, int, int, float, bool>(Streamer.CreateBlip);
+                new Action<string, float, float, float, int, int, int, int, float, bool, bool>(Streamer.CreateBlip);
             EventHandlers["streamer:createMarker"] +=
                 new Action<int, float, float, float, int, int, int, int, bool>(Streamer.CreateMarker);
             EventHandlers["streamer:create3dText"] +=
