@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using CitizenFX.Core;
@@ -14,14 +15,16 @@ namespace Client.Events{
         private static bool IsRadarExtended;
         private static readonly PlayerListHandler PlayerListInstance = ScaleformUI.Main.PlayerListInstance;
 
-        public static async Task OnRender(){
+        public static Task OnRender(){
             if (Var.HideAllHud)
-                return;
+                return Task.FromResult(true);
 
             renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.01f, 153, 255, 153); // Wallet
             renderMoney($"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}", 0.83f, 0.04f, 0, 155, 0); // Bank
 
             renderMap();
+
+            return Task.FromResult(true);
         }
 
         private static async void renderPlayerList(){
@@ -78,12 +81,12 @@ namespace Client.Events{
             }
         }
 
+        [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
         public class PlayerSlot{
             public string Name{ get; set; }
-
             public int Level{ get; set; }
-
-            //private int Color { get; set; }
             public string JobPointsText{ get; set; }
             public string GangName{ get; set; }
 
