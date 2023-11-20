@@ -12,7 +12,8 @@ using Server.Database.Entities;
 
 namespace Server.Services{
     internal class PlayerService : IService{
-        private static readonly Dictionary<string, VGPlayer> Players = new();
+        private static readonly Dictionary<string, VGPlayer> Players = new Dictionary<string, VGPlayer>();
+        public readonly Dictionary<string, PlayerSlot> PlayerSlots = new Dictionary<string, PlayerSlot>();
 
         public PlayerService(){
             Main.Instance.AddEventHandler("player:join", new Action<Player>(PlayerJoin));
@@ -21,9 +22,18 @@ namespace Server.Services{
             new Thread(() => { new AutoSaver(); }).Start();
         }
 
-        public void PlayerJoin([FromSource] Player player){
+        public async void PlayerJoin([FromSource] Player player){
             Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
-            CheckPlayer(player);
+            await CheckPlayer(player);
+
+            await BaseScript.Delay(1000);
+            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+            PlayerSlots.Add(player.Name, new PlayerSlot{
+                Name = player.Name,
+                Level = vgPlayer.Level,
+                JobPointsText = "",
+                GangName = ""
+            });
         }
 
         public static VGPlayer GetVgPlayerByPlayer(Player player){
@@ -185,7 +195,7 @@ namespace Server.Services{
 
         #endregion
 
-        private async void CheckPlayer(Player player){
+        private async Task CheckPlayer(Player player){
             var license = Utils.GetLicense(player);
             if (CheckIfPlayerExists(player).Result){
                 LoadPlayer(player, Utils.GetLicense(player));
@@ -207,6 +217,7 @@ namespace Server.Services{
 
             if (!Players.ContainsKey(license)) return;
             Players.Remove(license);
+            PlayerSlots.Remove(player.Name);
         }
 
         public void OnResourceStop(string resource){
@@ -218,6 +229,9 @@ namespace Server.Services{
                 Debug.WriteLine($"Saving of {player.Name}.");
                 UpdatePlayer(player, Utils.GetLicense(player));
             }
+
+            PlayerSlots.Clear();
+            Players.Clear();
         }
 
         private async void LoadPlayer(Player player, string license){
@@ -330,6 +344,16 @@ namespace Server.Services{
 
             return false;
         }
+    }
+
+    public class PlayerSlot{
+        public string Name{ get; set; }
+
+        public int Level{ get; set; }
+
+        //private int Color { get; set; }
+        public string JobPointsText{ get; set; }
+        public string GangName{ get; set; }
     }
 
 

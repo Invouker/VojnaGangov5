@@ -1,11 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CitizenFX.Core;
+using Newtonsoft.Json;
+using ScaleformUI;
+using ScaleformUI.Elements;
+using ScaleformUI.Scaleforms;
 using static CitizenFX.Core.Native.API;
 
 namespace Client.Events{
     public static class Hud{
         private static bool IsRadarExtended;
+        private static readonly PlayerListHandler PlayerListInstance = ScaleformUI.Main.PlayerListInstance;
 
         public static async Task OnRender(){
             if (Var.HideAllHud)
@@ -17,12 +24,82 @@ namespace Client.Events{
             renderMap();
         }
 
+        private static async void renderPlayerList(){
+            if (MenuHandler.IsAnyMenuOpen) return;
+            await PlayerListInstance.Load();
+            int playerCount = Main.Instance.GetPlayers().Count();
+            PlayerListInstance.SetTitle(Var.ServerName, $"({playerCount}/{Var.MaxPlayers})", 1);
+
+            List<PlayerRow> playerRows = await LoadPlayer();
+            PlayerListInstance.PlayerRows = playerRows;
+
+            PlayerListInstance.CurrentPage = 1;
+            PlayerListInstance.Enabled = true;
+        }
+
+        private static async Task<List<PlayerRow>> LoadPlayer(){
+            List<PlayerRow> playerRows = new List<PlayerRow>();
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+            BaseScript.TriggerServerEvent("playerlist:list", new Action<string>(Action));
+
+            await tcs.Task;
+            return playerRows;
+
+            async void Action(string data){
+                Dictionary<string, PlayerSlot> playerSlots =
+                    JsonConvert.DeserializeObject<Dictionary<string, PlayerSlot>>(data);
+
+                foreach (KeyValuePair<string, PlayerSlot> playerSlotDic in playerSlots){
+                    var handle = RegisterPedheadshot(PlayerPedId());
+
+                    while (!IsPedheadshotReady(handle) || !IsPedheadshotValid(handle))
+                        await BaseScript.Delay(100);
+
+                    var txd = GetPedheadshotTxdString(handle);
+
+                    PlayerSlot playerSlot = playerSlotDic.Value;
+                    playerRows.Add(new PlayerRow{
+                        Name = playerSlot.Name,
+                        RightText = playerSlot.Level.ToString(),
+                        Color = SColor.Olive.ArgbValue,
+                        IconOverlayText = "",
+                        JobPointsText = "",
+                        CrewLabelText = playerSlot.GangName,
+                        TextureString = txd,
+                        RightIcon = ScoreRightIconType.RANK_FREEMODE,
+                        JobPointsDisplayType = ScoreDisplayType.NONE,
+                        FriendType = ' '
+                    });
+                    UnregisterPedheadshot(handle);
+                }
+
+                tcs.SetResult(true);
+            }
+        }
+
+        public class PlayerSlot{
+            public string Name{ get; set; }
+
+            public int Level{ get; set; }
+
+            //private int Color { get; set; }
+            public string JobPointsText{ get; set; }
+            public string GangName{ get; set; }
+
+            public override string ToString(){
+                return $"Name: {Name}, Level: {Level}, JobPointsText: {JobPointsText}, GangName: {GangName}";
+            }
+        }
+
         private static async void renderMap(){
             if (!IsControlJustPressed(0, 20) || IsRadarExtended) return;
             IsRadarExtended = true;
+            renderPlayerList();
             SetRadarBigmapEnabled(true, false);
             await BaseScript.Delay(7000);
             SetRadarBigmapEnabled(false, false);
+            PlayerListInstance.Enabled = false;
             IsRadarExtended = false;
         }
 
@@ -77,10 +154,6 @@ namespace Client.Events{
 
                 await BaseScript.Delay(40);
             }
-        }
-
-        public static void Rank(){
-            ShowRankBar(1000, 100);
         }
 
         public static void ChangeXp(int xp, int level){

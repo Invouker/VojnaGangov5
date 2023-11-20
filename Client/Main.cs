@@ -35,6 +35,15 @@ namespace Client{
             AddEventHandler("player:hud:update:money", new Action<int, int>(Hud.ChangeMoney));
             AddEventHandler("player:hud:update:show:rank", new Action<int, int>(Hud.ShowRankBar));
             AddEventHandler("player:hud:update:xp", new Action<int, int>(Hud.ChangeXp));
+
+            TriggerServerEvent("playerlist:list:max", new Action<int, string>((max, serverName) => {
+                Var.MaxPlayers = max;
+                Var.ServerName = serverName;
+            }));
+        }
+
+        public PlayerList GetPlayers(){
+            return Players;
         }
 
         [Tick]
