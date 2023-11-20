@@ -146,43 +146,47 @@ namespace Client.Streamable{
     }
 
     internal class MapBlip : IStreamer{
-        private readonly float _x, _y, _z;
+        public int Id{ get; set; }
+        public string BlipName{ get; }
+        public bool QuickGPS{ get; }
+
+        public float x;
+        public float y;
+        public float z;
         private readonly int _blipSprite;
         private readonly int _blipDisplay;
         private readonly float _blipScale;
         private readonly int _colour;
         private readonly int _alpha;
         private readonly bool _showAsShortRange;
-        private bool QuickGPS{ get; }
 
-        private readonly String _blipName;
-
-        public MapBlip(string blipName, float x, float y, float z, int colour = 0, int alpha = 255, int blipSprite = 1,
+        public MapBlip(string blipName, float posX, float posY, float posZ, int colour = 0, int alpha = 255,
+            int blipSprite = 1,
             int blipDisplay = 2, float blipScale = 1f, bool showAsShortRange = false, bool quickGps = false){
-            _x = x;
-            _y = y;
-            _z = z;
+            x = posX;
+            y = posY;
+            z = posZ;
             _blipSprite = blipSprite;
             _blipDisplay = blipDisplay;
             _blipScale = blipScale;
             _colour = colour;
             _alpha = alpha;
             _showAsShortRange = showAsShortRange;
-            _blipName = blipName;
+            BlipName = blipName;
             QuickGPS = quickGps;
         }
 
         public void Render(){
-            var blip = API.AddBlipForCoord(_x, _y, _z);
-            API.SetBlipSprite(blip, _blipSprite);
-            API.SetBlipDisplay(blip, _blipDisplay);
-            API.SetBlipScale(blip, _blipScale);
-            API.SetBlipColour(blip, _colour);
-            API.SetBlipAlpha(blip, _alpha);
-            API.SetBlipAsShortRange(blip, _showAsShortRange);
+            Id = API.AddBlipForCoord(x, y, z);
+            API.SetBlipSprite(Id, _blipSprite);
+            API.SetBlipDisplay(Id, _blipDisplay);
+            API.SetBlipScale(Id, _blipScale);
+            API.SetBlipColour(Id, _colour);
+            API.SetBlipAlpha(Id, _alpha);
+            API.SetBlipAsShortRange(Id, _showAsShortRange);
             API.BeginTextCommandSetBlipName("STRING");
-            API.AddTextComponentString(_blipName);
-            API.EndTextCommandSetBlipName(blip);
+            API.AddTextComponentString(BlipName);
+            API.EndTextCommandSetBlipName(Id);
         }
     }
 }

@@ -1,12 +1,20 @@
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Streamable;
 using ScaleformUI.Menu;
 
 namespace Client.UIHandlers;
 
 public static class InteractiveUI{
+    private static bool IsRouteSelected;
+    private static int BlipRoute;
+    private static Vector3 BlipRoutePosition;
+    private static bool IsRouteFinished;
+    private static List<MapBlip> quickRouteGps = new List<MapBlip>();
+
     public static UIMenu GetInteractiveUI(){
         UIMenu interactiveMenu = new UIMenu("Interaction Menu", "Interaction menu for player", new PointF(20, 20),
                                             "commonmenu", "interaction_bgd"){
@@ -15,6 +23,8 @@ public static class InteractiveUI{
             MaxItemsOnScreen = 6,
             ScrollingType = ScrollingType.CLASSIC,
         };
+
+        #region Walking Style
 
         List<dynamic> animList = new List<dynamic>{
             "Male", "Female", "Alien", "Armored", "Arogant", "Brave", "Casual",
@@ -41,10 +51,38 @@ public static class InteractiveUI{
 
         UIMenuListItem walkingStyle =
             new UIMenuListItem("Walking Style", animList, Var.WalkingStyle, "Change your walking style.");
-        UIMenuItem killYourself = new UIMenuItem("Kill yourself", "You will lose a 5% of your wallet.");
 
-        interactiveMenu.AddItem(killYourself);
         interactiveMenu.AddItem(walkingStyle);
+
+        #endregion
+
+        #region Quick GPS
+
+        List<dynamic> quickGPSList = new List<dynamic>();
+
+
+        foreach (IStreamer streamer in Streamer.Streamed){
+            if (streamer is not MapBlip{ QuickGPS: true } mapBlip) continue;
+            quickGPSList.Add(mapBlip.BlipName);
+            quickRouteGps.Add(mapBlip);
+        }
+
+        UIMenuListItem quickGPS = new UIMenuListItem("Quick GPS", quickGPSList, 0, "Select your quick GPS.");
+        interactiveMenu.AddItem(quickGPS);
+
+        quickGPS.OnListChanged += (item, index) => {
+            MapBlip mapBlip = quickRouteGps.ToArray()[index];
+            API.SetBlipRoute(mapBlip.Id, true);
+            IsRouteSelected = true;
+            IsRouteFinished = false;
+            BlipRoute = mapBlip.Id;
+            BlipRoutePosition = new Vector3(mapBlip.x, mapBlip.y, mapBlip.z);
+        };
+
+        #endregion
+
+        UIMenuItem killYourself = new UIMenuItem("Kill yourself", "You will lose a 5% of your wallet.");
+        interactiveMenu.AddItem(killYourself);
 
         walkingStyle.OnListChanged += (sender, index) => {
             string selectedIndex = animListIndex.ToArray()[index];
@@ -52,17 +90,35 @@ public static class InteractiveUI{
             Var.WalkingStyle = index;
             BaseScript.TriggerServerEvent("player:interactive:walkingstyle", index);
         };
-        interactiveMenu.OnItemSelect += (sender, item, index) => { Debug.WriteLine("OnItemSelect of " + item); };
+        interactiveMenu.OnItemSelect += (sender, item, index) => {
+            if (item == killYourself){
+                API.SetEntityHealth(API.PlayerPedId(), 0);
+            }
 
+            Debug.WriteLine("OnItemSelect of " + item);
+        };
 
+        // SetBlipRoute(Blip blip, bool enabled);
         return interactiveMenu;
     }
 
-    private static async void SetAnimToPed(string anim){
+    private static async void SetAnimToPed(string anim){ // For request, wait for load and set a ped to walking style.
         API.RequestAnimSet(anim);
         while (!API.HasAnimSetLoaded(anim))
             await BaseScript.Delay(0);
 
         API.SetPedMovementClipset(API.PlayerPedId(), anim, 1f);
+    }
+
+    public static async Task Tick(){
+        if (!IsRouteSelected || IsRouteFinished) return;
+        if (BlipRoutePosition.IsZero) return;
+
+        if (BlipRoutePosition.DistanceToSquared2D(Player.Local.Character.Position) <= 2300){
+            IsRouteFinished = true;
+            API.SetBlipRoute(BlipRoute, false);
+        }
+
+        await BaseScript.Delay(1000); // Tick every second
     }
 }
