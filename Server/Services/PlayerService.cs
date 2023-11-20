@@ -18,6 +18,11 @@ namespace Server.Services{
         public PlayerService(){
             Main.Instance.AddEventHandler("player:join", new Action<Player>(PlayerJoin));
             Main.Instance.AddEventHandler("playerDropped", new Action<Player, string>(OnPlayerDropped));
+            Main.Instance.AddEventHandler("player:interactive:walkingstyle",
+                                          new Action<Player, int>(([FromSource] player, id) => {
+                                              VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
+                                              vgPlayer.WalkingStyle = id;
+                                          }));
 
             new Thread(() => { new AutoSaver(); }).Start();
         }
@@ -246,16 +251,17 @@ namespace Server.Services{
                 const string LoadPlayer = $"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE Licence = @licence;";
                 VGPlayer vgPlayer =
                     await connection.QueryFirstOrDefaultAsync<VGPlayer>(LoadPlayer,
-                                                                        new{ licence = Utils.GetLicense(player) },
-                                                                        null);
+                                                                        new{ licence = Utils.GetLicense(player) });
 
-                API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, false);
+                API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, true);
 
-                player.TriggerEvent("player:load:data", vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.Dimension,
-                                    vgPlayer.Hp, vgPlayer.Max_hp,
-                                    vgPlayer.Armour, vgPlayer.Max_armour, vgPlayer.Level, vgPlayer.Xp);
+                player.TriggerEvent("player:load:data",
+                                    vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.Dimension, vgPlayer.Hp,
+                                    vgPlayer.Max_hp, vgPlayer.Armour, vgPlayer.Max_armour, vgPlayer.Level, vgPlayer.Xp,
+                                    vgPlayer.WalkingStyle);
                 //   (long money, long bankMoney, float x, float y, float z, int dimension, int hp, int maxHp, int armour, int maxArmour){
-                //   new Action<long, long, float, float, float, int, int, int, int, int>(LoadPlayerData);
+                //    new Action<long, long, int, int,
+                // int, int, int, int, int, int>
                 Debug.WriteLine($"Loaded data: {vgPlayer}");
 
                 Players.Add(license, vgPlayer);
@@ -271,8 +277,8 @@ namespace Server.Services{
                 await connection.OpenAsync();
                 const string insertQuery =
                     $"""
-                     INSERT INTO {VGPlayer.TABLE_NAME} (Name, Licence, WantedLevel, Money, BankMoney, Level, Xp, PosX, PosY, PosZ, Dimension)
-                     											VALUES (@Name, @Licence, @WantedLevel, @Money, @BankMoney, @Level, @Xp, @PosX, @PosY, @PosZ, @Dimension)
+                     INSERT INTO {VGPlayer.TABLE_NAME} (Name, Licence, WantedLevel, Money, BankMoney, Level, Xp, walking_style, PosX, PosY, PosZ, Dimension)
+                     											VALUES (@Name, @Licence, @WantedLevel, @Money, @BankMoney, @Level, @Xp, @WalkingStyle @PosX, @PosY, @PosZ, @Dimension)
                      """;
                 VGPlayer vgPlayer =
                     new VGPlayer(player.Name, Utils.GetLicense(player), 100, 100, 0, 100, 0, 0, 0, 1, 0, 0, 0, 0, 0){
@@ -293,7 +299,7 @@ namespace Server.Services{
                 const string UpdateQuery = $"""
                                             UPDATE {VGPlayer.TABLE_NAME}
                                             						   SET Name = @Name, Licence = @Licence, Hp = @Hp, Max_hp = @Max_hp, Armour = @Armour, Max_armour = @Max_armour, WantedLevel = @WantedLevel,
-                                            							   Money = @Money, BankMoney = @BankMoney, Level = @Level, Xp = @Xp,
+                                            							   Money = @Money, BankMoney = @BankMoney, Level = @Level, Xp = @Xp, walking_style = @WalkingStyle,
                                             							   PosX = @PosX, PosY = @PosY, PosZ = @PosZ, Dimension = @Dimension
                                             						   WHERE Licence = @Licence
                                             """;

@@ -31,6 +31,8 @@ namespace Server.Database.Entities{
 
         public bool Registred{ get; set; }
 
+        public int WalkingStyle{ get; set; }
+
         #region Position data of player
 
         public float PosX{ get; set; }

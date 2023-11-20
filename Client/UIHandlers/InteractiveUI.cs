@@ -19,9 +19,11 @@ public static class InteractiveUI{
         List<dynamic> animList = new List<dynamic>{
             "Male", "Female", "Alien", "Armored", "Arogant", "Brave", "Casual",
             "Casual2", "Casual3", "Casual4", "Casual5", "Casual6", "Chichi",
-            "Confident", "Cop", "Cop2", "Cop3", "Money", "Sad", "Hobo",
+            "Confident", "Cop", "Money", "Sad", "Hobo",
             "Jog", "Flee", "Muscle", "Hipster",
-            "Gangster1", "Gangster2", "Gangster3"
+            "Gangster",
+            "Wide", "Slow", "Sexy", "Scared", "Swagger", "Tough", "Trash",
+            "Shady", "Posh", "Femme"
         };
 
         List<dynamic> animListIndex = new List<dynamic>{
@@ -29,20 +31,26 @@ public static class InteractiveUI{
             "move_f@arrogant@a", "move_m@brave", "move_m@casual@a",
             "move_m@casual@b", "move_m@casual@c", "move_m@casual@d", "move_m@casual@e", "move_m@casual@f",
             "move_f@chichi",
-            "move_m@confident", "move_m@business@a", "move_m@business@b", "move_m@business@c", "move_m@money",
-            "move_m@sad@a", "move_m@hobo@a",
+            "move_m@confident", "move_m@business@a", "move_m@money", "move_m@sad@a", "move_m@hobo@a",
             "move_m@jog@", "move_f@flee@a", "move_m@muscle@a", "move_m@hipster@a",
-            "move_m@gangster@generic", "move_m@gangster@ng", "move_m@gangster@var_e"
+            "move_m@gangster@generic",
+            "move_m@bag", "move_characters@jimmy@slow@", "move_f@sexy@a", "move_f@scared", "move_m@swagger",
+            "move_m@tough_guy@", "clipset@move@trash_fast_turn",
+            "move_m@shadyped@a", "move_m@posh@", "move_f@femme@"
         };
 
-        UIMenuListItem walkingStyle = new UIMenuListItem("Walking Style", animList, 0, "Change your walking style.");
+        UIMenuListItem walkingStyle =
+            new UIMenuListItem("Walking Style", animList, Var.WalkingStyle, "Change your walking style.");
+        UIMenuItem killYourself = new UIMenuItem("Kill yourself", "You will lose a 5% of your wallet.");
 
+        interactiveMenu.AddItem(killYourself);
         interactiveMenu.AddItem(walkingStyle);
 
         walkingStyle.OnListChanged += (sender, index) => {
             string selectedIndex = animListIndex.ToArray()[index];
-            LoadAnim(selectedIndex);
-            Debug.WriteLine("Changed to: " + animList.ToArray()[index]);
+            SetAnimToPed(selectedIndex);
+            Var.WalkingStyle = index;
+            BaseScript.TriggerServerEvent("player:interactive:walkingstyle", index);
         };
         interactiveMenu.OnItemSelect += (sender, item, index) => { Debug.WriteLine("OnItemSelect of " + item); };
 
@@ -50,7 +58,7 @@ public static class InteractiveUI{
         return interactiveMenu;
     }
 
-    private static async void LoadAnim(string anim){
+    private static async void SetAnimToPed(string anim){
         API.RequestAnimSet(anim);
         while (!API.HasAnimSetLoaded(anim))
             await BaseScript.Delay(0);

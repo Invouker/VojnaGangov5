@@ -14,7 +14,7 @@ namespace Client{
 
             TriggerServerEvent("player:join");
             EventHandlers["player:load:data"] +=
-                new Action<long, long, int, int, int, int, int, int, int>(LoadPlayerData);
+                new Action<long, long, int, int, int, int, int, int, int, int>(LoadPlayerData);
 
             EventHandlers["streamer:createBlip"] +=
                 new Action<string, float, float, float, int, int, int, int, float, bool, bool>(Streamer.CreateBlip);
@@ -70,7 +70,7 @@ namespace Client{
         }
 
         private void LoadPlayerData(long money, long bankMoney, int dimension, int hp, int maxHp, int armour,
-            int maxArmour, int level, int xp){
+            int maxArmour, int level, int xp, int walkingStyle){
             int playerPed = API.PlayerPedId();
             API.SetEntityHealth(playerPed, hp);
             API.SetEntityMaxHealth(playerPed, maxHp);
@@ -81,6 +81,7 @@ namespace Client{
             API.SetMaxArmourHudDisplay(maxArmour);
             Var.XP = xp;
             Var.Level = level;
+            Var.WalkingStyle = walkingStyle;
         }
     }
 }
