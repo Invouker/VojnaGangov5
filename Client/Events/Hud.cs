@@ -93,6 +93,7 @@ namespace Client.Events{
         }
 
         private static async void renderMap(){
+            if (MenuHandler.IsAnyMenuOpen) return;
             if (!IsControlJustPressed(0, 20) || IsRadarExtended) return;
             IsRadarExtended = true;
             renderPlayerList();
