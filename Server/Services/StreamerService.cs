@@ -44,6 +44,7 @@ namespace Server.Services{
         /// <param name="blipDisplay"></param>
         /// <param name="blipScale"></param>
         /// <param name="showAsShortRange"></param>
+        /// <param name="quickGps"></param>
         public static void CreateBlip(string blipName, float posX, float posY, float posZ, int colour = 0,
             int alpha = 255, int blipSprite = 84, int blipDisplay = 2, float blipScale = 1f,
             bool showAsShortRange = false, bool quickGps = false){
