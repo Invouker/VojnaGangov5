@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Events;
+using Client.Handlers;
 using Client.Streamable;
 using Client.UIHandlers;
 
@@ -33,6 +34,7 @@ namespace Client{
             Tick += InteractStreamable.OnInteractTick;
             Tick += Hud.OnRender;
             Tick += InteractiveUI.Tick;
+            Tick += KeyHandler.Tick;
             TriggerServerEvent("player:post_join");
 
             AddEventHandler("player:hud:update:money", new Action<int, int>(Hud.ChangeMoney));

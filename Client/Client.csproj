@@ -64,6 +64,7 @@
     <Compile Include="Entities\CharacterCreatorData.cs"/>
     <Compile Include="Events\Hud.cs"/>
     <Compile Include="Events\SpawnManager.cs"/>
+    <Compile Include="Handlers\KeyHandler.cs"/>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
       <Compile Include="UIHandlers\CharacterCreatorUI.cs"/>

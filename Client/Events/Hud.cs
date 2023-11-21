@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using CitizenFX.Core;
+using Client.Handlers;
 using Client.UIHandlers;
 using Newtonsoft.Json;
 using ScaleformUI;
@@ -16,18 +17,20 @@ namespace Client.Events{
         private static bool IsRadarExtended;
         private static readonly PlayerListHandler PlayerListInstance = ScaleformUI.Main.PlayerListInstance;
 
+        static Hud(){
+            KeyHandler.CreateKeyPair(Control.MultiplayerInfo, RenderProps);
+            KeyHandler.CreateKeyPair(Control.InteractionMenu,
+                                     () => {
+                                         InteractiveUI.GetInteractiveUI().Visible =
+                                             !InteractiveUI.GetInteractiveUI().Visible;
+                                     });
+        }
+
         public static Task OnRender(){
-            if (IsControlJustPressed(0, Control.InteractionMenu.GetHashCode()))
-                InteractiveUI.GetInteractiveUI().Visible = !InteractiveUI.GetInteractiveUI().Visible;
-
-
-            if (Var.HideAllHud)
-                return Task.FromResult(true);
+            if (Var.HideAllHud) return Task.FromResult(true);
 
             renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.01f, 153, 255, 153); // Wallet
             renderMoney($"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}", 0.83f, 0.04f, 0, 155, 0); // Bank
-
-            RenderProps();
 
             return Task.FromResult(true);
         }
@@ -102,7 +105,7 @@ namespace Client.Events{
 
         private static async void RenderProps(){
             if (MenuHandler.IsAnyMenuOpen) return;
-            if (!IsControlJustPressed(0, 20) || IsRadarExtended) return;
+            if (IsRadarExtended) return;
             IsRadarExtended = true;
             renderPlayerList();
             SetRadarBigmapEnabled(true, false);
