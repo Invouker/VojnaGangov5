@@ -256,12 +256,8 @@ namespace Server.Services{
                 API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, true);
 
                 player.TriggerEvent("player:load:data",
-                                    vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.Dimension, vgPlayer.Hp,
-                                    vgPlayer.MaxHp, vgPlayer.Armour, vgPlayer.MaxArmour, vgPlayer.Level, vgPlayer.Xp,
-                                    vgPlayer.WalkingStyle);
-                //   (long money, long bankMoney, float x, float y, float z, int dimension, int hp, int maxHp, int armour, int maxArmour){
-                //    new Action<long, long, int, int,
-                // int, int, int, int, int, int>
+                                    vgPlayer.Dimension, vgPlayer.Hp, vgPlayer.MaxHp, vgPlayer.Armour,
+                                    vgPlayer.MaxArmour, vgPlayer.Level, vgPlayer.Xp, vgPlayer.WalkingStyle);
                 Debug.WriteLine($"Loaded data: {vgPlayer}");
 
                 Players.Add(license, vgPlayer);

@@ -13,23 +13,21 @@ namespace Client{
 
         public Main(){
             Instance = this;
-
             TriggerServerEvent("player:join");
-            EventHandlers["player:load:data"] +=
-                new Action<long, long, int, int, int, int, int, int, int, int>(LoadPlayerData);
 
-            EventHandlers["streamer:createBlip"] +=
-                new Action<string, float, float, float, int, int, int, int, float, bool, bool>(Streamer.CreateBlip);
-            EventHandlers["streamer:createMarker"] +=
-                new Action<int, float, float, float, int, int, int, int, bool>(Streamer.CreateMarker);
-            EventHandlers["streamer:create3dText"] +=
-                new Action<string, float, float, float, int, int, int, int>(Streamer.Create3dText);
+            AddEventHandler("player:load:data", new Action<int, int, int, int, int, int, int, int>(LoadPlayerData));
+            AddEventHandler("streamer:createBlip",
+                            new Action<string, float, float, float, int, int, int, int, float, bool, bool>(Streamer
+                               .CreateBlip));
+            AddEventHandler("streamer:createMarker",
+                            new Action<int, float, float, float, int, int, int, int, bool>(Streamer.CreateMarker));
+            AddEventHandler("streamer:create3dText",
+                            new Action<string, float, float, float, int, int, int, int>(Streamer.Create3dText));
 
-            EventHandlers["player:spawn:to:world"] +=
-                new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
-            EventHandlers["player:character:data"] += new Action<string>(SpawnManager.AssignCharacterData);
-            EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
-            //EventHandlers["test:rankup"] += new Action(Hud.Rank);
+            AddEventHandler("player:spawn:to:world",
+                            new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld));
+            AddEventHandler("player:character:data", new Action<string>(SpawnManager.AssignCharacterData));
+            AddEventHandler("player:spawn:to:creator", new Action(SpawnManager.TeleportToCreator));
 
             Tick += InteractStreamable.OnInteractTick;
             Tick += Hud.OnRender;
@@ -73,8 +71,8 @@ namespace Client{
             EventHandlers[handler] += action;
         }
 
-        private void LoadPlayerData(long money, long bankMoney, int dimension, int hp, int maxHp, int armour,
-            int maxArmour, int level, int xp, int walkingStyle){
+        private void LoadPlayerData(int dimension, int hp, int maxHp, int armour, int maxArmour, int level, int xp,
+            int walkingStyle){
             int playerPed = API.PlayerPedId();
             API.SetEntityHealth(playerPed, hp);
             API.SetEntityMaxHealth(playerPed, maxHp);
@@ -86,6 +84,7 @@ namespace Client{
             Var.XP = xp;
             Var.Level = level;
             Var.WalkingStyle = walkingStyle;
+            Debug.WriteLine($"Load Player Data, dimension: {dimension}, Hp: {hp}, maxHp: {maxHp}, armour: {armour}, maxArmour: {maxArmour}, level: {level}, xp: {xp}, walkingStyle: {walkingStyle}");
         }
     }
 }
