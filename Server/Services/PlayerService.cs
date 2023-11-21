@@ -248,16 +248,16 @@ namespace Server.Services{
 
             await using (MySqlConnection connection = Connector.GetConnection()){
                 await connection.OpenAsync();
-                const string LoadPlayer = $"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE Licence = @licence;";
+                const string LoadPlayer = $"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE license = @license;";
                 VGPlayer vgPlayer =
                     await connection.QueryFirstOrDefaultAsync<VGPlayer>(LoadPlayer,
-                                                                        new{ licence = Utils.GetLicense(player) });
+                                                                        new{ license = Utils.GetLicense(player) });
 
                 API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, true);
 
                 player.TriggerEvent("player:load:data",
                                     vgPlayer.Money, vgPlayer.BankMoney, vgPlayer.Dimension, vgPlayer.Hp,
-                                    vgPlayer.Max_hp, vgPlayer.Armour, vgPlayer.Max_armour, vgPlayer.Level, vgPlayer.Xp,
+                                    vgPlayer.MaxHp, vgPlayer.Armour, vgPlayer.MaxArmour, vgPlayer.Level, vgPlayer.Xp,
                                     vgPlayer.WalkingStyle);
                 //   (long money, long bankMoney, float x, float y, float z, int dimension, int hp, int maxHp, int armour, int maxArmour){
                 //    new Action<long, long, int, int,
@@ -277,8 +277,8 @@ namespace Server.Services{
                 await connection.OpenAsync();
                 const string insertQuery =
                     $"""
-                     INSERT INTO {VGPlayer.TABLE_NAME} (Name, Licence, WantedLevel, Money, BankMoney, Level, Xp, walking_style, PosX, PosY, PosZ, Dimension)
-                     											VALUES (@Name, @Licence, @WantedLevel, @Money, @BankMoney, @Level, @Xp, @WalkingStyle @PosX, @PosY, @PosZ, @Dimension)
+                     INSERT INTO {VGPlayer.TABLE_NAME} (Name, License, WantedLevel, Money, BankMoney, Level, Xp, WalkingStyle, PosX, PosY, PosZ, Dimension)
+                     											VALUES (@Name, @License, @WantedLevel, @Money, @BankMoney, @Level, @Xp, @WalkingStyle, @PosX, @PosY, @PosZ, @Dimension)
                      """;
                 VGPlayer vgPlayer =
                     new VGPlayer(player.Name, Utils.GetLicense(player), 100, 100, 0, 100, 0, 0, 0, 1, 0, 0, 0, 0, 0){
@@ -296,24 +296,26 @@ namespace Server.Services{
         public static async void UpdatePlayer(Player player, string license){
             await using (MySqlConnection connection = Connector.GetConnection()){
                 await connection.OpenAsync();
-                const string UpdateQuery = $"""
-                                            UPDATE {VGPlayer.TABLE_NAME}
-                                            						   SET Name = @Name, Licence = @Licence, Hp = @Hp, Max_hp = @Max_hp, Armour = @Armour, Max_armour = @Max_armour, WantedLevel = @WantedLevel,
-                                            							   Money = @Money, BankMoney = @BankMoney, Level = @Level, Xp = @Xp, walking_style = @WalkingStyle,
-                                            							   PosX = @PosX, PosY = @PosY, PosZ = @PosZ, Dimension = @Dimension
-                                            						   WHERE Licence = @Licence
-                                            """;
+                const String UpdateQueryString = $"""
+                                                  UPDATE {VGPlayer.TABLE_NAME} SET Name = @Name,
+                                                                                        Hp = @Hp, MaxHp = @MaxHp, Armour = @Armour,
+                                                                                           MaxArmour = @MaxArmour, WantedLevel = @WantedLevel,
+                                                                                           Money = @Money, BankMoney = @BankMoney, Level = @Level,
+                                                                                           Xp = @Xp, WalkingStyle = @WalkingStyle,
+                                                                                           PosX = @PosX, PosY = @PosY, PosZ = @PosZ, Dimension = @Dimension WHERE License = @License;
+
+                                                  """;
 
                 if (Players.TryGetValue(license, out VGPlayer vgPlayer)){
                     vgPlayer.PosX = player.Character.Position.X;
                     vgPlayer.PosY = player.Character.Position.Y;
                     vgPlayer.PosZ = player.Character.Position.Z;
                     vgPlayer.Hp = API.GetEntityHealth(player.Character.Handle);
-                    vgPlayer.Max_hp = API.GetEntityMaxHealth(player.Character.Handle);
+                    vgPlayer.MaxHp = API.GetEntityMaxHealth(player.Character.Handle);
                     vgPlayer.Armour = API.GetPedArmour(player.Character.Handle);
-                    vgPlayer.Max_armour = API.GetPlayerMaxArmour(player.Handle);
+                    vgPlayer.MaxArmour = API.GetPlayerMaxArmour(player.Handle);
                     vgPlayer.Dimension = API.GetPlayerRoutingBucket(player.Handle);
-                    await connection.ExecuteAsync(UpdateQuery, vgPlayer);
+                    await connection.ExecuteAsync(UpdateQueryString, vgPlayer);
                 }
 
                 await connection.CloseAsync();
@@ -324,10 +326,10 @@ namespace Server.Services{
             await using (MySqlConnection connection = Connector.GetConnection()){
                 await connection.OpenAsync();
                 const string CheckExistenceQuery =
-                    $"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE Licence = @Licence";
+                    $"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
                 int recordCount =
                     await connection.QueryFirstAsync<int>(CheckExistenceQuery,
-                                                          new{ Licence = Utils.GetLicense(player) });
+                                                          new{ License = Utils.GetLicense(player) });
                 if (recordCount > 0)
                     return true;
                 await connection.CloseAsync();
@@ -339,10 +341,10 @@ namespace Server.Services{
         private async Task<bool> CheckIfPlayerCharacterExists(Player player){
             await using (MySqlConnection connection = Connector.GetConnection()){
                 await connection.OpenAsync();
-                string checkExistenceQuery = $@"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE Licence = @Licence";
+                string checkExistenceQuery = $@"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
                 int recordCount =
                     await connection.QueryFirstAsync<int>(checkExistenceQuery,
-                                                          new{ Licence = Utils.GetLicense(player) });
+                                                          new{ License = Utils.GetLicense(player) });
                 if (recordCount > 0)
                     return true;
                 await connection.CloseAsync();

@@ -16,20 +16,18 @@ namespace Server.Database.Entities{
 
         public int Id{ get; set; }
         public string Name{ get; set; }
-        public string Licence{ get; set; }
+        public string License{ get; set; }
 
         public int Hp{ get; set; }
-        public int Max_hp{ get; set; }
+        public int MaxHp{ get; set; }
         public int Armour{ get; set; }
-        public int Max_armour{ get; set; }
+        public int MaxArmour{ get; set; }
         public int WantedLevel{ get; set; }
         public long Money{ get; set; }
         public long BankMoney{ get; set; }
 
         public int Level{ get; set; }
         public int Xp{ get; set; }
-
-        public bool Registred{ get; set; }
 
         public int WalkingStyle{ get; set; }
 
@@ -47,11 +45,11 @@ namespace Server.Database.Entities{
             int dimension){
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Licence = licence ?? throw new ArgumentNullException(nameof(licence));
+            License = licence ?? throw new ArgumentNullException(nameof(licence));
             Hp = hp;
-            Max_hp = max_hp;
+            MaxHp = max_hp;
             Armour = armour;
-            Max_armour = max_armour;
+            MaxArmour = max_armour;
             WantedLevel = wantedLevel;
             Money = money;
             BankMoney = bankMoney;
@@ -66,11 +64,11 @@ namespace Server.Database.Entities{
         public VGPlayer(string name, string licence, int hp, int max_hp, int armour, int max_armour, int wantedLevel,
             int money, int bankMoney, int level, int xp, float posX, float posY, float posZ, int dimension){
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Licence = licence ?? throw new ArgumentNullException(nameof(licence));
+            License = licence ?? throw new ArgumentNullException(nameof(licence));
             Hp = hp;
-            Max_hp = max_hp;
+            MaxHp = max_hp;
             Armour = armour;
-            Max_armour = max_armour;
+            MaxArmour = max_armour;
             WantedLevel = wantedLevel;
             Money = money;
             BankMoney = bankMoney;
@@ -87,7 +85,7 @@ namespace Server.Database.Entities{
 
         public override string ToString(){
             return
-                $"Id: {Id}, Name: {Name}, License: {Licence}, Hp: {Hp}, Max HP: {Max_hp}, Armour: {Armour}, Max Armour: {Max_armour}, WantedLevel: {WantedLevel}, Money: {Money}, BankMoney: {BankMoney}, Level: {Level},Xp: {Xp}, PosX: {PosX}, PosY: {PosY}, PosZ: {PosZ}, Dimension: {Dimension}";
+                $"Id: {Id}, Name: {Name}, License: {License}, Hp: {Hp}, Max HP: {MaxHp}, Armour: {Armour}, Max Armour: {MaxArmour}, WantedLevel: {WantedLevel}, Money: {Money}, BankMoney: {BankMoney}, Level: {Level},Xp: {Xp}, PosX: {PosX}, PosY: {PosY}, PosZ: {PosZ}, Dimension: {Dimension}, WalkingStyle: {WalkingStyle}";
         }
 
 
