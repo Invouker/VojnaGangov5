@@ -9,10 +9,6 @@ using ScaleformUI.Menu;
 namespace Client.UIHandlers;
 
 public static class InteractiveUI{
-    private static bool IsRouteSelected;
-    private static int BlipRoute;
-    private static Vector3 BlipRoutePosition;
-    private static bool IsRouteFinished;
     private static List<MapBlip> quickRouteGps = new List<MapBlip>();
 
     public static UIMenu GetInteractiveUI(){
@@ -54,11 +50,18 @@ public static class InteractiveUI{
 
         interactiveMenu.AddItem(walkingStyle);
 
+        walkingStyle.OnListChanged += (sender, index) => {
+            string selectedIndex = animListIndex.ToArray()[index];
+            SetAnimToPed(selectedIndex);
+            Var.WalkingStyle = index;
+            BaseScript.TriggerServerEvent("player:interactive:walkingstyle", index);
+        };
+
         #endregion
 
         #region Quick GPS
 
-        List<dynamic> quickGPSList = new List<dynamic>();
+        List<dynamic> quickGPSList = new List<dynamic>{ "None" };
 
 
         foreach (IStreamer streamer in Streamer.Streamed){
@@ -67,16 +70,26 @@ public static class InteractiveUI{
             quickRouteGps.Add(mapBlip);
         }
 
-        UIMenuListItem quickGPS = new UIMenuListItem("Quick GPS", quickGPSList, 0, "Select your quick GPS.");
+        UIMenuListItem quickGPS = new UIMenuListItem("Quick GPS", quickGPSList, Var.GPSRoute,
+                                                     "Select your quick GPS. You should be in vehicle to activate it.");
         interactiveMenu.AddItem(quickGPS);
 
         quickGPS.OnListChanged += (item, index) => {
-            MapBlip mapBlip = quickRouteGps.ToArray()[index];
+            if (index == 0){
+                Route.IsRouteSelected = false;
+                Route.IsRouteFinished = true;
+                Var.GPSRoute = 0;
+                API.ClearAllBlipRoutes();
+                return;
+            }
+
+            MapBlip mapBlip = quickRouteGps.ToArray()[index + 1];
             API.SetBlipRoute(mapBlip.Id, true);
-            IsRouteSelected = true;
-            IsRouteFinished = false;
-            BlipRoute = mapBlip.Id;
-            BlipRoutePosition = new Vector3(mapBlip.x, mapBlip.y, mapBlip.z);
+            Route.IsRouteSelected = true;
+            Route.IsRouteFinished = false;
+            Route.BlipRoute = mapBlip.Id;
+            Route.BlipRoutePosition = new Vector3(mapBlip.x, mapBlip.y, mapBlip.z);
+            Var.GPSRoute = index;
         };
 
         #endregion
@@ -84,12 +97,6 @@ public static class InteractiveUI{
         UIMenuItem killYourself = new UIMenuItem("Kill yourself", "You will lose a 5% of your wallet.");
         interactiveMenu.AddItem(killYourself);
 
-        walkingStyle.OnListChanged += (sender, index) => {
-            string selectedIndex = animListIndex.ToArray()[index];
-            SetAnimToPed(selectedIndex);
-            Var.WalkingStyle = index;
-            BaseScript.TriggerServerEvent("player:interactive:walkingstyle", index);
-        };
         interactiveMenu.OnItemSelect += (sender, item, index) => {
             if (item == killYourself){
                 API.SetEntityHealth(API.PlayerPedId(), 0);
@@ -111,14 +118,21 @@ public static class InteractiveUI{
     }
 
     public static async Task Tick(){
-        if (!IsRouteSelected || IsRouteFinished) return;
-        if (BlipRoutePosition.IsZero) return;
+        if (!Route.IsRouteSelected || Route.IsRouteFinished) return;
+        if (Route.BlipRoutePosition.IsZero) return;
 
-        if (BlipRoutePosition.DistanceToSquared2D(Player.Local.Character.Position) <= 2300){
-            IsRouteFinished = true;
-            API.SetBlipRoute(BlipRoute, false);
+        if (Route.BlipRoutePosition.DistanceToSquared2D(Player.Local.Character.Position) <= 2300){
+            Route.IsRouteFinished = true;
+            API.SetBlipRoute(Route.BlipRoute, false);
         }
 
         await BaseScript.Delay(1000); // Tick every second
+    }
+
+    internal class Route{
+        public static bool IsRouteSelected;
+        public static int BlipRoute;
+        public static Vector3 BlipRoutePosition;
+        public static bool IsRouteFinished;
     }
 }
