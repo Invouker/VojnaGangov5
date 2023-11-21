@@ -9,8 +9,6 @@ using ScaleformUI.Menu;
 namespace Client.UIHandlers;
 
 public static class InteractiveUI{
-    private static List<MapBlip> quickRouteGps = new List<MapBlip>();
-
     public static UIMenu GetInteractiveUI(){
         UIMenu interactiveMenu = new UIMenu("Interaction Menu", "Interaction menu for player", new PointF(20, 20),
                                             "commonmenu", "interaction_bgd"){
@@ -67,7 +65,7 @@ public static class InteractiveUI{
         foreach (IStreamer streamer in Streamer.Streamed){
             if (streamer is not MapBlip{ QuickGPS: true } mapBlip) continue;
             quickGPSList.Add(mapBlip.BlipName);
-            quickRouteGps.Add(mapBlip);
+            Route.QuickRouteGps.Add(mapBlip);
         }
 
         UIMenuListItem quickGPS = new UIMenuListItem("Quick GPS", quickGPSList, Var.GPSRoute,
@@ -83,7 +81,7 @@ public static class InteractiveUI{
                 return;
             }
 
-            MapBlip mapBlip = quickRouteGps.ToArray()[index + 1];
+            MapBlip mapBlip = Route.QuickRouteGps.ToArray()[index + 1];
             API.SetBlipRoute(mapBlip.Id, true);
             Route.IsRouteSelected = true;
             Route.IsRouteFinished = false;
@@ -101,11 +99,8 @@ public static class InteractiveUI{
             if (item == killYourself){
                 API.SetEntityHealth(API.PlayerPedId(), 0);
             }
-
-            Debug.WriteLine("OnItemSelect of " + item);
         };
 
-        // SetBlipRoute(Blip blip, bool enabled);
         return interactiveMenu;
     }
 
@@ -129,7 +124,9 @@ public static class InteractiveUI{
         await BaseScript.Delay(1000); // Tick every second
     }
 
-    internal class Route{
+    private static class Route{
+        public static readonly List<MapBlip> QuickRouteGps = new List<MapBlip>();
+
         public static bool IsRouteSelected;
         public static int BlipRoute;
         public static Vector3 BlipRoutePosition;
