@@ -39,14 +39,14 @@ public class Enums{
     7 = Back2
      */
     public enum DoorIndex{
-        [DoorAttribute("Front Left Door")] FRONT_LEFT_DOOR = 0,
-        [DoorAttribute("Front Right Door")] FRONT_RIGHT_DOOR = 1,
-        [DoorAttribute("Back Left Door")] BACK_LEFT_DOOR = 2,
-        [DoorAttribute("Back Right Door")] BACK_RIGHT_DOOR = 3,
-        [DoorAttribute("Hood")] HOOD = 4,
-        [DoorAttribute("Trunk")] TRUNK = 5,
-        [DoorAttribute("Back")] BACK = 6,
-        [DoorAttribute("Back2")] BACK2 = 7
+        [Door("Front Left Door")] FRONT_LEFT_DOOR = 0,
+        [Door("Front Right Door")] FRONT_RIGHT_DOOR = 1,
+        [Door("Back Left Door")] BACK_LEFT_DOOR = 2,
+        [Door("Back Right Door")] BACK_RIGHT_DOOR = 3,
+        [Door("Hood")] HOOD = 4,
+        [Door("Trunk")] TRUNK = 5,
+        [Door("Back")] BACK = 6,
+        [Door("Back2")] BACK2 = 7
     }
 
 
@@ -59,7 +59,7 @@ public class Enums{
     }
 
     public static DoorAttribute GetAttributeDoorIndex(DoorIndex doorIndex){
-        var fieldInfo = typeof(DoorIndex).GetField(doorIndex.ToString());
+        FieldInfo fieldInfo = typeof(DoorIndex).GetField(doorIndex.ToString());
         return (DoorAttribute)fieldInfo.GetCustomAttributes(typeof(DoorAttribute), false).FirstOrDefault();
     }
 
