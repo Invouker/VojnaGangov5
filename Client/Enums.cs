@@ -6,6 +6,7 @@ namespace Client;
 
 public class Enums{
     public enum SeatPosition{
+        NONE = -5,
         SF_FrontDriverSide = -1,
         SF_FrontPassengerSide = 0,
         SF_BackDriverSide = 1,

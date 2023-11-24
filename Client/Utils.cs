@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using CitizenFX.Core;
@@ -25,6 +26,19 @@ public static class Utils{
 
     public static int GetReputationToLevel(int level){
         return level * 827 + 1734 + level * 86;
+    }
+
+    public static Enums.SeatPosition GetSeatByPed(int ped){
+        int vehicle = API.GetVehiclePedIsIn(API.PlayerPedId(), false);
+        if (vehicle == 0) return Enums.SeatPosition.NONE;
+        foreach (Enums.SeatPosition seatPosition in Enum.GetValues(typeof(Enums.SeatPosition))){
+            int id = (int)seatPosition;
+            if (API.IsVehicleSeatFree(vehicle, id)) continue;
+            if (API.GetPedInVehicleSeat(vehicle, id) == ped)
+                return seatPosition;
+        }
+
+        return Enums.SeatPosition.NONE;
     }
 
     public static async void SetWalkingAnimToPed(string anim){

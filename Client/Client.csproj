@@ -65,6 +65,7 @@
     <Compile Include="Enums.cs"/>
     <Compile Include="Events\Hud.cs"/>
     <Compile Include="Events\SpawnManager.cs"/>
+    <Compile Include="Events\VehicleEvents.cs"/>
     <Compile Include="Handlers\KeyHandler.cs"/>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
