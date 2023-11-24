@@ -61,6 +61,15 @@ namespace Server.Testable{
                 Debug.WriteLine($"XP: {PlayerService.GetXP(player)}, Level: {PlayerService.GetLevel(player)}");
                 Debug.WriteLine($"XP: {PlayerService.GetXP(player)},XpToNextLevel: {PlayerService.GetReputationToLevel(PlayerService.GetLevel(player) + 1)} ,Level: {PlayerService.GetLevel(player)}");
             }), false);
+
+            API.RegisterCommand("test4", new Action<int, List<object>, string>((source, args, rawCommand) => {
+                Player player = Players[source];
+                PlayerService.GiveXP(player, 60);
+                var vehicle = API.GetVehiclePedIsIn(player.Character.Handle, false);
+                uint newPed = (uint)API.GetHashKey("s_m_m_armoured_01");
+
+                API.CreatePedInsideVehicle(vehicle, 4, newPed, 0, true, false);
+            }), false);
         }
     }
 }

@@ -1,14 +1,19 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Streamable;
+using ScaleformUI;
 using ScaleformUI.Menu;
 
 namespace Client.UIHandlers;
 
 public static class InteractiveUI{
+    private static readonly Dictionary<int, bool> EngineState = new Dictionary<int, bool>();
+
     public static UIMenu GetInteractiveUI(){
         UIMenu interactiveMenu = new UIMenu("Interaction Menu", "Interaction menu for player", new PointF(20, 20),
                                             "commonmenu", "interaction_bgd"){
@@ -20,37 +25,14 @@ public static class InteractiveUI{
 
         #region Walking Style
 
-        List<dynamic> animList = new List<dynamic>{
-            "Male", "Female", "Alien", "Armored", "Arogant", "Brave", "Casual",
-            "Casual2", "Casual3", "Casual4", "Casual5", "Casual6", "Chichi",
-            "Confident", "Cop", "Money", "Sad", "Hobo",
-            "Jog", "Flee", "Muscle", "Hipster",
-            "Gangster",
-            "Wide", "Slow", "Sexy", "Scared", "Swagger", "Tough", "Trash",
-            "Shady", "Posh", "Femme"
-        };
-
-        List<dynamic> animListIndex = new List<dynamic>{
-            "move_m@multiplayer", "move_f@multiplayer", "move_m@alien", "anim_group_move_ballistic",
-            "move_f@arrogant@a", "move_m@brave", "move_m@casual@a",
-            "move_m@casual@b", "move_m@casual@c", "move_m@casual@d", "move_m@casual@e", "move_m@casual@f",
-            "move_f@chichi",
-            "move_m@confident", "move_m@business@a", "move_m@money", "move_m@sad@a", "move_m@hobo@a",
-            "move_m@jog@", "move_f@flee@a", "move_m@muscle@a", "move_m@hipster@a",
-            "move_m@gangster@generic",
-            "move_m@bag", "move_characters@jimmy@slow@", "move_f@sexy@a", "move_f@scared", "move_m@swagger",
-            "move_m@tough_guy@", "clipset@move@trash_fast_turn",
-            "move_m@shadyped@a", "move_m@posh@", "move_f@femme@"
-        };
-
         UIMenuListItem walkingStyle =
-            new UIMenuListItem("Walking Style", animList, Var.WalkingStyle, "Change your walking style.");
+            new UIMenuListItem("Walking Style", Utils.AnimWalkingList, Var.WalkingStyle, "Change your walking style.");
 
         interactiveMenu.AddItem(walkingStyle);
 
         walkingStyle.OnListChanged += (sender, index) => {
-            string selectedIndex = animListIndex.ToArray()[index];
-            SetAnimToPed(selectedIndex);
+            string selectedIndex = Utils.AnimWalkingListIndex.ToArray()[index];
+            Utils.SetWalkingAnimToPed(selectedIndex);
             Var.WalkingStyle = index;
             BaseScript.TriggerServerEvent("player:interactive:walkingstyle", index);
         };
@@ -95,21 +77,149 @@ public static class InteractiveUI{
         UIMenuItem killYourself = new UIMenuItem("Kill yourself", "You will lose a 5% of your wallet.");
         interactiveMenu.AddItem(killYourself);
 
-        interactiveMenu.OnItemSelect += (sender, item, index) => {
-            if (item == killYourself){
-                API.SetEntityHealth(API.PlayerPedId(), 0);
-            }
-        };
+        #region Vehicle
+
+        VehicleSubMenu(interactiveMenu);
+        //Open
+
+        #endregion
+
+        killYourself.Activated += (sender, item) => API.SetEntityHealth(API.PlayerPedId(), 0);
 
         return interactiveMenu;
     }
 
-    private static async void SetAnimToPed(string anim){ // For request, wait for load and set a ped to walking style.
-        API.RequestAnimSet(anim);
-        while (!API.HasAnimSetLoaded(anim))
-            await BaseScript.Delay(0);
+    private static void VehicleSubMenu(UIMenu interactiveMenu){
+        UIMenuItem toVehicleMenu = new UIMenuItem("Vehicle interaction",
+                                                  "Control your vehicle with this menu, the condition is to be the chauffeur in the vehicle!");
+        int vehicle = API.GetVehiclePedIsIn(API.PlayerPedId(), false);
+        { // Check if player is in vehicle and if is driver.
+            if (!API.IsPedInAnyVehicle(API.PlayerPedId(), false)){
+                toVehicleMenu.SetLeftBadge(BadgeIcon.LOCK);
+                toVehicleMenu.Enabled = false;
+                //SetVehicleEngineOn
+            }
+            else{
+                if (API.GetPedInVehicleSeat(vehicle, (int)Enums.SeatPosition.SF_FrontDriverSide) != API.PlayerPedId()){
+                    //Check if is driver
+                    toVehicleMenu.SetLeftBadge(BadgeIcon.LOCK);
+                    toVehicleMenu.Enabled = false;
+                }
+            }
+        }
 
-        API.SetPedMovementClipset(API.PlayerPedId(), anim, 1f);
+        var vehClass = API.GetVehicleClass(vehicle);
+        switch (vehClass){
+            case 0: //compacts
+            case 1: //sedan
+            case 2: //suv's
+            case 3: //coupes
+            case 4: //muscle
+            case 5: //sport classic
+            case 6: //sport
+            case 7: //super
+            case 8: //motorcycle
+            case 9: // offroad
+            case 10: //industrial
+            case 11: //utility ????
+            case 12:{ } //vans
+                break;
+            default:{ // Others like: bicycles, boats, Helicopters, plane, service, emergency, military
+                toVehicleMenu.SetLeftBadge(BadgeIcon.LOCK);
+                toVehicleMenu.Enabled = false;
+                break;
+            }
+        }
+
+        toVehicleMenu.SetRightLabel(">>");
+        interactiveMenu.AddItem(toVehicleMenu);
+
+        UIMenu vehicleMenu = new UIMenu("Vehicle menu", "Control of vehicle", new PointF(20, 20), "commonmenu",
+                                        "interaction_bgd"){
+            BuildingAnimation = MenuBuildingAnimation.NONE,
+            EnableAnimation = false,
+            MaxItemsOnScreen = 6,
+            ScrollingType = ScrollingType.CLASSIC,
+        };
+
+        UIMenuCheckboxItem lockVehicleItem =
+            new UIMenuCheckboxItem("Lock Vehicle", UIMenuCheckboxStyle.Tick, false,
+                                   "Prevent players to enter into vehicle.");
+        vehicleMenu.AddItem(lockVehicleItem);
+
+        UIMenuItem ejectPlayers = new UIMenuItem("Eject players",
+                                                 "Halt all players in the vehicle and eject them from the vehicle.");
+        vehicleMenu.AddItem(ejectPlayers);
+
+
+        UIMenuCheckboxItem engineControl = new UIMenuCheckboxItem("Start/Stop the engine", UIMenuCheckboxStyle.Tick,
+                                                                  !EngineState.TryGetValue(vehicle, out bool isOn) ||
+                                                                  isOn,
+                                                                  "Easily start or stop a engine at your vehicle.");
+        vehicleMenu.AddItem(engineControl);
+
+        List<dynamic> DoorsName = (from Enums.DoorIndex doorIndex in Enum.GetValues(typeof(Enums.DoorIndex))
+                                   select Enums.GetAttributeDoorIndex(doorIndex).Name).Cast<dynamic>().ToList();
+        UIMenuListItem doorInteract = new UIMenuListItem("Interact specific door", DoorsName, 0,
+                                                         "Manipulate with specific door on your vehicle.");
+        vehicleMenu.AddItem(doorInteract);
+
+        UIMenuCheckboxItem controlDoor = new UIMenuCheckboxItem("Interact with all doors", UIMenuCheckboxStyle.Tick,
+                                                                false, "Open or close all doors on vehicle.");
+        vehicleMenu.AddItem(controlDoor);
+
+        UIMenuItem back = new UIMenuItem("Return to Interaction", "Switch to interaction menu.");
+        vehicleMenu.AddItem(back);
+
+        doorInteract.OnListSelected += (sender, index) => { InteractVehicleSpecificDoor(index); };
+        engineControl.CheckboxEvent += async (sender, @checked) => {
+            if (!@checked){
+                API.BringVehicleToHalt(vehicle, 400, 3000, true);
+                await BaseScript.Delay(1000);
+            }
+            else
+                API.StopBringVehicleToHalt(vehicle);
+
+            API.SetVehicleEngineOn(vehicle, @checked, true, true);
+            EngineState[vehicle] = @checked;
+        };
+        controlDoor.CheckboxEvent += (sender, @checked) => InteractVehicleDoor();
+        ejectPlayers.Activated += (sender, item) => EjectAllPlayersFromVehicle();
+        lockVehicleItem.CheckboxEvent += (sender, @checked) =>
+            Utils.SetVehicleLockStatus(Enums.CarLock.CARLOCK_UNLOCKED, @checked);
+        interactiveMenu.OnItemSelect += (sender, item, index) => interactiveMenu.SwitchTo(vehicleMenu);
+        back.Activated += (sender, item) => vehicleMenu.SwitchTo(interactiveMenu);
+    }
+
+    private static void InteractVehicleDoor(){
+        foreach (Enums.DoorIndex door in Enum.GetValues(typeof(Enums.DoorIndex))){ // Itearate trought all doors
+            int id = (int)door;
+            InteractVehicleSpecificDoor(id);
+        }
+    }
+
+    private static void InteractVehicleSpecificDoor(int id){
+        int vehicle = API.GetVehiclePedIsIn(API.PlayerPedId(), false);
+        if (vehicle == 0) return;
+
+        float angleRation = API.GetVehicleDoorAngleRatio(vehicle, id);
+        if (angleRation == 0f){ // If door on vehicle is fully opened
+            API.SetVehicleDoorOpen(vehicle, id, false, false);
+        }
+        else // closed
+            API.SetVehicleDoorShut(vehicle, id, false);
+    }
+
+    private static void EjectAllPlayersFromVehicle(){
+        int vehicle = API.GetVehiclePedIsIn(API.PlayerPedId(), false);
+        if (vehicle == 0) return;
+        foreach (Enums.SeatPosition seatPosition in Enum.GetValues(typeof(Enums.SeatPosition))){
+            int id = (int)seatPosition;
+            if (id == -1) continue; // Skip driver
+            if (API.IsVehicleSeatFree(vehicle, id)) continue;
+            int ped = API.GetPedInVehicleSeat(vehicle, id);
+            API.TaskLeaveVehicle(ped, vehicle, 0);
+        }
     }
 
     public static async Task Tick(){
