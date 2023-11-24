@@ -18,7 +18,7 @@ namespace Client{
             AddEventHandler("player:load:data", new Action<int, int, int, int, int, int, int, int>(LoadPlayerData));
             AddEventHandler("streamer:createBlip",
                             new Action<string, float, float, float, int, int, int, int, float, bool, bool>(Streamer
-                               .CreateBlip));
+                                        .CreateBlip));
             AddEventHandler("streamer:createMarker",
                             new Action<int, float, float, float, int, int, int, int, bool>(Streamer.CreateMarker));
             AddEventHandler("streamer:create3dText",
@@ -72,7 +72,7 @@ namespace Client{
         }
 
         private void LoadPlayerData(int dimension, int hp, int maxHp, int armour, int maxArmour, int level, int xp,
-            int walkingStyle){
+            int walkingStyleInt){
             int playerPed = API.PlayerPedId();
             API.SetEntityHealth(playerPed, hp);
             API.SetEntityMaxHealth(playerPed, maxHp);
@@ -81,9 +81,11 @@ namespace Client{
 
             API.SetMaxHealthHudDisplay(maxHp);
             API.SetMaxArmourHudDisplay(maxArmour);
+            string walkingStyle = Utils.AnimWalkingListIndex.ToArray()[walkingStyleInt];
+            Utils.SetWalkingAnimToPed(walkingStyle);
             Var.XP = xp;
             Var.Level = level;
-            Var.WalkingStyle = walkingStyle;
+            Var.WalkingStyle = walkingStyleInt;
             Debug.WriteLine($"Load Player Data, dimension: {dimension}, Hp: {hp}, maxHp: {maxHp}, armour: {armour}, maxArmour: {maxArmour}, level: {level}, xp: {xp}, walkingStyle: {walkingStyle}");
         }
     }
