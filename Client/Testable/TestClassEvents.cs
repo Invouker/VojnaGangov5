@@ -1,6 +1,7 @@
 using System;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using ScaleformUI;
 
 namespace Client.Testable;
 
@@ -44,6 +45,8 @@ public class TestClassEvents{
         API.SetEntityHealth(player, 100);
         API.SetEntityCoordsNoOffset(ped, 341.4725f, -1396.971f, 32.49817f, false, false, true);
         API.RequestCollisionAtCoord(341.4725f, -1396.971f, 32.49817f);
+
+        MenuHandler.CloseAndClearHistory();
         await BaseScript.Delay(500);
         API.DoScreenFadeIn(1500);
     }

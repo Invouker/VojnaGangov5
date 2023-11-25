@@ -49,7 +49,7 @@ public static class PlayerDeadEvent{
                 BaseScript.TriggerEvent("event:player_died", killerType, API.GetEntityCoords(ped, true));
                 BaseScript.TriggerServerEvent("event:player_died", killerType, API.GetEntityCoords(ped, true));
                 HasBeenDead = true;
-                MenuHandler.CloseAndClearHistory();
+                Debug.WriteLine("MenuHandler.IsAnyMenuOpen: " + MenuHandler.IsAnyMenuOpen);
             }
             else{
                 Vector3 killerPos = API.GetEntityCoords(ped, true);
@@ -63,7 +63,6 @@ public static class PlayerDeadEvent{
                 };
                 BaseScript.TriggerEvent("event:player_killed", killerId, eventData);
                 BaseScript.TriggerServerEvent("event:player_killed", killerId, eventData);
-                MenuHandler.CloseAndClearHistory();
                 HasBeenDead = true;
             }
         }
@@ -75,7 +74,6 @@ public static class PlayerDeadEvent{
         if (!HasBeenDead && DiedAt > 0){
             BaseScript.TriggerEvent("event:player_wasted", API.GetEntityCoords(ped, true));
             BaseScript.TriggerServerEvent("event:player_wasted", API.GetEntityCoords(ped, true));
-            MenuHandler.CloseAndClearHistory();
             HasBeenDead = true;
         }
         else if (HasBeenDead && DiedAt != -1 && DiedAt <= 0){
