@@ -32,6 +32,9 @@ public class TestClassEvents{
     }
 
     private static async void SpawnAfterDie(){
+        const float posX = 341.4725f;
+        const float posY = -1396.971f;
+        const float posZ = 32.49817f;
         while (API.IsScreenFadingOut())
             await BaseScript.Delay(1);
 
@@ -41,10 +44,10 @@ public class TestClassEvents{
         int player = API.PlayerId();
         API.ClearPedTasksImmediately(ped);
         API.ClearPlayerWantedLevel(player);
-        API.NetworkResurrectLocalPlayer(341.4725f, -1396.971f, 32.49817f, 48.188797f, true, false);
+        API.NetworkResurrectLocalPlayer(posX, posY, posZ, 48.188797f, true, false);
         API.SetEntityHealth(player, 100);
-        API.SetEntityCoordsNoOffset(ped, 341.4725f, -1396.971f, 32.49817f, false, false, true);
-        API.RequestCollisionAtCoord(341.4725f, -1396.971f, 32.49817f);
+        API.SetEntityCoordsNoOffset(ped, posX, posY, posZ, false, false, true);
+        API.RequestCollisionAtCoord(posX, posY, posZ);
 
         MenuHandler.CloseAndClearHistory();
         await BaseScript.Delay(500);
