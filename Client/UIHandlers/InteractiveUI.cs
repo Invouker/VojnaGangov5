@@ -84,7 +84,10 @@ public static class InteractiveUI{
 
         #endregion
 
-        killYourself.Activated += (sender, item) => API.SetEntityHealth(API.PlayerPedId(), 0);
+        killYourself.Activated += (sender, item) => {
+            Game.Player.Character.Kill();
+            API.DoScreenFadeOut(500);
+        };
 
         return interactiveMenu;
     }
@@ -187,19 +190,19 @@ public static class InteractiveUI{
         back.Activated += (sender, item) => vehicleMenu.SwitchTo(interactiveMenu);
 
         Main.Instance.AddEventHandler("event:entered_vehicle", new Action<int, int, string, int>((vehicle, seat,
-                                          vehicleName, netID) => {
-                                          ToVehicleItem.Enabled = true;
-                                          ToVehicleItem.SetLeftBadge(BadgeIcon.NONE);
-                                      }));
+                                                   vehicleName, netID) => {
+                                                   ToVehicleItem.Enabled = true;
+                                                   ToVehicleItem.SetLeftBadge(BadgeIcon.NONE);
+                                               }));
         Main.Instance.AddEventHandler("event:left_vehicle", new Action<int, int, string, int>((vehicle, seat,
-                                          vehicleName, netID) => {
-                                          ToVehicleItem.Enabled = false;
-                                          ToVehicleItem.SetLeftBadge(BadgeIcon.LOCK);
+                                                   vehicleName, netID) => {
+                                                   ToVehicleItem.Enabled = false;
+                                                   ToVehicleItem.SetLeftBadge(BadgeIcon.LOCK);
 
-                                          if (vehicleMenu.Visible){
-                                              vehicleMenu.SwitchTo(interactiveMenu);
-                                          }
-                                      }));
+                                                   if (vehicleMenu.Visible){
+                                                       vehicleMenu.SwitchTo(interactiveMenu);
+                                                   }
+                                               }));
     }
 
     private static void InteractVehicleDoor(){
