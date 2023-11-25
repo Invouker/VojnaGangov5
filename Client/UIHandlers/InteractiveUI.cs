@@ -90,22 +90,18 @@ public static class InteractiveUI{
     }
 
     private static void VehicleSubMenu(UIMenu interactiveMenu){
-        UIMenuItem toVehicleMenu = new UIMenuItem("Vehicle interaction",
-                                                  "Control your vehicle with this menu, the condition is to be the chauffeur in the vehicle!");
         int vehicle = API.GetVehiclePedIsIn(API.PlayerPedId(), false);
-        { // Check if player is in vehicle and if is driver.
-            if (!API.IsPedInAnyVehicle(API.PlayerPedId(), false)){
-                toVehicleMenu.SetLeftBadge(BadgeIcon.LOCK);
-                toVehicleMenu.Enabled = false;
-                //SetVehicleEngineOn
-            }
-            else{
-                if (API.GetPedInVehicleSeat(vehicle, (int)Enums.SeatPosition.SF_FrontDriverSide) != API.PlayerPedId()){
-                    //Check if is driver
-                    toVehicleMenu.SetLeftBadge(BadgeIcon.LOCK);
-                    toVehicleMenu.Enabled = false;
-                }
-            }
+        UIMenuItem ToVehicleItem = new UIMenuItem("Vehicle interaction",
+                                                  "Control your vehicle with this menu, the condition is to be the chauffeur in the vehicle!");
+        // Check if player is in vehicle and if is driver.
+        if (!API.IsPedInAnyVehicle(API.PlayerPedId(), false)){
+            ToVehicleItem.SetLeftBadge(BadgeIcon.LOCK);
+            ToVehicleItem.Enabled = false;
+        }
+        else if (API.GetPedInVehicleSeat(vehicle, (int)Enums.SeatPosition.SF_FrontDriverSide) != API.PlayerPedId()){
+            //Check if is driver
+            ToVehicleItem.SetLeftBadge(BadgeIcon.LOCK);
+            ToVehicleItem.Enabled = false;
         }
 
         var vehClass = API.GetVehicleClass(vehicle);
@@ -125,14 +121,14 @@ public static class InteractiveUI{
             case 12:{ } //vans
                 break;
             default:{ // Others like: bicycles, boats, Helicopters, plane, service, emergency, military
-                toVehicleMenu.SetLeftBadge(BadgeIcon.LOCK);
-                toVehicleMenu.Enabled = false;
+                ToVehicleItem.SetLeftBadge(BadgeIcon.LOCK);
+                ToVehicleItem.Enabled = false;
                 break;
             }
         }
 
-        toVehicleMenu.SetRightLabel(">>");
-        interactiveMenu.AddItem(toVehicleMenu);
+        ToVehicleItem.SetRightLabel(">>");
+        interactiveMenu.AddItem(ToVehicleItem);
 
         UIMenu vehicleMenu = new UIMenu("Vehicle menu", "Control of vehicle", new PointF(20, 20), "commonmenu",
                                         "interaction_bgd"){
@@ -150,7 +146,6 @@ public static class InteractiveUI{
         UIMenuItem ejectPlayers = new UIMenuItem("Eject players",
                                                  "Halt all players in the vehicle and eject them from the vehicle.");
         vehicleMenu.AddItem(ejectPlayers);
-
 
         UIMenuCheckboxItem engineControl = new UIMenuCheckboxItem("Start/Stop the engine", UIMenuCheckboxStyle.Tick,
                                                                   !EngineState.TryGetValue(vehicle, out bool isOn) ||
@@ -183,12 +178,28 @@ public static class InteractiveUI{
             API.SetVehicleEngineOn(vehicle, @checked, true, true);
             EngineState[vehicle] = @checked;
         };
+
         controlDoor.CheckboxEvent += (sender, @checked) => InteractVehicleDoor();
         ejectPlayers.Activated += (sender, item) => EjectAllPlayersFromVehicle();
         lockVehicleItem.CheckboxEvent += (sender, @checked) =>
             Utils.SetVehicleLockStatus(Enums.CarLock.CARLOCK_UNLOCKED, @checked);
         interactiveMenu.OnItemSelect += (sender, item, index) => interactiveMenu.SwitchTo(vehicleMenu);
         back.Activated += (sender, item) => vehicleMenu.SwitchTo(interactiveMenu);
+
+        Main.Instance.AddEventHandler("event:entered_vehicle", new Action<int, int, string, int>((vehicle, seat,
+                                          vehicleName, netID) => {
+                                          ToVehicleItem.Enabled = true;
+                                          ToVehicleItem.SetLeftBadge(BadgeIcon.NONE);
+                                      }));
+        Main.Instance.AddEventHandler("event:left_vehicle", new Action<int, int, string, int>((vehicle, seat,
+                                          vehicleName, netID) => {
+                                          ToVehicleItem.Enabled = false;
+                                          ToVehicleItem.SetLeftBadge(BadgeIcon.LOCK);
+
+                                          if (vehicleMenu.Visible){
+                                              vehicleMenu.SwitchTo(interactiveMenu);
+                                          }
+                                      }));
     }
 
     private static void InteractVehicleDoor(){
