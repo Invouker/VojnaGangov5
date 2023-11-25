@@ -35,6 +35,7 @@ namespace Client{
             Tick += InteractiveUI.Tick;
             Tick += KeyHandler.Tick;
             Tick += VehicleEvents.Tick;
+            Tick += PlayerDeadEvent.Tick;
             TriggerServerEvent("player:post_join");
 
             AddEventHandler("player:hud:update:money", new Action<int, int>(Hud.ChangeMoney));
