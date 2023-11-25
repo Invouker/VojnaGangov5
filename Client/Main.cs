@@ -5,6 +5,7 @@ using CitizenFX.Core.Native;
 using Client.Events;
 using Client.Handlers;
 using Client.Streamable;
+using Client.Testable;
 using Client.UIHandlers;
 
 namespace Client{
@@ -44,6 +45,8 @@ namespace Client{
                 Var.MaxPlayers = max;
                 Var.ServerName = serverName;
             }));
+
+            TestClassEvents.Handle(); // For handle test class
         }
 
         public PlayerList GetPlayers(){

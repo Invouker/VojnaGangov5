@@ -9,10 +9,10 @@ namespace Client.Events;
  * https://github.com/citizenfx/cfx-server-data/blob/0e7ba538339f7c1c26d0e689aa750a336576cf02/resources/%5Bsystem%5D/baseevents/vehiclechecker.lua#L41
  */
 public static class VehicleEvents{
-    private static bool IsInVehicle;
-    private static bool IsEnteringVehicle;
-    private static int CurrentVehicle;
-    private static int CurrentSeat;
+    private static bool IsInVehicle = false;
+    private static bool IsEnteringVehicle = false;
+    private static int CurrentVehicle = 0;
+    private static int CurrentSeat = 0;
 
 
     public static async Task Tick(){
@@ -28,9 +28,10 @@ public static class VehicleEvents{
                                               netId);
                 BaseScript.TriggerEvent("event:entering_vehicle", vehicle, seat,
                                         API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(vehicle)), netId);
+                // event:entering_vehicle - int,int,string,int
                 await BaseScript.Delay(100);
             }
-            else if (API.DoesEntityExist(API.GetVehiclePedIsTryingToEnter(ped)) && !API.IsPedInAnyVehicle(ped, true) &&
+            else if (!API.DoesEntityExist(API.GetVehiclePedIsTryingToEnter(ped)) && !API.IsPedInAnyVehicle(ped, true) &&
                      IsEnteringVehicle){
                 BaseScript.TriggerServerEvent("event:entering_vehicle_aborted");
                 IsEnteringVehicle = false;
@@ -41,20 +42,16 @@ public static class VehicleEvents{
                 IsInVehicle = true;
                 CurrentVehicle = API.GetVehiclePedIsUsing(ped);
                 CurrentSeat = (int)Utils.GetSeatByPed(ped);
-                //var model = API.GetEntityModel(CurrentVehicle);
-                //var name = API.GetDisplayNameFromVehicleModel((uint)CurrentVehicle);
+                var model = API.GetEntityModel(CurrentVehicle);
+                var name = API.GetDisplayNameFromVehicleModel((uint)model);
                 var netId = API.VehToNet(CurrentVehicle);
-                BaseScript.TriggerServerEvent("event:entered_vehicle", CurrentVehicle, CurrentSeat,
-                                              API.GetDisplayNameFromVehicleModel((uint)API
-                                                 .GetEntityModel(CurrentVehicle)), netId);
-                BaseScript.TriggerEvent("event:entered_vehicle", CurrentVehicle, CurrentSeat,
-                                        API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(CurrentVehicle)),
-                                        netId);
+                BaseScript.TriggerServerEvent("event:entered_vehicle", CurrentVehicle, CurrentSeat, name, netId);
+                BaseScript.TriggerEvent("event:entered_vehicle", CurrentVehicle, CurrentSeat, name, netId);
+                // event:entered_vehicle - int,int,string,int
                 await BaseScript.Delay(100);
             }
         }
-        else if (IsInVehicle){
-            if (!API.IsPedInAnyVehicle(ped, false) && !API.IsPlayerDead(API.PlayerId())) return;
+        else if (IsInVehicle && (!API.IsPedInAnyVehicle(ped, false) || API.IsPlayerDead(API.PlayerId()))){
             //var model = API.GetEntityModel(CurrentVehicle);
             //var name = API.GetDisplayNameFromVehicleModel((uint)CurrentVehicle);
             var netId = API.VehToNet(CurrentVehicle);
@@ -64,6 +61,7 @@ public static class VehicleEvents{
             BaseScript.TriggerEvent("event:left_vehicle", CurrentVehicle, CurrentSeat,
                                     API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(CurrentVehicle)),
                                     netId);
+            // event:left_vehicle - int, int, string, int
             IsInVehicle = false;
             CurrentVehicle = 0;
             CurrentSeat = 0;

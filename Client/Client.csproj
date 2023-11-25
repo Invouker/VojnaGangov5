@@ -69,6 +69,7 @@
     <Compile Include="Handlers\KeyHandler.cs"/>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Testable\TestClassEvents.cs"/>
       <Compile Include="UIHandlers\CharacterCreatorUI.cs"/>
     <Compile Include="Streamable\InteractStreamable.cs"/>
     <Compile Include="Streamable\Streamer.cs"/>
@@ -81,9 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="objs\**"/>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Testable\"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
