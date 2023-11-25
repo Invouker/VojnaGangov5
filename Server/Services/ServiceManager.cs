@@ -2,10 +2,12 @@
     class ServiceManager{
         public static PlayerService PlayerService{ get; private set; }
         public static StreamerService StreamerService{ get; private set; }
+        public static CharacterCreatorService CharacterCreatorService{ get; private set; }
 
         public ServiceManager(){
             PlayerService = new PlayerService();
             StreamerService = new StreamerService();
+            CharacterCreatorService = new CharacterCreatorService();
         }
     }
 }

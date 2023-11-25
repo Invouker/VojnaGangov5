@@ -19,10 +19,19 @@ namespace Client{
             EventHandlers["streamer:create3dText"] +=
                 new Action<string, float, float, float, int, int, int, int>(Streamer.Create3dText);
 
-            Tick += InteractStreamable.OnInteractTick;
+            EventHandlers["player:spawn:to:world"] +=
+                new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld);
+            EventHandlers["player:character:data"] += new Action<string>(SpawnManager.AssignCharacterData);
+            EventHandlers["player:spawn:to:creator"] += new Action(SpawnManager.TeleportToCreator);
 
-            SpawnManager.SpawnPlayer();
+            Tick += InteractStreamable.OnInteractTick;
             TriggerServerEvent("player:post_join");
+        }
+
+        [Tick]
+        public async Task onSpawnManagerTick(){
+            await SpawnManager.CreatorTick();
+            await Task.FromResult(true);
         }
 
         [Tick]
@@ -33,22 +42,20 @@ namespace Client{
 
         [Tick]
         public async Task OnTickInteract(){
-            InteractStreamable.OnInteractTick();
+            await InteractStreamable.OnInteractTick();
             await Task.FromResult(true);
         }
 
         private void LoadPlayerData(long money, long bankMoney, float x, float y, float z, int dimension, int hp,
             int maxHp, int armour, int maxArmour){
-            API.StartPlayerTeleport(API.GetPlayerIndex(), x, y, z, 0, false, false, true);
-            int playerPed = API.GetPlayerPed(-1);
+            int playerPed = API.PlayerPedId();
             API.SetEntityHealth(playerPed, hp);
             API.SetEntityMaxHealth(playerPed, maxHp);
             API.SetPedArmour(playerPed, armour);
-            API.SetPlayerMaxArmour(Game.Player.Handle, maxArmour);
+            API.SetPlayerMaxArmour(Player.Local.Handle, maxArmour);
 
             API.SetMaxHealthHudDisplay(maxHp);
             API.SetMaxArmourHudDisplay(maxArmour);
-            Debug.WriteLine("Load Player Data!");
         }
     }
 }
