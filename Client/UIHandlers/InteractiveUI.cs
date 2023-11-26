@@ -173,11 +173,12 @@ public static class InteractiveUI{
         engineControl.CheckboxEvent += async (sender, @checked) => {
             if (!@checked){
                 API.BringVehicleToHalt(vehicle, 400, 3000, true);
-                await BaseScript.Delay(1000);
             }
-            else
+            else{
                 API.StopBringVehicleToHalt(vehicle);
+            }
 
+            await BaseScript.Delay(1500);
             API.SetVehicleEngineOn(vehicle, @checked, true, true);
             EngineState[vehicle] = @checked;
         };
