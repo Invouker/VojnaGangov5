@@ -92,6 +92,7 @@ public static class PlayerDeadEvent{
 
     private static async Task DoWastedScreen(string reason){
         MenuHandler.CloseAndClearHistory();
+        Var.HideAllHud = true;
         Debug.WriteLine("X: " + MenuHandler.IsAnyMenuOpen);
         Debug.WriteLine("Y: " + MenuHandler.CurrentMenu);
         Debug.WriteLine("Z: " + MenuHandler.CurrentPauseMenu);
@@ -179,5 +180,7 @@ public static class PlayerDeadEvent{
         MenuHandler.CloseAndClearHistory();
         await BaseScript.Delay(500);
         API.DoScreenFadeIn(1500);
+
+        Var.HideAllHud = false;
     }
 }
