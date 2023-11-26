@@ -84,10 +84,7 @@ public static class InteractiveUI{
 
         #endregion
 
-        killYourself.Activated += (sender, item) => {
-            Game.Player.Character.Kill();
-            API.DoScreenFadeOut(500);
-        };
+        killYourself.Activated += (sender, item) => { Game.Player.Character.Kill(); };
 
         return interactiveMenu;
     }
