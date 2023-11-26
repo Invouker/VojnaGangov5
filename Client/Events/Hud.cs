@@ -28,11 +28,24 @@ namespace Client.Events{
 
         public static Task OnRender(){
             if (Var.HideAllHud) return Task.FromResult(true);
-
-            renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.01f, 153, 255, 153); // Wallet
-            renderMoney($"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}", 0.83f, 0.04f, 0, 155, 0); // Bank
-
+            string moneyWallet = $"Cash ${Utils.FormatWithDotSeparator(Var.Money)}";
+            string moneyBank = $"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}";
+            renderMoney(moneyWallet, GetMoneyOffset(moneyWallet), 0.045f, 153, 255, 153); // Wallet
+            renderMoney(moneyBank, GetMoneyOffset(moneyBank), 0.075f, 0, 145, 0); // Bank
+            //renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.045f, 153, 255, 153); // Wallet
+            //renderMoney($"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}", 0.85f, 0.075f, 0, 155, 0); // Bank
+            //0,09f = 1 character
             return Task.FromResult(true);
+        }
+
+        private static float GetMoneyOffset(string money){
+            int moneyCharCount = money.Length;
+            float moneyCharCountOffset = 1f; // set initial offset
+            for (int i = 0; i < moneyCharCount; i++){
+                moneyCharCountOffset -= 0.0091f; // add offset for each character
+            }
+
+            return moneyCharCountOffset;
         }
 
         private static async void renderPlayerList(){
