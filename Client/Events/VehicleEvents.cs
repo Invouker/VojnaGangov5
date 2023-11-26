@@ -17,7 +17,7 @@ public static class VehicleEvents{
 
     public static async Task Tick(){
         int ped = API.PlayerPedId();
-        if (!IsInVehicle && !API.IsPlayerDead(ped) && Game.Player.Character.Health > 100){
+        if (!IsInVehicle && !API.IsPlayerDead(ped) && Game.Player.Character.Health > 0){
             if (API.DoesEntityExist(API.GetVehiclePedIsTryingToEnter(ped)) && !IsEnteringVehicle){
                 var vehicle = API.GetVehiclePedIsTryingToEnter(ped);
                 var seat = API.GetSeatPedIsTryingToEnter(ped);
