@@ -14,8 +14,9 @@ public static class VehicleEvents{
     private static int CurrentVehicle = 0;
     private static int CurrentSeat = 0;
 
-
     public static async Task Tick(){
+        VehicleNumberPlates();
+
         int ped = API.PlayerPedId();
         if (!IsInVehicle && !API.IsPlayerDead(ped) && Game.Player.Character.Health > 0){
             if (API.DoesEntityExist(API.GetVehiclePedIsTryingToEnter(ped)) && !IsEnteringVehicle){
@@ -67,5 +68,13 @@ public static class VehicleEvents{
             CurrentSeat = 0;
             await BaseScript.Delay(100);
         }
+    }
+
+    private static void VehicleNumberPlates(){
+        Vector3 playerPos = Game.Player.Character.Position;
+        string zoneName = API.GetNameOfZone(playerPos.X, playerPos.Y, playerPos.Z)
+                             .Substring(0, 2)
+                             .Replace("A", "^A");
+        API.SetDefaultVehicleNumberPlateTextPattern(-1, $"{zoneName} AAA11");
     }
 }
