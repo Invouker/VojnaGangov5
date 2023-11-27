@@ -11,7 +11,7 @@ using ScaleformUI.Menu;
 
 namespace Client.UIHandlers;
 
-public static class InteractiveUI{
+public static class InteractiveMenu{
     private static readonly Dictionary<int, bool> EngineState = new Dictionary<int, bool>();
 
     public static UIMenu GetInteractiveUI(){

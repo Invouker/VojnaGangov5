@@ -13,18 +13,22 @@ using ScaleformUI.Scaleforms;
 using static CitizenFX.Core.Native.API;
 
 namespace Client.Events{
-    public static class Hud{
+    public static class HudRenderEvent{
         private static bool IsRadarExtended;
         private static readonly PlayerListHandler PlayerListInstance = ScaleformUI.Main.PlayerListInstance;
         private static MinimapHandler.Minimap minimap = MinimapHandler.GetMinimapAnchor();
 
-        static Hud(){
+        static HudRenderEvent(){
             KeyHandler.CreateKeyPair(Control.MultiplayerInfo, RenderProps);
             KeyHandler.CreateKeyPair(Control.InteractionMenu,
                                      () => {
-                                         InteractiveUI.GetInteractiveUI().Visible =
-                                             !InteractiveUI.GetInteractiveUI().Visible;
+                                         InteractiveMenu.GetInteractiveUI().Visible =
+                                             !InteractiveMenu.GetInteractiveUI().Visible;
                                      });
+
+            Main.Instance.AddEventHandler("player:hud:update:money", new Action<int, int>(ChangeMoney));
+            Main.Instance.AddEventHandler("player:hud:update:show:rank", new Action<int>(ShowRankBar));
+            Main.Instance.AddEventHandler("player:hud:update:xp", new Action<int, int>(ChangeXp));
         }
 
         public static Task OnRender(){

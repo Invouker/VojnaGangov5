@@ -246,7 +246,7 @@ namespace Server.Services{
                 return;
             }
 
-            await using (MySqlConnection connection = Connector.GetConnection()){
+            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
                 const string LoadPlayer = $"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE license = @license;";
                 VGPlayer vgPlayer =
@@ -269,7 +269,7 @@ namespace Server.Services{
         }
 
         private async Task<VGPlayer> InsertPlayer(Player player){
-            await using (MySqlConnection connection = Connector.GetConnection()){
+            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
                 const string insertQuery =
                     $"""
@@ -290,7 +290,7 @@ namespace Server.Services{
         }
 
         public static async void UpdatePlayer(Player player, string license){
-            await using (MySqlConnection connection = Connector.GetConnection()){
+            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
                 const String UpdateQueryString = $"""
                                                   UPDATE {VGPlayer.TABLE_NAME} SET Name = @Name,
@@ -319,7 +319,7 @@ namespace Server.Services{
         }
 
         private static async Task<bool> CheckIfPlayerExists(Player player){
-            await using (MySqlConnection connection = Connector.GetConnection()){
+            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
                 const string CheckExistenceQuery =
                     $"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
@@ -335,7 +335,7 @@ namespace Server.Services{
         }
 
         private async Task<bool> CheckIfPlayerCharacterExists(Player player){
-            await using (MySqlConnection connection = Connector.GetConnection()){
+            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
                 string checkExistenceQuery = $@"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
                 int recordCount =

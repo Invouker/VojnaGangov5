@@ -1,8 +1,14 @@
-﻿using CitizenFX.Core;
+﻿using System;
+using CitizenFX.Core;
 using Server.Services;
 
 namespace Server.Testable{
-    public class StreamerTest{
+    public static class StreamerTest{
+        static StreamerTest(){
+            Main.Instance.AddEventHandler("player:post_join", new Action<Player>(PlayerPostJoin));
+            Main.Instance.AddEventHandler("player:interact:marker", new Action<int>(OnMarkerInteract));
+        }
+
         public static void PlayerPostJoin(Player player){
             //StreamerService.CreateBlip("Gang: Alt", -470.547f, -1719.703f, 18.67876f, 59, 255, 1, 2, 1f, false);
             StreamerService.Create3dText("test\n :*~bold~ huhu 1\n :)\n\nPress ~INPUT_PICKUP~ to interact.", -470.547f,

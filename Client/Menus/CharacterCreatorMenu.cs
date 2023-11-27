@@ -8,8 +8,8 @@ using ScaleformUI;
 using ScaleformUI.Menu;
 
 namespace Client.UIHandlers{
-    public static class CharacterCreatorUI{
-        private static readonly CharacterCreatorData CharacterData = new CharacterCreatorData();
+    public static class CharacterCreatorMenu{
+        private static readonly CharacterCreatorEntity CharacterEntity = new CharacterCreatorEntity();
 
         public static UIMenu SelectSexUI(){
             UIMenu menu = new UIMenu("Character Creator", "Select your Sex", new PointF(20, 20)){
@@ -97,7 +97,7 @@ namespace Client.UIHandlers{
                 "Twisted Bob", "Big Bangs", "Braided Top Knot", "Mullet"
             }; //Last was: "Nightvision"
 
-            List<dynamic> hairNames = CharacterData.Sex == 0 ? mHairNames : fHairNames;
+            List<dynamic> hairNames = CharacterEntity.Sex == 0 ? mHairNames : fHairNames;
 
             UIMenuListItem hairCuts = new UIMenuListItem("Haircut", hairNames, 0);
             UIMenuColorPanel hairCutsColor = new UIMenuColorPanel("Colour", ColorPanelType.Hair);
@@ -105,12 +105,12 @@ namespace Client.UIHandlers{
 
             hairCuts.OnListChanged += (selectedItem, index) => {
                 API.SetPedComponentVariation(Game.Player.Character.Handle, 2, index, 0, 2);
-                CharacterData.HairType = index;
+                CharacterEntity.HairType = index;
             };
 
             hairCutsColor.OnColorPanelChange += (menu, panel, index) => {
                 API.SetPedHairColor(Game.Player.Character.Handle, index, 0);
-                CharacterData.HairColor = index;
+                CharacterEntity.HairColor = index;
             };
 
             menu.AddItem(hairCuts);
@@ -203,8 +203,8 @@ namespace Client.UIHandlers{
             UIMenuItem spawnPlayer = new UIMenuItem("Spawn to world", "");
             menu.AddItem(spawnPlayer);
             spawnPlayer.Activated += (sender, item) => {
-                CharacterData.SendDataToServer();
-                SpawnManager.TeleportToWorld(CharacterData.Sex, -2246.927f, 269.0242f, 174.6095f, 110f);
+                CharacterEntity.SendDataToServer();
+                SpawnManager.TeleportToWorld(CharacterEntity.Sex, -2246.927f, 269.0242f, 174.6095f, 110f);
                 menu.Visible = false;
             };
 
@@ -222,55 +222,55 @@ namespace Client.UIHandlers{
             uiGrid.OnGridPanelChange += (menu, panel, value) => {
                 switch (indexOne){
                     case 0:
-                        CharacterData.NoseWidth = value.X;
+                        CharacterEntity.NoseWidth = value.X;
                         break;
                     case 2:
-                        CharacterData.NoseLength = value.X;
+                        CharacterEntity.NoseLength = value.X;
                         break;
                     case 4:
-                        CharacterData.NoseTip = value.X;
+                        CharacterEntity.NoseTip = value.X;
                         break;
                     case 6:
-                        CharacterData.Eyebrow = value.X;
+                        CharacterEntity.Eyebrow = value.X;
                         break;
                     case 8:
-                        CharacterData.CheekBones = value.X;
+                        CharacterEntity.CheekBones = value.X;
                         break;
                     case 13:
-                        CharacterData.JawBoneWidth = value.X;
+                        CharacterEntity.JawBoneWidth = value.X;
                         break;
                     case 15:
-                        CharacterData.ChinBone = value.X;
+                        CharacterEntity.ChinBone = value.X;
                         break;
                     case 17:
-                        CharacterData.ChinBoneShape = value.X;
+                        CharacterEntity.ChinBoneShape = value.X;
                         break;
                 }
 
                 switch (indexTwo){
                     case 1:
-                        CharacterData.NosePeak = value.Y;
+                        CharacterEntity.NosePeak = value.Y;
                         break;
                     case 3:
-                        CharacterData.NoseBoneCurvness = value.Y;
+                        CharacterEntity.NoseBoneCurvness = value.Y;
                         break;
                     case 5:
-                        CharacterData.NoseBoneTwist = value.Y;
+                        CharacterEntity.NoseBoneTwist = value.Y;
                         break;
                     case 7:
-                        CharacterData.Eyebrow2 = value.Y;
+                        CharacterEntity.Eyebrow2 = value.Y;
                         break;
                     case 9:
-                        CharacterData.CheekSidewaysBoneSize = value.Y;
+                        CharacterEntity.CheekSidewaysBoneSize = value.Y;
                         break;
                     case 14:
-                        CharacterData.JawBoneShape = value.Y;
+                        CharacterEntity.JawBoneShape = value.Y;
                         break;
                     case 16:
-                        CharacterData.ChinBoneLength = value.Y;
+                        CharacterEntity.ChinBoneLength = value.Y;
                         break;
                     case 18:
-                        CharacterData.ChinHole = value.Y;
+                        CharacterEntity.ChinHole = value.Y;
                         break;
                 }
 
@@ -288,16 +288,16 @@ namespace Client.UIHandlers{
             uiGrid.OnGridPanelChange += (menu, panel, value) => {
                 switch (index){
                     case 10:
-                        CharacterData.CheekBonesWidth = value.X;
+                        CharacterEntity.CheekBonesWidth = value.X;
                         break;
                     case 11:
-                        CharacterData.EyeOpening = value.X;
+                        CharacterEntity.EyeOpening = value.X;
                         break;
                     case 12:
-                        CharacterData.LipThickness = value.X;
+                        CharacterEntity.LipThickness = value.X;
                         break;
                     case 19:
-                        CharacterData.NeckThickness = value.X;
+                        CharacterEntity.NeckThickness = value.X;
                         break;
                 }
 
@@ -350,49 +350,49 @@ namespace Client.UIHandlers{
         private static void updateData(int overlayId, int objectType, int objectColor, float objectOpacity){
             switch (overlayId){ // 1,2,3,4,6,7,8,9,11
                 case 1:
-                    CharacterData.FacialHair = objectType;
-                    CharacterData.FacialHairColor = objectColor;
-                    CharacterData.FacialHairOpacity = objectOpacity;
+                    CharacterEntity.FacialHair = objectType;
+                    CharacterEntity.FacialHairColor = objectColor;
+                    CharacterEntity.FacialHairOpacity = objectOpacity;
                     break;
                 case 2:
-                    CharacterData.Eyebrows = objectType;
-                    CharacterData.EyebrowsColor = objectColor;
-                    CharacterData.EyebrowsOpacity = objectOpacity;
+                    CharacterEntity.Eyebrows = objectType;
+                    CharacterEntity.EyebrowsColor = objectColor;
+                    CharacterEntity.EyebrowsOpacity = objectOpacity;
                     break;
                 case 3:
-                    CharacterData.Ageing = objectType;
-                    CharacterData.AgeingColor = objectColor;
-                    CharacterData.AgeingOpacity = objectOpacity;
+                    CharacterEntity.Ageing = objectType;
+                    CharacterEntity.AgeingColor = objectColor;
+                    CharacterEntity.AgeingOpacity = objectOpacity;
                     break;
                 case 4:
-                    CharacterData.Makeup = objectType;
-                    CharacterData.MakeupColor = objectColor;
-                    CharacterData.MakeupOpacity = objectOpacity;
+                    CharacterEntity.Makeup = objectType;
+                    CharacterEntity.MakeupColor = objectColor;
+                    CharacterEntity.MakeupOpacity = objectOpacity;
                     break;
                 case 6:
-                    CharacterData.Complexion = objectType;
-                    CharacterData.ComplexionColor = objectColor;
-                    CharacterData.ComplexionOpacity = objectOpacity;
+                    CharacterEntity.Complexion = objectType;
+                    CharacterEntity.ComplexionColor = objectColor;
+                    CharacterEntity.ComplexionOpacity = objectOpacity;
                     break;
                 case 7:
-                    CharacterData.SunDamage = objectType;
-                    CharacterData.SunDamageColor = objectColor;
-                    CharacterData.SunDamageOpacity = objectOpacity;
+                    CharacterEntity.SunDamage = objectType;
+                    CharacterEntity.SunDamageColor = objectColor;
+                    CharacterEntity.SunDamageOpacity = objectOpacity;
                     break;
                 case 8:
-                    CharacterData.Lipstick = objectType;
-                    CharacterData.LipstickColor = objectColor;
-                    CharacterData.LipstickOpacity = objectOpacity;
+                    CharacterEntity.Lipstick = objectType;
+                    CharacterEntity.LipstickColor = objectColor;
+                    CharacterEntity.LipstickOpacity = objectOpacity;
                     break;
                 case 9:
-                    CharacterData.MolesFreckles = objectType;
-                    CharacterData.MolesFrecklesColor = objectColor;
-                    CharacterData.MolesFrecklesOpacity = objectOpacity;
+                    CharacterEntity.MolesFreckles = objectType;
+                    CharacterEntity.MolesFrecklesColor = objectColor;
+                    CharacterEntity.MolesFrecklesOpacity = objectOpacity;
                     break;
                 case 11:
-                    CharacterData.BodyBlemishes = objectType;
-                    CharacterData.BodyBlemishesColor = objectColor;
-                    CharacterData.BodyBlemishesOpacity = objectOpacity;
+                    CharacterEntity.BodyBlemishes = objectType;
+                    CharacterEntity.BodyBlemishesColor = objectColor;
+                    CharacterEntity.BodyBlemishesOpacity = objectOpacity;
                     break;
             }
         }
@@ -469,28 +469,28 @@ namespace Client.UIHandlers{
 
             switch (compId){
                 case 3:
-                    CharacterData.Torso = index;
-                    CharacterData.TorsoTexture = 0;
+                    CharacterEntity.Torso = index;
+                    CharacterEntity.TorsoTexture = 0;
                     break;
                 case 4:
-                    CharacterData.Legs = index;
-                    CharacterData.LegsTexture = 0;
+                    CharacterEntity.Legs = index;
+                    CharacterEntity.LegsTexture = 0;
                     break;
                 case 6:
-                    CharacterData.Foot = index;
-                    CharacterData.FootTexture = 0;
+                    CharacterEntity.Foot = index;
+                    CharacterEntity.FootTexture = 0;
                     break;
                 case 7:
-                    CharacterData.Accesories = index;
-                    CharacterData.AccesoriesTexture = 0;
+                    CharacterEntity.Accesories = index;
+                    CharacterEntity.AccesoriesTexture = 0;
                     break;
                 case 8:
-                    CharacterData.Scarfs = index;
-                    CharacterData.ScarfsTexture = 0;
+                    CharacterEntity.Scarfs = index;
+                    CharacterEntity.ScarfsTexture = 0;
                     break;
                 case 11:
-                    CharacterData.Torso2 = index;
-                    CharacterData.Torso2Texture = 0;
+                    CharacterEntity.Torso2 = index;
+                    CharacterEntity.Torso2Texture = 0;
                     break;
             }
         }
@@ -630,31 +630,31 @@ namespace Client.UIHandlers{
             windowSubmenu.AddItem(back);
             windowSubmenu.OnListChange += (sender, item, index) => {
                 if (item == mom)
-                    CharacterData.Mother = index;
+                    CharacterEntity.Mother = index;
                 else if (item == dad)
-                    CharacterData.Father = index;
+                    CharacterEntity.Father = index;
 
 
-                heritageWindow.Index(CharacterData.Mother, CharacterData.Father);
+                heritageWindow.Index(CharacterEntity.Mother, CharacterEntity.Father);
                 API.SetPedHeadBlendData(Game.Player.Character.Handle,
-                                        CharacterData.Mother, CharacterData.Father, 0,
-                                        CharacterData.Mother, CharacterData.Father, 0,
-                                        CharacterData.ParentFaceShapePercent,
-                                        CharacterData.ParentSkinTonePercent, .5f, true);
+                                        CharacterEntity.Mother, CharacterEntity.Father, 0,
+                                        CharacterEntity.Mother, CharacterEntity.Father, 0,
+                                        CharacterEntity.ParentFaceShapePercent,
+                                        CharacterEntity.ParentSkinTonePercent, .5f, true);
             };
             windowSubmenu.OnSliderChange += (sender, item, index) => {
                 if (item == ShapeMixItem){
-                    CharacterData.ParentFaceShapePercent = (float)amount[index];
+                    CharacterEntity.ParentFaceShapePercent = (float)amount[index];
                 }
                 else if (item == SkinMixItem){
-                    CharacterData.ParentSkinTonePercent = (float)amount[index];
+                    CharacterEntity.ParentSkinTonePercent = (float)amount[index];
                 }
 
                 API.SetPedHeadBlendData(Game.Player.Character.Handle,
-                                        CharacterData.Mother, CharacterData.Father, 0,
-                                        CharacterData.Mother, CharacterData.Father, 0,
-                                        CharacterData.ParentFaceShapePercent,
-                                        CharacterData.ParentSkinTonePercent, .5f, true);
+                                        CharacterEntity.Mother, CharacterEntity.Father, 0,
+                                        CharacterEntity.Mother, CharacterEntity.Father, 0,
+                                        CharacterEntity.ParentFaceShapePercent,
+                                        CharacterEntity.ParentSkinTonePercent, .5f, true);
             };
             windowsItem.Activated += (sender, e) => { sender.SwitchTo(windowSubmenu, inheritOldMenuParams: true); };
 
@@ -662,7 +662,7 @@ namespace Client.UIHandlers{
         }
 
         private static async void ChangeSex(int sexIndex){
-            CharacterData.Sex = (short)sexIndex;
+            CharacterEntity.Sex = (short)sexIndex;
             string sexHash = sexIndex switch{
                 0 => "mp_m_freemode_01",
                 1 => "mp_f_freemode_01",

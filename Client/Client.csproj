@@ -61,9 +61,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\CharacterCreatorData.cs"/>
-    <Compile Include="Enums.cs"/>
-    <Compile Include="Events\Hud.cs"/>
+      <Compile Include="Entities\CharacterCreatorEntity.cs"/>
+      <Compile Include="Events\HudRenderEvent.cs"/>
     <Compile Include="Events\PlayerDeadEvent.cs"/>
     <Compile Include="Events\SpawnManager.cs"/>
     <Compile Include="Events\VehicleEvents.cs"/>
@@ -72,12 +71,13 @@
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Testable\TestClassEvents.cs"/>
-      <Compile Include="UIHandlers\CharacterCreatorUI.cs"/>
+      <Compile Include="Menus\CharacterCreatorMenu.cs"/>
     <Compile Include="Streamable\InteractStreamable.cs"/>
     <Compile Include="Streamable\Streamer.cs"/>
-    <Compile Include="UIHandlers\InteractiveUI.cs"/>
-      <Compile Include="Utils.cs"/>
-    <Compile Include="Var.cs"/>
+      <Compile Include="Menus\InteractiveMenu.cs"/>
+      <Compile Include="Utils\Enums.cs"/>
+      <Compile Include="Utils\Utils.cs"/>
+      <Compile Include="Utils\Var.cs"/>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Remove="objs\**"/>

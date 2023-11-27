@@ -9,7 +9,7 @@ namespace Server.Services{
     public class CharacterCreatorService{
         private async Task<bool> CheckIfCharacterExist(string name){
             bool exists = false;
-            await using MySqlConnection connection = Connector.GetConnection();
+            await using MySqlConnection connection = DatabaseConnector.GetConnection();
             await connection.OpenAsync();
 
             const string checkExistenceQuery = "SELECT COUNT(*) FROM characters WHERE name = @Name";
@@ -21,7 +21,7 @@ namespace Server.Services{
         }
 
         private async Task<Character> GetCharacter(string name){
-            await using MySqlConnection dbConnection = Connector.GetConnection();
+            await using MySqlConnection dbConnection = DatabaseConnector.GetConnection();
             await dbConnection.OpenAsync();
 
             const string SelectQuery = @"SELECT * FROM characters WHERE Name = @Name";
@@ -33,7 +33,7 @@ namespace Server.Services{
         }
 
         public async void SaveCharacterData([FromSource] Player player, string data){
-            await using MySqlConnection dbConnection = Connector.GetConnection();
+            await using MySqlConnection dbConnection = DatabaseConnector.GetConnection();
             await dbConnection.OpenAsync();
 
             string name = player.Name;
@@ -69,7 +69,7 @@ namespace Server.Services{
         }
 
         public async void LoadCharacterData([FromSource] Player player, int playerPed){
-            await using MySqlConnection dbConnection = Connector.GetConnection();
+            await using MySqlConnection dbConnection = DatabaseConnector.GetConnection();
             await dbConnection.OpenAsync();
             string name = player.Name;
             const string SelectQuery = "SELECT * FROM characters WHERE name = @Name";

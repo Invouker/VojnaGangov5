@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
@@ -22,6 +23,36 @@ namespace Client.Events{
             Main = 1,
             Right = 2,
             Unzoom = 3
+        }
+
+        static SpawnManager(){
+            Main.Instance.AddEventHandler("player:load:data",
+                                          new Action<int, int, int, int, int, int, int, int>(LoadPlayerData));
+
+            Main.Instance.AddEventHandler("player:spawn:to:world",
+                                          new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld));
+            Main.Instance.AddEventHandler("player:character:data",
+                                          new Action<string>(SpawnManager.AssignCharacterData));
+            Main.Instance.AddEventHandler("player:spawn:to:creator", new Action(SpawnManager.TeleportToCreator));
+        }
+
+        private static void LoadPlayerData(int dimension, int hp, int maxHp, int armour, int maxArmour, int level,
+            int xp,
+            int walkingStyleInt){
+            int playerPed = API.PlayerPedId();
+            API.SetEntityHealth(playerPed, hp);
+            API.SetEntityMaxHealth(playerPed, maxHp);
+            API.SetPedArmour(playerPed, armour);
+            API.SetPlayerMaxArmour(Player.Local.Handle, maxArmour);
+
+            API.SetMaxHealthHudDisplay(maxHp);
+            API.SetMaxArmourHudDisplay(maxArmour);
+            string walkingStyle = Utils.AnimWalkingListIndex.ToArray()[walkingStyleInt];
+            Utils.SetWalkingAnimToPed(walkingStyle);
+            Var.XP = xp;
+            Var.Level = level;
+            Var.WalkingStyle = walkingStyleInt;
+            Debug.WriteLine($"Load Player Data, dimension: {dimension}, Hp: {hp}, maxHp: {maxHp}, armour: {armour}, maxArmour: {maxArmour}, level: {level}, xp: {xp}, walkingStyle: {walkingStyle}");
         }
 
         public static async void TeleportToCreator(){
@@ -80,7 +111,7 @@ namespace Client.Events{
             IsPlayerInCreator = true;
             API.DisplayRadar(false);
             API.SetPedHeadBlendData(API.GetPlayerPed(-1), 0, 0, 0, 0, 0, 0, 0, 0f, 0f, false);
-            UIMenu menu = CharacterCreatorUI.SelectSexUI();
+            UIMenu menu = CharacterCreatorMenu.SelectSexUI();
             menu.Visible = true;
 
             API.SetPedCanHeadIk(Game.Player.Character.Handle, true);
@@ -238,7 +269,7 @@ namespace Client.Events{
 
         public static void AssignCharacterData(string data){
             int playerPed = API.PlayerPedId();
-            CharacterCreatorData character = CharacterCreatorData.DeserializeFromJson(data);
+            CharacterCreatorEntity character = CharacterCreatorEntity.DeserializeFromJson(data);
             API.SetPedHeadBlendData(playerPed, character.Mother, character.Father, 0,
                                     character.Mother, character.Father, 0,
                                     character.ParentFaceShapePercent, character.ParentSkinTonePercent, 0, true);

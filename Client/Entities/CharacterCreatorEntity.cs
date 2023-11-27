@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Client.Entities;
 
-public class CharacterCreatorData{
+public class CharacterCreatorEntity{
     #region HeadBlendData // Player.Local.Character.GetHeadBlendData();
 
     public short Sex{ get; set; }
@@ -105,8 +105,8 @@ public class CharacterCreatorData{
     }
 
     // Deserialization method
-    public static CharacterCreatorData DeserializeFromJson(string json){
-        return JsonConvert.DeserializeObject<CharacterCreatorData>(json);
+    public static CharacterCreatorEntity DeserializeFromJson(string json){
+        return JsonConvert.DeserializeObject<CharacterCreatorEntity>(json);
     }
 
     public void SendDataToServer(){

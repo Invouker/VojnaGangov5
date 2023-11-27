@@ -103,10 +103,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\Connector.cs" />
+      <Compile Include="Database\DatabaseConnector.cs"/>
     <Compile Include="Database\Entities\Character.cs"/>
     <Compile Include="Database\Entities\VGPlayer.cs" />
-    <Compile Include="Database\Test.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CharacterCreatorService.cs"/>
@@ -116,15 +115,11 @@
     <Compile Include="Services\StreamerService.cs"/>
     <Compile Include="Testable\CommandsTest.cs"/>
     <Compile Include="Testable\StreamerTest.cs"/>
-    <Compile Include="Utils.cs"/>
+      <Compile Include="Utils\Utils.cs"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Entities\"/>
-    <Folder Include="Exceptions\"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
