@@ -76,7 +76,7 @@ namespace Server.Services{
             Character character = await dbConnection.QueryFirstAsync<Character>(SelectQuery, new{ Name = name });
             await dbConnection.CloseAsync();
 
-            BaseScript.TriggerClientEvent(player, "player:character:data", character.SerializeToJson());
+            player.TriggerEvent("player:character:data", character.SerializeToJson());
         }
 
         public async void Loader([FromSource] Player player){
@@ -84,10 +84,10 @@ namespace Server.Services{
             Character character = await GetCharacter(player.Name);
             VGPlayer vgPlayer = PlayerService.GetVgPlayerByPlayer(player);
             if (tasks)
-                BaseScript.TriggerClientEvent("player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY,
-                                              vgPlayer.PosZ, 110f);
+                player.TriggerEvent("player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY,
+                                    vgPlayer.PosZ, 110f);
             else
-                BaseScript.TriggerClientEvent("player:spawn:to:creator");
+                player.TriggerEvent("player:spawn:to:creator");
         }
     }
 }
