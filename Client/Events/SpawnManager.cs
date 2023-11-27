@@ -111,21 +111,26 @@ namespace Client.Events{
             API.SetPlayerModel(player, hash);
             var playerPed = API.PlayerPedId();
             API.SetPedDefaultComponentVariation(playerPed);
-            API.SetModelAsNoLongerNeeded(hash);
 
             //-2246.927f, 269.0242f, 174.6095f
-            API.RequestCollisionAtCoord(posX, posY, posZ);
+            Model pModel = Player.Local.Character.Model;
+            API.RequestCollisionForModel((uint)pModel.Hash);
+
+            API.SetModelAsNoLongerNeeded(hash);
+            //API.RequestCollisionAtCoord(posX, posY, posZ);
             API.SetEntityCoordsNoOffset(playerPed, posX, posY, posZ, false, false, true);
             API.NetworkResurrectLocalPlayer(posX, posY, posZ, heading, true, false);
-            API.ClearPedTasksImmediately(playerPed);
+            Game.Player.Character.IsPositionFrozen = true;
 
             API.ClearPedTasksImmediately(playerPed);
-            API.RemoveAllPedWeapons(playerPed, true);
+            API.RemoveAllPedWeapons(playerPed, true); //Todo: Do load a weapons for player.
             API.ClearPlayerWantedLevel(player);
 
-            API.StartPlayerTeleport(player, posX, posY, posZ, heading, false, false, false);
-
+            //API.StartPlayerTeleport(player, posX, posY, posZ, heading, false, false, false);
             BaseScript.TriggerServerEvent("player:spawn:to:world:server", playerPed);
+
+            await BaseScript.Delay(2000);
+
             API.DoScreenFadeIn(1000);
             while (!API.IsScreenFadedIn())
                 await BaseScript.Delay(1);
@@ -133,11 +138,8 @@ namespace Client.Events{
             API.DisplayRadar(true);
             API.RenderScriptCams(false, false, 1, true, true);
 
-            API.SetPedCanHeadIk(Game.Player.Character.Handle, false);
-            API.TaskStandStill(Game.Player.Character.Handle, 0);
-            Game.Player.Character.IsPositionFrozen = false;
             Game.Player.Character.IsInvincible = false;
-
+            Game.Player.Character.IsPositionFrozen = false;
             Var.HideAllHud = false;
         }
 

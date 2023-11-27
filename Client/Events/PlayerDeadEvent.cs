@@ -175,12 +175,20 @@ public static class PlayerDeadEvent{
         API.NetworkResurrectLocalPlayer(posX, posY, posZ, 48.188797f, true, false);
         API.SetEntityHealth(player, 100);
         API.SetEntityCoordsNoOffset(ped, posX, posY, posZ, false, false, true);
-        API.RequestCollisionAtCoord(posX, posY, posZ);
+        Model pModel = Player.Local.Character.Model;
+        API.RequestCollisionForModel((uint)pModel.Hash);
+
+        Game.Player.Character.IsPositionFrozen = true;
+        //API.RequestCollisionAtCoord(posX, posY, posZ);
 
         MenuHandler.CloseAndClearHistory();
-        await BaseScript.Delay(500);
-        API.DoScreenFadeIn(1500);
+        await BaseScript.Delay(2000);
 
+        API.DoScreenFadeIn(1500);
+        while (API.IsScreenFadedIn())
+            await BaseScript.Delay(0);
+
+        Game.Player.Character.IsPositionFrozen = false;
         Var.HideAllHud = false;
     }
 }
