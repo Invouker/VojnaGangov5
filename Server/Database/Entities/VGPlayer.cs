@@ -3,7 +3,7 @@
 namespace Server.Database.Entities{
     /* CREATE TABLE `accounts` (  `id` int(11) NOT NULL,  `name` varchar(255) NOT NULL,  `licence` varchar(255) NOT NULL,  `hp` int (255) NOT NULL DEFAULT 100,  `max_hp` int (255) DEFAULT 100,  `armour` int (255) NOT NULL DEFAULT 100,  `max_armour` int (255) NOT NULL DEFAULT 100,  `wantedLevel` int (6) NOT NULL DEFAULT 0,  `money` bigint(20) NOT NULL DEFAULT 0,  `bankMoney` bigint(20) NOT NULL DEFAULT 0,  `Level` int (255) DEFAULT 1,  `Xp` int (11) NOT NULL DEFAULT 0,  `posX` float NOT NULL,  `posY` float NOT NULL,  `posZ` float NOT NULL,  `Dimension` int (255) NOT NULL DEFAULT 0) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE = utf8mb4_general_ci;ALTER TABLE `accounts`  ADD PRIMARY KEY(`id`);ALTER TABLE `accounts`  MODIFY `id` int (11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;COMMIT;
 */
-    class VGPlayer{
+    public class VGPlayer{
         public const string TABLE_NAME = "accounts";
 
         /* TODO:
