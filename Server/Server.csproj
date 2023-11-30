@@ -105,6 +105,9 @@
   <ItemGroup>
       <Compile Include="Database\DatabaseConnector.cs"/>
     <Compile Include="Database\Entities\Character.cs"/>
+    <Compile Include="Database\Entities\PlayerInventory\Inventory.cs"/>
+    <Compile Include="Database\Entities\PlayerInventory\ItemID.cs"/>
+    <Compile Include="Database\Entities\PlayerInventory\Items.cs"/>
     <Compile Include="Database\Entities\VGPlayer.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
