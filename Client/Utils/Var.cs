@@ -1,4 +1,4 @@
-namespace Client;
+namespace Client.Utils;
 
 public static class Var{
     public static int Money{ get; set; }

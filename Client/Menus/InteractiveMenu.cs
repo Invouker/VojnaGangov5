@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Streamable;
+using Client.Utils;
 using ScaleformUI;
 using ScaleformUI.Menu;
+using static Client.Utils.Utils;
 
-namespace Client.UIHandlers;
+namespace Client.Menus;
 
 public static class InteractiveMenu{
     private static readonly Dictionary<int, bool> EngineState = new Dictionary<int, bool>();

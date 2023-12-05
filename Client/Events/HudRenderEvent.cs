@@ -5,12 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using Client.Handlers;
-using Client.UIHandlers;
+using Client.Menus;
+using Client.Utils;
 using Newtonsoft.Json;
 using ScaleformUI;
 using ScaleformUI.Elements;
 using ScaleformUI.Scaleforms;
 using static CitizenFX.Core.Native.API;
+using static Client.Utils.Utils;
 
 namespace Client.Events{
     public static class HudRenderEvent{
@@ -156,7 +158,7 @@ namespace Client.Events{
         public static void ShowRankBar(int giveXP){
             ScaleformUI.Main.RankBarInstance.OverrideAnimationSpeed(3000);
             ScaleformUI.Main.RankBarInstance.OverrideOnscreenDuration(7000);
-            ScaleformUI.Main.RankBarInstance.SetScores(0, Utils.GetReputationToLevel(Var.Level + 1), Var.XP,
+            ScaleformUI.Main.RankBarInstance.SetScores(0, GetReputationToLevel(Var.Level + 1), Var.XP,
                                                        (Var.XP + giveXP), Var.Level);
         }
 

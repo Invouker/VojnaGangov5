@@ -5,7 +5,7 @@ using Client.Events;
 using Client.Handlers;
 using Client.Streamable;
 using Client.Testable;
-using Client.UIHandlers;
+using Client.Utils;
 
 namespace Client{
     // ReSharper disable once ClassNeverInstantiated.Global

@@ -3,7 +3,7 @@ using CitizenFX.Core;
 
 namespace Client.Testable;
 
-public class TestClassEvents{
+public static class TestClassEvents{
     public static void Handle(){
         Main.Instance.AddEventHandler("event:entering_vehicle",
                                       new Action<int, int, string, int>((vehicle, seat, vehicleName, netID) => {

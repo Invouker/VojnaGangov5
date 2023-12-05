@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using static Client.Utils.Utils;
 
 namespace Client.Events;
 
@@ -42,7 +43,7 @@ public static class VehicleEvents{
                 IsEnteringVehicle = false;
                 IsInVehicle = true;
                 CurrentVehicle = API.GetVehiclePedIsUsing(ped);
-                CurrentSeat = (int)Utils.GetSeatByPed(ped);
+                CurrentSeat = (int)GetSeatByPed(ped);
                 var model = API.GetEntityModel(CurrentVehicle);
                 var name = API.GetDisplayNameFromVehicleModel((uint)model);
                 var netId = API.VehToNet(CurrentVehicle);
