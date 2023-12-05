@@ -28,13 +28,13 @@ public static class InteractiveMenu{
         #region Walking Style
 
         UIMenuListItem walkingStyle =
-            new UIMenuListItem("Walking Style", Utils.AnimWalkingList, Var.WalkingStyle, "Change your walking style.");
+            new UIMenuListItem("Walking Style", AnimWalkingList, Var.WalkingStyle, "Change your walking style.");
 
         interactiveMenu.AddItem(walkingStyle);
 
         walkingStyle.OnListChanged += (sender, index) => {
-            string selectedIndex = Utils.AnimWalkingListIndex.ToArray()[index];
-            Utils.SetWalkingAnimToPed(selectedIndex);
+            string selectedIndex = AnimWalkingListIndex.ToArray()[index];
+            SetWalkingAnimToPed(selectedIndex);
             Var.WalkingStyle = index;
             BaseScript.TriggerServerEvent("player:interactive:walkingstyle", index);
         };
@@ -185,7 +185,7 @@ public static class InteractiveMenu{
         controlDoor.CheckboxEvent += (sender, @checked) => InteractVehicleDoor();
         ejectPlayers.Activated += (sender, item) => EjectAllPlayersFromVehicle();
         lockVehicleItem.CheckboxEvent += (sender, @checked) =>
-            Utils.SetVehicleLockStatus(Enums.CarLock.CARLOCK_UNLOCKED, @checked);
+            SetVehicleLockStatus(Enums.CarLock.CARLOCK_UNLOCKED, @checked);
         interactiveMenu.OnItemSelect += (sender, item, index) => interactiveMenu.SwitchTo(vehicleMenu);
         back.Activated += (sender, item) => vehicleMenu.SwitchTo(interactiveMenu);
 

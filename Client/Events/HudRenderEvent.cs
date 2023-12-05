@@ -35,8 +35,8 @@ namespace Client.Events{
 
         public static Task OnRender(){
             if (Var.HideAllHud) return Task.FromResult(true);
-            string moneyWallet = $"Cash ${Utils.FormatWithDotSeparator(Var.Money)}";
-            string moneyBank = $"Bank ${Utils.FormatWithDotSeparator(Var.BankMoney)}";
+            string moneyWallet = $"Cash ${FormatWithDotSeparator(Var.Money)}";
+            string moneyBank = $"Bank ${FormatWithDotSeparator(Var.BankMoney)}";
             renderText(moneyWallet, GetMoneyOffset(moneyWallet), 0.045f, 153, 255, 153); // Wallet
             renderText(moneyBank, GetMoneyOffset(moneyBank), 0.075f, 0, 145, 0); // Bank
             //renderMoney($"Cash ${Utils.FormatWithDotSeparator(Var.Money)}", 0.83f, 0.045f, 153, 255, 153); // Wallet
