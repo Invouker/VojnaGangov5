@@ -9,6 +9,10 @@ namespace Server{
             return API.GetPlayerIdentifierByType(player.Handle, "license");
         }
 
+        public static string GetIP(Player player){
+            return API.GetPlayerEndpoint(player.Handle);
+        }
+
         public static bool IsNumberInArray(IEnumerable<int> array, int number){
             return array.Any(numberArray => numberArray == number);
         }

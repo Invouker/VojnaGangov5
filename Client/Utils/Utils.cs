@@ -9,12 +9,7 @@ namespace Client.Utils;
 
 public static class Utils{
     public static bool IsNumberInArray(int[] array, int number){
-        foreach (var numberArray in array){
-            if (numberArray == number)
-                return true;
-        }
-
-        return false;
+        return array.Any(numberArray => numberArray == number);
     }
 
     public static int CountDigits(int number){
