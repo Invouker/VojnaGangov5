@@ -1,13 +1,22 @@
+using System;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using Dapper;
 using MySqlConnector;
 using Server.Database;
-using Server.Database.Entities;
+using Server.Database.Entities.Player;
 
 namespace Server.Services{
     public class CharacterCreatorService{
-        private async Task<bool> CheckIfCharacterExist(string name){
+        public CharacterCreatorService(){
+            Main.Instance.AddEventHandler("player:data:character",
+                                          new Action<Player, string>(SaveCharacterData));
+            Main.Instance.AddEventHandler("player:spawn:to:world:server",
+                                          new Action<Player, int>(LoadCharacterData));
+        }
+
+
+        public static async Task<bool> CheckIfCharacterExist(string name){
             bool exists = false;
             await using MySqlConnection connection = DatabaseConnector.GetConnection();
             await connection.OpenAsync();
@@ -20,7 +29,7 @@ namespace Server.Services{
             return exists;
         }
 
-        private async Task<Character> GetCharacter(string name){
+        public static async Task<Character> GetCharacter(string name){
             await using MySqlConnection dbConnection = DatabaseConnector.GetConnection();
             await dbConnection.OpenAsync();
 
@@ -32,7 +41,7 @@ namespace Server.Services{
             return character;
         }
 
-        public async void SaveCharacterData([FromSource] Player player, string data){
+        public static async void SaveCharacterData([FromSource] Player player, string data){
             await using MySqlConnection dbConnection = DatabaseConnector.GetConnection();
             await dbConnection.OpenAsync();
 
@@ -68,7 +77,7 @@ namespace Server.Services{
             await dbConnection.CloseAsync();
         }
 
-        public async void LoadCharacterData([FromSource] Player player, int playerPed){
+        public static async void LoadCharacterData([FromSource] Player player, int playerPed){
             await using MySqlConnection dbConnection = DatabaseConnector.GetConnection();
             await dbConnection.OpenAsync();
             string name = player.Name;
@@ -77,17 +86,6 @@ namespace Server.Services{
             await dbConnection.CloseAsync();
 
             player.TriggerEvent("player:character:data", character.SerializeToJson());
-        }
-
-        public async void Loader([FromSource] Player player){
-            bool tasks = await CheckIfCharacterExist(player.Name);
-            Character character = await GetCharacter(player.Name);
-            VGPlayer vgPlayer = PlayerService.GetVgPlayerByPlayer(player);
-            if (tasks)
-                player.TriggerEvent("player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY,
-                                    vgPlayer.PosZ, 110f);
-            else
-                player.TriggerEvent("player:spawn:to:creator");
         }
     }
 }
