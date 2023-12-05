@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CitizenFX.Core;
@@ -8,37 +7,28 @@ using CitizenFX.Core.Native;
 using Dapper;
 using MySqlConnector;
 using Server.Database;
-using Server.Database.Entities;
+using Server.Database.Entities.Player;
+using Server.Database.Entities.Player.PlayerInventory;
 
 namespace Server.Services{
-    internal class PlayerService : IService{
-        private static readonly Dictionary<string, VGPlayer> Players = new Dictionary<string, VGPlayer>();
+    public class PlayerService : IService{
+        private static readonly Dictionary<string, Data> PlayerData = new Dictionary<string, Data>(); // nickname, Data
+
         public readonly Dictionary<string, PlayerSlot> PlayerSlots = new Dictionary<string, PlayerSlot>();
 
         public PlayerService(){
-            Main.Instance.AddEventHandler("player:join", new Action<Player>(PlayerJoin));
+            Trace.Log("PlayerService initializing....");
+            Main.Instance.AddEventHandler("playerConnected", new Action<Player>(OnPlayerConnected));
             Main.Instance.AddEventHandler("playerDropped", new Action<Player, string>(OnPlayerDropped));
+            Main.Instance.AddEventHandler("resourceStop", new Action<string>(OnResourceStop));
             Main.Instance.AddEventHandler("player:interactive:walkingstyle",
                                           new Action<Player, int>(([FromSource] player, id) => {
                                               VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
                                               vgPlayer.WalkingStyle = id;
                                           }));
 
+
             new Thread(() => { new AutoSaver(); }).Start();
-        }
-
-        public async void PlayerJoin([FromSource] Player player){
-            Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
-            await CheckPlayer(player);
-
-            await BaseScript.Delay(1000);
-            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
-            PlayerSlots.Add(player.Name, new PlayerSlot{
-                Name = player.Name,
-                Level = vgPlayer.Level,
-                JobPointsText = "",
-                GangName = ""
-            });
         }
 
         public static VGPlayer GetVgPlayerByPlayer(Player player){
@@ -46,16 +36,7 @@ namespace Server.Services{
         }
 
         public static VGPlayer GetVgPlayerByName(string Name){
-            return (from Player in Players where Player.Value.Name.Equals(Name) select Player.Value).FirstOrDefault();
-        }
-
-        public static VGPlayer GetVgPlayerByLicense(string license){
-            if (Players.TryGetValue(license, out VGPlayer vgPlayer)){
-                return vgPlayer;
-            }
-
-            Debug.WriteLine($"Player with license '{license}' not found.");
-            return null; // Return null if the player with the given name is not found.
+            return PlayerData[Name].VGPlayer;
         }
 
         #region Reputation
@@ -119,139 +100,14 @@ namespace Server.Services{
 
         #endregion
 
-        #region MoneyMethods
 
-        public enum MoneyType{
-            Wallet = 0,
-            Bank = 1
-        }
-
-        public static bool HasMoreThanMoney(Player player, MoneyType moneyType, int value){
-            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
-            return moneyType switch{
-                MoneyType.Bank => vgPlayer.BankMoney >= value,
-                MoneyType.Wallet => vgPlayer.Money >= value,
-                _ => throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
-                                                           "There is no other registred MoneyType than (Wallet,Bank).")
-            };
-        }
-
-        public static long GetMoney(Player player, MoneyType moneyType){
-            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
-            return moneyType switch{
-                MoneyType.Bank => vgPlayer.BankMoney,
-                MoneyType.Wallet => vgPlayer.Money,
-                _ => throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
-                                                           "There is no other registred MoneyType than (Wallet,Bank).")
-            };
-        }
-
-        public static void SetMoney(Player player, MoneyType moneyType, uint value){
-            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
-            switch (moneyType){
-                case MoneyType.Bank:
-                    vgPlayer.BankMoney = value;
-                    break;
-                case MoneyType.Wallet:
-                    vgPlayer.Money = value;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
-                                                          "There is no other registred MoneyType than (Wallet,Bank).");
-            }
-
-            BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, value);
-        }
-
-        public static void AddMoney(Player player, MoneyType moneyType, uint value){
-            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
-            switch (moneyType){
-                case MoneyType.Bank:
-                    vgPlayer.BankMoney += value;
-                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType,
-                                                  vgPlayer.BankMoney);
-                    break;
-                case MoneyType.Wallet:
-                    vgPlayer.Money += value;
-                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
-                                                          "There is no other registred MoneyType than (Wallet,Bank).");
-            }
-        }
-
-        public static void TakeMoney(Player player, MoneyType moneyType, uint value){
-            VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
-            switch (moneyType){
-                case MoneyType.Bank:
-                    vgPlayer.BankMoney -= value;
-                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType,
-                                                  vgPlayer.BankMoney);
-                    break;
-                case MoneyType.Wallet:
-                    vgPlayer.Money -= value;
-                    BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType, null);
-            }
-        }
-
-        #endregion
-
-        private async Task CheckPlayer(Player player){
-            var license = Utils.GetLicense(player);
-            if (CheckIfPlayerExists(player).Result){
-                LoadPlayer(player, Utils.GetLicense(player));
-            }
-            else{
-                var vgPlayer = InsertPlayer(player);
-                while (!vgPlayer.IsCompleted)
-                    await BaseScript.Delay(0);
-
-                Players.Add(license, vgPlayer.Result);
-            }
-        }
-
-        public void OnPlayerDropped([FromSource] Player player, string reason){
-            Debug.WriteLine($"Player left {player.Name}");
-
-            var license = Utils.GetLicense(player);
-            UpdatePlayer(player, license);
-
-            if (!Players.ContainsKey(license)) return;
-            Players.Remove(license);
-            PlayerSlots.Remove(player.Name);
-        }
-
-        public void OnResourceStop(string resource){
-            if (resource != "vojnagangov5")
-                return;
-            Debug.WriteLine($"Resource {resource} has stopped");
-            PlayerList playerList = Main.Instance.PlayerList();
-            foreach (Player player in playerList){
-                Debug.WriteLine($"Saving of {player.Name}.");
-                UpdatePlayer(player, Utils.GetLicense(player));
-            }
-
-            PlayerSlots.Clear();
-            Players.Clear();
-        }
-
-        private async void LoadPlayer(Player player, string license){
-            if (Players.ContainsKey(license)){
-                //UpdatePlayer(player, Utils.GetLicense(player));
-                player.Drop("Multiple account connected by one license.");
-                return;
-            }
-
+        private static async Task<VGPlayer> LoadVGPlayer(Player player){
             await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
-                const string LoadPlayer = $"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE license = @license;";
+                const string LoadPlayer = $"SELECT * FROM {VGPlayer.TABLE_NAME} WHERE Name = @Name;";
                 VGPlayer vgPlayer =
                     await connection.QueryFirstOrDefaultAsync<VGPlayer>(LoadPlayer,
-                                                                        new{ license = Utils.GetLicense(player) });
+                                                                        new{ Name = player.Name });
 
                 API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, true);
 
@@ -260,15 +116,28 @@ namespace Server.Services{
                                     vgPlayer.MaxArmour, vgPlayer.Level, vgPlayer.Xp, vgPlayer.WalkingStyle);
                 Debug.WriteLine($"Loaded data: {vgPlayer}");
 
-                Players.Add(license, vgPlayer);
                 player.TriggerEvent("player:hud:update:money", 0, vgPlayer.Money);
                 player.TriggerEvent("player:hud:update:money", 1, vgPlayer.BankMoney);
 
                 await connection.CloseAsync();
+                return vgPlayer;
             }
         }
 
-        private async Task<VGPlayer> InsertPlayer(Player player){
+        private static async Task<User> LoadUser(Player player){
+            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
+                await connection.OpenAsync();
+                const string LoadPlayer = $"SELECT * FROM {User.TABLE_NAME} WHERE License = @License;";
+                User user =
+                    await connection.QueryFirstOrDefaultAsync<User>(LoadPlayer,
+                                                                    new{ License = Utils.GetLicense(player) });
+
+                await connection.CloseAsync();
+                return user;
+            }
+        }
+
+        private static async Task<VGPlayer> InsertVGPlayer(Player player){
             await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
                 const string insertQuery =
@@ -277,7 +146,7 @@ namespace Server.Services{
                      											VALUES (@Name, @License, @WantedLevel, @Money, @BankMoney, @Level, @Xp, @WalkingStyle, @PosX, @PosY, @PosZ, @Dimension)
                      """;
                 VGPlayer vgPlayer =
-                    new VGPlayer(player.Name, Utils.GetLicense(player), 100, 100, 0, 100, 0, 0, 0, 1, 0, 0, 0, 0, 0){
+                    new VGPlayer(player.Name, 100, 100, 0, 100, 0, 0, 0, 1, 0, 0, 0, 0, 0){
                         PosX = player.Character.Position.X,
                         PosY = player.Character.Position.Y,
                         PosZ = player.Character.Position.Z
@@ -289,20 +158,36 @@ namespace Server.Services{
             }
         }
 
-        public static async void UpdatePlayer(Player player, string license){
+        private static async Task<User> InsertUser(Player player){
             await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
-                const String UpdateQueryString = $"""
+                const string insertQuery =
+                    $"""
+                     INSERT INTO {User.TABLE_NAME} (Name, License, Ip, Token)
+                     											VALUES (@Name, @License, @Ip, @Token)
+                     """;
+                User user = new User(player.Name, Utils.GetLicense(player), Utils.GetIP(player),
+                                     API.GetPlayerToken(player.Handle, 0));
+                await connection.ExecuteAsync(insertQuery, user);
+                await connection.CloseAsync();
+                return user;
+            }
+        }
+
+        public static async void UpdateVGPlayer(Player player, string name){
+            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
+                await connection.OpenAsync();
+                const string UpdateQueryString = $"""
                                                   UPDATE {VGPlayer.TABLE_NAME} SET Name = @Name,
                                                                                         Hp = @Hp, MaxHp = @MaxHp, Armour = @Armour,
                                                                                            MaxArmour = @MaxArmour, WantedLevel = @WantedLevel,
                                                                                            Money = @Money, BankMoney = @BankMoney, Level = @Level,
                                                                                            Xp = @Xp, WalkingStyle = @WalkingStyle,
-                                                                                           PosX = @PosX, PosY = @PosY, PosZ = @PosZ, Dimension = @Dimension WHERE License = @License;
-
+                                                                                           PosX = @PosX, PosY = @PosY, PosZ = @PosZ, Dimension = @Dimension WHERE Name = @Name;
                                                   """;
 
-                if (Players.TryGetValue(license, out VGPlayer vgPlayer)){
+                if (PlayerData.TryGetValue(name, out Data playerData)){
+                    VGPlayer vgPlayer = playerData.VGPlayer;
                     vgPlayer.PosX = player.Character.Position.X;
                     vgPlayer.PosY = player.Character.Position.Y;
                     vgPlayer.PosZ = player.Character.Position.Z;
@@ -317,12 +202,23 @@ namespace Server.Services{
                 await connection.CloseAsync();
             }
         }
+        /*
+                private static async Task<bool> CheckIfPlayerExists(Player player){
+                    await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
+                        await connection.OpenAsync();
+                        const string CheckExistenceQuery = $"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
+                        int recordCount = await connection.QueryFirstAsync<int>(CheckExistenceQuery, new{ License = Utils.GetLicense(player) });
+                        if (recordCount > 0)
+                            return true;
+                        await connection.CloseAsync();
+                    }
+                    return false;
+                }*/
 
-        private static async Task<bool> CheckIfPlayerExists(Player player){
+        private static async Task<bool> CheckIfUserExists(Player player){
             await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                 await connection.OpenAsync();
-                const string CheckExistenceQuery =
-                    $"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
+                const string CheckExistenceQuery = $"SELECT COUNT(*) FROM {User.TABLE_NAME} WHERE License = @License";
                 int recordCount =
                     await connection.QueryFirstAsync<int>(CheckExistenceQuery,
                                                           new{ License = Utils.GetLicense(player) });
@@ -334,20 +230,77 @@ namespace Server.Services{
             return false;
         }
 
-        private async Task<bool> CheckIfPlayerCharacterExists(Player player){
-            await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
-                await connection.OpenAsync();
-                string checkExistenceQuery = $@"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
-                int recordCount =
-                    await connection.QueryFirstAsync<int>(checkExistenceQuery,
-                                                          new{ License = Utils.GetLicense(player) });
-                if (recordCount > 0)
-                    return true;
-                await connection.CloseAsync();
+        public void OnPlayerDropped([FromSource] Player player, string reason){
+            Debug.WriteLine($"Player left {player.Name}({player.Handle}), Reason: {reason}");
+
+            string playerName = player.Name;
+            UpdateVGPlayer(player, playerName);
+            if (!PlayerData.ContainsKey(playerName)) return;
+            PlayerData.Remove(playerName);
+            PlayerSlots.Remove(playerName);
+        }
+
+        public void OnResourceStop(string resource){
+            if (resource != "vojnagangov5")
+                return;
+            Debug.WriteLine($"Resource {resource} has stopped");
+            PlayerList playerList = Main.Instance.PlayerList();
+            foreach (Player player in playerList){
+                Debug.WriteLine($"Saving of {player.Name}.");
+                UpdateVGPlayer(player, player.Name);
             }
 
-            return false;
+            PlayerSlots.Clear();
+            PlayerData.Clear();
         }
+
+        public async void OnPlayerConnected([FromSource] Player player){
+            string playerName = player.Name;
+
+            if (PlayerData.ContainsKey(playerName)){
+                player.Drop("Multiple account connected by one license.");
+                return;
+            }
+
+            PlayerData.Add(player.Name, new Data());
+
+            VGPlayer vgPlayer;
+            User user;
+            if (await CheckIfUserExists(player)){
+                user = await LoadUser(player);
+                vgPlayer = await LoadVGPlayer(player);
+            }
+            else{
+                user = await InsertUser(player);
+                vgPlayer = await InsertVGPlayer(player);
+            }
+
+            PlayerData[playerName].User = user;
+            PlayerData[playerName].VGPlayer = vgPlayer;
+
+            bool tasks = await CharacterCreatorService.CheckIfCharacterExist(player.Name);
+            Character character = await CharacterCreatorService.GetCharacter(player.Name);
+            if (tasks)
+                player.TriggerEvent("player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY, vgPlayer.PosZ,
+                                    110f);
+            else
+                player.TriggerEvent("player:spawn:to:creator");
+
+            PlayerSlots.Add(player.Name, new PlayerSlot{
+                Name = player.Name,
+                Level = vgPlayer.Level,
+                JobPointsText = "",
+                GangName = ""
+            });
+            BaseScript.TriggerEvent("afterLoad", player.Name);
+            Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
+        }
+    }
+
+    public class Data{
+        public User User{ get; set; }
+        public VGPlayer VGPlayer{ get; set; }
+        public Inventory Inventory{ get; set; }
     }
 
     public class PlayerSlot{
@@ -375,7 +328,7 @@ namespace Server.Services{
                 if (player == null)
                     continue;
 
-                PlayerService.UpdatePlayer(player, Utils.GetLicense(player));
+                PlayerService.UpdateVGPlayer(player, player.Name);
                 TotalSaved++;
             }
 

@@ -5,6 +5,7 @@ using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Entities;
 using Client.UIHandlers;
+using Client.Utils;
 using ScaleformUI.Menu;
 using ScaleformUI.Scaleforms;
 

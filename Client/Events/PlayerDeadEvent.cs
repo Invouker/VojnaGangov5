@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Client.Utils;
 using ScaleformUI;
+using static Client.Utils.Utils;
 
 namespace Client.Events;
 
@@ -39,7 +41,7 @@ public static class PlayerDeadEvent{
                     killerInVehicle = true;
                     killerVehicleName =
                         API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(API.GetVehiclePedIsUsing(killer)));
-                    killerVehicleSeat = (int)Utils.GetSeatByPed(killer);
+                    killerVehicleSeat = (int)GetSeatByPed(killer);
                 }
             }
 
