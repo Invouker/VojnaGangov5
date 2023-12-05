@@ -76,6 +76,7 @@
     <Compile Include="Streamable\Streamer.cs"/>
       <Compile Include="Menus\InteractiveMenu.cs"/>
       <Compile Include="Utils\Enums.cs"/>
+    <Compile Include="Utils\Trace.cs"/>
       <Compile Include="Utils\Utils.cs"/>
       <Compile Include="Utils\Var.cs"/>
   </ItemGroup>
