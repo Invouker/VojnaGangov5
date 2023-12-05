@@ -4,8 +4,8 @@ using Server.Services;
 
 namespace Server.Testable{
     public static class StreamerTest{
-        static StreamerTest(){
-            Main.Instance.AddEventHandler("player:post_join", new Action<Player>(PlayerPostJoin));
+        public static void Init(){
+            Main.Instance.AddEventHandler("playerConnected", new Action<Player>(PlayerPostJoin));
             Main.Instance.AddEventHandler("player:interact:marker", new Action<int>(OnMarkerInteract));
         }
 
