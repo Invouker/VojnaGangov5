@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
 
-namespace Server.Database.Entities;
+namespace Server.Database.Entities.Player;
 
 //"characters" Table
-public class Character{
+public class Character : IPlayerMetaData{
     [JsonIgnore] public int Id{ get; set; }
     [JsonIgnore] public int AccId{ get; set; }
     [JsonIgnore] public string Name{ get; set; }
