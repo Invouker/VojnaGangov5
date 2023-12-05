@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CitizenFX.Core;
 using Client.Events;
 using Client.Handlers;
+using Client.Menus;
 using Client.Streamable;
 using Client.Testable;
 using Client.Utils;
@@ -14,7 +15,6 @@ namespace Client{
 
         public Main(){
             Instance = this;
-            TriggerServerEvent("player:join");
 
             Tick += InteractStreamable.OnInteractTick;
             Tick += HudRenderEvent.OnRender;
@@ -22,7 +22,8 @@ namespace Client{
             Tick += KeyHandler.Tick;
             Tick += VehicleEvents.Tick;
             Tick += PlayerDeadEvent.Tick;
-            TriggerServerEvent("player:post_join");
+
+            TriggerServerEvent("playerConnected");
 
             TriggerServerEvent("playerlist:list:max", new Action<int, string>((max, serverName) => {
                 Var.MaxPlayers = max;

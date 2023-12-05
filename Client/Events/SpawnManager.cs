@@ -23,7 +23,7 @@ namespace Client.Events{
             Left = 0,
             Main = 1,
             Right = 2,
-            Unzoom = 3
+            UnZoom = 3
         }
 
         static SpawnManager(){
@@ -31,10 +31,9 @@ namespace Client.Events{
                                           new Action<int, int, int, int, int, int, int, int>(LoadPlayerData));
 
             Main.Instance.AddEventHandler("player:spawn:to:world",
-                                          new Action<short, float, float, float, float>(SpawnManager.TeleportToWorld));
-            Main.Instance.AddEventHandler("player:character:data",
-                                          new Action<string>(SpawnManager.AssignCharacterData));
-            Main.Instance.AddEventHandler("player:spawn:to:creator", new Action(SpawnManager.TeleportToCreator));
+                                          new Action<short, float, float, float, float>(TeleportToWorld));
+            Main.Instance.AddEventHandler("player:character:data", new Action<string>(AssignCharacterData));
+            Main.Instance.AddEventHandler("player:spawn:to:creator", new Action(TeleportToCreator));
         }
 
         private static void LoadPlayerData(int dimension, int hp, int maxHp, int armour, int maxArmour, int level,
@@ -48,15 +47,15 @@ namespace Client.Events{
 
             API.SetMaxHealthHudDisplay(maxHp);
             API.SetMaxArmourHudDisplay(maxArmour);
-            string walkingStyle = Utils.AnimWalkingListIndex.ToArray()[walkingStyleInt];
-            Utils.SetWalkingAnimToPed(walkingStyle);
+            string walkingStyle = Utils.Utils.AnimWalkingListIndex.ToArray()[walkingStyleInt];
+            Utils.Utils.SetWalkingAnimToPed(walkingStyle);
             Var.XP = xp;
             Var.Level = level;
             Var.WalkingStyle = walkingStyleInt;
             Debug.WriteLine($"Load Player Data, dimension: {dimension}, Hp: {hp}, maxHp: {maxHp}, armour: {armour}, maxArmour: {maxArmour}, level: {level}, xp: {xp}, walkingStyle: {walkingStyle}");
         }
 
-        public static async void TeleportToCreator(){
+        private static async void TeleportToCreator(){
             API.DoScreenFadeOut(500);
 
             while (!API.IsScreenFadedOut())
@@ -196,7 +195,7 @@ namespace Client.Events{
                     API.PointCamAtCoord(CameraCreator, playerPosition.X, playerPosition.Y, playerPosition.Z + 0.65f);
                     API.RenderScriptCams(true, true, 1000, true, true);
 
-                    CameraPos = PositionOfCamera.Unzoom;
+                    CameraPos = PositionOfCamera.UnZoom;
                     await BaseScript.Delay(1000);
                 }
 
