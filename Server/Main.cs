@@ -2,6 +2,7 @@
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json;
+using Server.Database.Entities.Player.PlayerInventory;
 using Server.Services;
 using Server.Testable;
 
@@ -42,6 +43,11 @@ namespace Server{
                                                                     call.Invoke(maxPlayers, serverName);
                                                                 }));
 
+            AddEventHandler("player:get:inventory", new Action<string, NetworkCallbackDelegate>((player, call) => {
+                Trace.Log("Calling a player:get:inventory");
+                string json = Inventory.ConvertInventoryOfPlayerToJson(player);
+                call.Invoke(json);
+            }));
             
             new InventoryTest();
             CommandsTest.RegisterCommands(Players);

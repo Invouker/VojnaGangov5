@@ -7,6 +7,7 @@ using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Client.Streamable;
 using Client.Utils;
+using Newtonsoft.Json;
 using ScaleformUI;
 using ScaleformUI.Menu;
 using static Client.Utils.Utils;
@@ -78,13 +79,9 @@ public static class InteractiveMenu{
 
         UIMenuItem killYourself = new UIMenuItem("Kill yourself", "You will lose a 5% of your wallet.");
         interactiveMenu.AddItem(killYourself);
-
-        #region Vehicle
-
+        
         VehicleSubMenu(interactiveMenu);
-        //Open
-
-        #endregion
+        SubPlayerInventory(interactiveMenu);
 
         killYourself.Activated += (sender, item) => { Game.Player.Character.Kill(); };
 
@@ -184,9 +181,9 @@ public static class InteractiveMenu{
 
         controlDoor.CheckboxEvent += (sender, @checked) => InteractVehicleDoor();
         ejectPlayers.Activated += (sender, item) => EjectAllPlayersFromVehicle();
-        lockVehicleItem.CheckboxEvent += (sender, @checked) =>
-            SetVehicleLockStatus(Enums.CarLock.CARLOCK_UNLOCKED, @checked);
-        interactiveMenu.OnItemSelect += (sender, item, index) => interactiveMenu.SwitchTo(vehicleMenu);
+        lockVehicleItem.CheckboxEvent += (sender, @checked) => SetVehicleLockStatus(Enums.CarLock.CARLOCK_UNLOCKED, @checked);
+        //interactiveMenu.OnItemSelect += (sender, item, index) => interactiveMenu.SwitchTo(vehicleMenu);
+        ToVehicleItem.Activated += (sender, item) => interactiveMenu.SwitchTo(vehicleMenu);;
         back.Activated += (sender, item) => vehicleMenu.SwitchTo(interactiveMenu);
 
         Main.Instance.AddEventHandler("event:entered_vehicle", new Action<int, int, string, int>((vehicle, seat,
@@ -202,8 +199,41 @@ public static class InteractiveMenu{
                                                    if (vehicleMenu.Visible){
                                                        vehicleMenu.SwitchTo(interactiveMenu);
                                                    }
-                                               }));
+        }));
     }
+
+    private static void SubPlayerInventory(UIMenu interactiveMenu) {
+        Trace.Log("SubPlayerInventory");
+        UIMenu playerInventoryMenu = new UIMenu("Player Inventory", "Inventory of " + Player.Local.Name, new PointF(20, 20),
+            "commonmenu", "interaction_bgd"){
+            BuildingAnimation = MenuBuildingAnimation.NONE,
+            EnableAnimation = false,
+            MaxItemsOnScreen = 6,
+            ScrollingType = ScrollingType.CLASSIC,
+        };
+        
+        UIMenuItem toPlayerInventory = new UIMenuItem("Player Inventory");
+        
+        BaseScript.TriggerServerEvent("player:get:inventory", Player.Local.Name, new Action<string>(LoadInventory));
+
+        void LoadInventory(string data) {
+            PlayerInventory.LoadPlayerInventory(data);
+            
+            Trace.Log(data);
+            Trace.Log("PlayerInventory.Inventory.Count: " + PlayerInventory.Inventory.Count);
+        }
+        
+        UIMenuItem back = new UIMenuItem("Return to Interaction", "Switch to interaction menu.");
+        playerInventoryMenu.AddItem(back);
+        
+        toPlayerInventory.SetRightLabel(">>");
+        interactiveMenu.AddItem(toPlayerInventory);
+        
+        toPlayerInventory.Activated += (sender, item) => interactiveMenu.SwitchTo(playerInventoryMenu);
+        back.Activated += (sender, item) => playerInventoryMenu.SwitchTo(interactiveMenu);
+        
+    }
+    
 
     private static void InteractVehicleDoor(){
         foreach (Enums.DoorIndex door in Enum.GetValues(typeof(Enums.DoorIndex))){ // Itearate trought all doors
@@ -255,5 +285,49 @@ public static class InteractiveMenu{
         public static int BlipRoute;
         public static Vector3 BlipRoutePosition;
         public static bool IsRouteFinished;
+    }
+
+
+
+    internal class PlayerInventory {
+
+        public static List<InventorySlot> Inventory;
+
+        public static void LoadPlayerInventory(string jsonInventory) {
+            Inventory = JsonConvert.DeserializeObject<List<InventorySlot>>(jsonInventory);
+        }
+
+    public class InventorySlot(Item item, int amount) {
+            private static int _id;
+            public int Amount{ get; set; } = amount;
+            public Item Item{ get; set; } = item;
+            public int SlotId { get; } = _id++;
+        
+            public override string ToString(){
+                return $"Slot: {SlotId}, Amount: {Amount}, Item: {Item}";
+            }
+        }
+        
+        public class Item(ItemID id, int maxAmount, string itemName, Action useAction) {
+            public ItemID Id{ get; } = id;
+            public string ItemName{ get; } = itemName;
+            private Action UseAction{ get; } = useAction;
+            public int MaxAmount{ get; } = maxAmount;
+
+            public void Use(){
+                Console.WriteLine($"Using {ItemName}...");
+                UseAction?.Invoke();
+            }
+        
+            public override string ToString() {
+                return $"Item ID: {Id}, Name: {ItemName}, Max Amount: {MaxAmount}";
+            }
+        
+        }
+    }
+    
+    public enum ItemID{
+        BREAD,
+        COLA
     }
 }

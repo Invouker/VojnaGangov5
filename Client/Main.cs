@@ -31,6 +31,9 @@ namespace Client{
             }));
 
             TestClassEvents.Handle(); // For handle test class
+            
+            Trace.Log("Inventory was received from server.");
+            AddEventHandler("player:inventory:send", new Action<string>(InteractiveMenu.PlayerInventory.LoadPlayerInventory));
         }
 
         public PlayerList GetPlayers(){
