@@ -295,6 +295,8 @@ namespace Server.Services{
             BaseScript.TriggerEvent("afterLoad", player.Name);
             Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
         }
+
+        public void Init() { }
     }
 
     public class Data{

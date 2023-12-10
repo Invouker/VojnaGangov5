@@ -81,4 +81,6 @@ public class MoneyService : IService{
                 throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType, null);
         }
     }
+
+    public void Init() { }
 }

@@ -7,7 +7,7 @@ using Server.Database;
 using Server.Database.Entities.Player;
 
 namespace Server.Services{
-    public class CharacterCreatorService{
+    public class CharacterCreatorService:IService{
         public CharacterCreatorService(){
             Main.Instance.AddEventHandler("player:data:character",
                                           new Action<Player, string>(SaveCharacterData));
@@ -87,5 +87,7 @@ namespace Server.Services{
 
             player.TriggerEvent("player:character:data", character.SerializeToJson());
         }
+
+        public void Init() { }
     }
 }

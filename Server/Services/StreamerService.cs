@@ -51,5 +51,7 @@ namespace Server.Services{
             BaseScript.TriggerClientEvent("streamer:createBlip", blipName, posX, posY, posZ, colour, alpha, blipSprite,
                                           blipDisplay, blipScale, showAsShortRange, quickGps);
         }
+
+        public void Init() { }
     }
 }
