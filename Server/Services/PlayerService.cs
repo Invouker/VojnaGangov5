@@ -328,7 +328,7 @@ namespace Server.Services{
                 TotalSaved++;
             }
 
-            Debug.WriteLine($"[Server] Auto-save of players ({TotalSaved})");
+            Trace.Log($"[Server] Auto-save of players ({TotalSaved})");
         }
     }
 }
