@@ -10,6 +10,7 @@ using Client.Utils;
 using Newtonsoft.Json;
 using ScaleformUI;
 using ScaleformUI.Elements;
+using ScaleformUI.Menu;
 using ScaleformUI.Scaleforms;
 using static CitizenFX.Core.Native.API;
 using static Client.Utils.Utils;
@@ -24,8 +25,8 @@ namespace Client.Events{
             KeyHandler.CreateKeyPair(Control.MultiplayerInfo, RenderProps);
             KeyHandler.CreateKeyPair(Control.InteractionMenu,
                                      () => {
-                                         InteractiveMenu.GetInteractiveUI().Visible =
-                                             !InteractiveMenu.GetInteractiveUI().Visible;
+                                         UIMenu menu = InteractiveMenu.GetInteractiveUI();
+                                         menu.Visible = !menu.Visible;
                                      });
 
             Main.Instance.AddEventHandler("player:hud:update:money", new Action<int, int>(ChangeMoney));
