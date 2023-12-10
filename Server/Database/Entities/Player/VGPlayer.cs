@@ -6,8 +6,7 @@ namespace Server.Database.Entities.Player{
     public class VGPlayer : IPlayerMetaData{
         public const string TABLE_NAME = "accounts";
 
-        //public List<Inventory.InventoryItem> Inventory { get; private set; }
-        /* TODO:
+       /* TODO:
             Add saving system for this:
 
             health + max health // DONE
