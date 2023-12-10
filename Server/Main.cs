@@ -15,12 +15,14 @@ namespace Server{
         }
 
         public Main(){
+            Trace.Log("Initializing server resource.");
             Instance = this;
 
+            StreamerTest.Init();
 
-            AddEventHandler("player:post_join",
-                            new Action<Player>(ServiceManager.CharacterCreatorService
-                                                             .Loader)); // Load and switch between creator / spawn in world
+            ServiceManager.PlayerService.Init();
+            ServiceManager.CharacterCreatorService.Init();
+            //AddEventHandler("playerLoaded", new Action<Player>(CharacterCreatorService.Loader)); // Load and switch between creator / spawn in world
             AddEventHandler("playerlist:list",
                             new Action<NetworkCallbackDelegate>(call => { // For Player List information
                                                                     call.Invoke(JsonConvert
@@ -40,7 +42,11 @@ namespace Server{
                                                                     call.Invoke(maxPlayers, serverName);
                                                                 }));
 
+            
+            new InventoryTest();
             CommandsTest.RegisterCommands(Players);
+            
+            Trace.Log("Resource is fully loaded!");
         }
 
         public void AddEventHandler(string handler, Delegate action){
@@ -53,5 +59,6 @@ namespace Server{
                 args = new[]{ "[Server]", message }
             });
         }
+    
     }
 }
