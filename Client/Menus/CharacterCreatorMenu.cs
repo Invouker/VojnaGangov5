@@ -7,7 +7,7 @@ using Client.Events;
 using ScaleformUI;
 using ScaleformUI.Menu;
 
-namespace Client.UIHandlers{
+namespace Client.Menus{
     public static class CharacterCreatorMenu{
         private static readonly CharacterCreatorEntity CharacterEntity = new CharacterCreatorEntity();
 

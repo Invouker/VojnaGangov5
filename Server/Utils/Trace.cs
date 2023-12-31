@@ -1,7 +1,7 @@
 using System;
 using CitizenFX.Core;
 
-namespace Server;
+namespace Server.Utils;
 
 public class Trace{
     public static void Log(string log){

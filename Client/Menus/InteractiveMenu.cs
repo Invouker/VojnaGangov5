@@ -129,8 +129,7 @@ public static class InteractiveMenu{
         ToVehicleItem.SetRightLabel(">>");
         interactiveMenu.AddItem(ToVehicleItem);
 
-        UIMenu vehicleMenu = new UIMenu("Vehicle menu", "Control of vehicle", new PointF(20, 20), "commonmenu",
-                                        "interaction_bgd"){
+        UIMenu vehicleMenu = new UIMenu("Vehicle menu", "Control of vehicle", new PointF(20, 20), "commonmenu", "interaction_bgd"){
             BuildingAnimation = MenuBuildingAnimation.NONE,
             EnableAnimation = false,
             MaxItemsOnScreen = 6,
@@ -183,7 +182,7 @@ public static class InteractiveMenu{
         ejectPlayers.Activated += (sender, item) => EjectAllPlayersFromVehicle();
         lockVehicleItem.CheckboxEvent += (sender, @checked) => SetVehicleLockStatus(Enums.CarLock.CARLOCK_UNLOCKED, @checked);
         //interactiveMenu.OnItemSelect += (sender, item, index) => interactiveMenu.SwitchTo(vehicleMenu);
-        ToVehicleItem.Activated += (sender, item) => interactiveMenu.SwitchTo(vehicleMenu);;
+        ToVehicleItem.Activated += (sender, item) => interactiveMenu.SwitchTo(vehicleMenu);
         back.Activated += (sender, item) => vehicleMenu.SwitchTo(interactiveMenu);
 
         Main.Instance.AddEventHandler("event:entered_vehicle", new Action<int, int, string, int>((vehicle, seat,
@@ -212,26 +211,41 @@ public static class InteractiveMenu{
             ScrollingType = ScrollingType.CLASSIC,
         };
         
-        UIMenuItem toPlayerInventory = new UIMenuItem("Player Inventory");
+        UIMenuItem toPlayerInventory = new UIMenuItem("Player Inventory", "You can eat, or use something from your inventory.");
+        UIMenuItem back = new UIMenuItem("Return to Interaction", "Switch to interaction menu.");
         
         BaseScript.TriggerServerEvent("player:get:inventory", Player.Local.Name, new Action<string>(LoadInventory));
-
-        void LoadInventory(string data) {
-            PlayerInventory.LoadPlayerInventory(data);
-            
-            Trace.Log(data);
-            Trace.Log("PlayerInventory.Inventory.Count: " + PlayerInventory.Inventory.Count);
-        }
-        
-        UIMenuItem back = new UIMenuItem("Return to Interaction", "Switch to interaction menu.");
-        playerInventoryMenu.AddItem(back);
         
         toPlayerInventory.SetRightLabel(">>");
         interactiveMenu.AddItem(toPlayerInventory);
+
+        playerInventoryMenu.OnItemSelect += (sender, item, index) => {
+            if (index == PlayerInventory.Inventory.Count) // For return item
+                return;
+
+            if (PlayerInventory.Inventory[index].Amount < 0)
+                return;
+            
+            PlayerInventory.InventorySlot inventorySlot = PlayerInventory.Inventory[index];
+            BaseScript.TriggerServerEvent("player:inventory:use", Player.Local.Name, inventorySlot.SlotId);
+            
+            UIMenuItem menuItem = sender.MenuItems[index];
+            menuItem.SetRightLabel($"{PlayerInventory.Inventory[index].Amount--}");
+        };
+        toPlayerInventory.Activated += (_, _) => interactiveMenu.SwitchTo(playerInventoryMenu);
+        back.Activated += (_, _) => playerInventoryMenu.SwitchTo(interactiveMenu);
+        return;
         
-        toPlayerInventory.Activated += (sender, item) => interactiveMenu.SwitchTo(playerInventoryMenu);
-        back.Activated += (sender, item) => playerInventoryMenu.SwitchTo(interactiveMenu);
-        
+        void LoadInventory(string data) {
+            PlayerInventory.LoadPlayerInventory(data);
+            foreach (PlayerInventory.InventorySlot inventorySlot in PlayerInventory.Inventory) {
+                UIMenuItem item = new UIMenuItem(inventorySlot.Item.ItemName, $"{inventorySlot.SlotId}");
+                item.SetRightLabel($"{inventorySlot.Amount}");
+                playerInventoryMenu.AddItem(item);
+            }
+          
+            playerInventoryMenu.AddItem(back);
+        }
     }
     
 

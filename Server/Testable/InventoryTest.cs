@@ -14,7 +14,7 @@ public class InventoryTest{
     }
 
     public static void HandleThis(string playerName){
-        Player player = Main.Instance.PlayerList()[playerName];
+        //Player player = Main.Instance.PlayerList()[playerName];
         Debug.WriteLine("HT1");
         AddItem(playerName);
         Debug.WriteLine("HT2");
