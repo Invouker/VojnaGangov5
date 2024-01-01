@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
 
 namespace Client.Utils;
 
-public static class Utils{
+public static class Util{
     public static bool IsNumberInArray(int[] array, int number){
         return array.Any(numberArray => numberArray == number);
     }
