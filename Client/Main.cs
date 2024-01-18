@@ -29,7 +29,7 @@ namespace Client{
             Tick += PlayerDeadEvent.Tick;
 
             Trace.Log("playerConnected");
-            EventDispatcher.Send("playerConnected", LocalPlayer.Handle);
+            EventDispatcher.Send("playerConnected");
 
             EventDispatcher.Mount("playerlist:list:max", new Action<int, string>((max, serverName) => {
                 Var.MaxPlayers = max;
