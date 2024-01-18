@@ -1,4 +1,3 @@
-using CitizenFX.Core;
 using Newtonsoft.Json;
 
 namespace Client.Entities;
@@ -111,6 +110,7 @@ public class CharacterCreatorEntity{
 
     public void SendDataToServer(){
         string data = SerializeToJson();
-        BaseScript.TriggerLatentServerEvent("player:data:character", 6000, data);
+        //BaseScript.TriggerLatentServerEvent("player:data:character", 6000, data);
+        EventDispatcher.Send("player:data:character", data);
     }
 }

@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using CitizenFX.Core;
 using Client.Handlers;
 using Client.Menus;
 using Client.Utils;
@@ -13,7 +11,6 @@ using ScaleformUI.Elements;
 using ScaleformUI.Menu;
 using ScaleformUI.Scaleforms;
 using static CitizenFX.Core.Native.API;
-using static Client.Utils.Utils;
 
 namespace Client.Events{
     public static class HudRenderEvent{
@@ -29,9 +26,9 @@ namespace Client.Events{
                                          menu.Visible = !menu.Visible;
                                      });
 
-            Main.Instance.AddEventHandler("player:hud:update:money", new Action<int, int>(ChangeMoney));
-            Main.Instance.AddEventHandler("player:hud:update:show:rank", new Action<int>(ShowRankBar));
-            Main.Instance.AddEventHandler("player:hud:update:xp", new Action<int, int>(ChangeXp));
+             EventDispatcher.Mount("player:hud:update:money", new Action<int, int>(ChangeMoney));
+             EventDispatcher.Mount("player:hud:update:show:rank", new Action<int>(ShowRankBar));
+             EventDispatcher.Mount("player:hud:update:xp", new Action<int, int>(ChangeXp));
         }
 
         public static Task OnRender(){
@@ -76,8 +73,8 @@ namespace Client.Events{
         private static async Task<List<PlayerRow>> LoadPlayer(){
             List<PlayerRow> playerRows = new List<PlayerRow>();
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-
-            BaseScript.TriggerServerEvent("playerlist:list", new Action<string>(Action));
+            Trace.Log("playerlist:list");
+            EventDispatcher.Send("playerlist:list", new Action<string>(Action));
 
             await tcs.Task;
             return playerRows;

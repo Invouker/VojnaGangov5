@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -8,6 +7,10 @@ namespace Server.Database.Entities.Player.PlayerInventory;
 public class Inventory{
     private static readonly Dictionary<string, List<InventorySlot>> Inventories = new Dictionary<string, List<InventorySlot>>();
     
+    static Inventory(){ // Events from client
+         EventDispatcher.Mount("player:inventory:use", new Action<string, int>(UseItem));
+    }
+
     public class InventorySlot(Item item, int amount) {
         private static int _id;
         public int Amount{ get; set; } = amount;
@@ -23,8 +26,14 @@ public class Inventory{
         bool success = Inventories.TryGetValue(playerName, out List<InventorySlot> items);
         return success ? JsonConvert.SerializeObject(items) : "{}";
     }
+
+    private static void UseItem(string playerName, int itemId) {
+        ItemID itemIdEnum = (ItemID)itemId;
+        UseItem(playerName, itemIdEnum, 1);
+    }
     
-    public static void UseItem(string playerName, ItemID id, int amount = 1){
+    public static void UseItem(string playerName, ItemID id, int amount = 1) {
+        CitizenFX.Core.Player player = Main.Instance.PlayerList()[playerName];
         if (!Inventories.TryGetValue(playerName, out List<InventorySlot> inventorySlots)){
             Inventories[playerName] = new List<InventorySlot>();
             inventorySlots = Inventories[playerName];
@@ -35,6 +44,10 @@ public class Inventory{
             if (slot.Amount < amount)
                 return;
 
+            if (slot.Amount <= 0) {
+                EventDispatcher.Send(player, "player:sound:playfrontend", "NO", "HUD_FRONTEND_DEFAULT_SOUNDSET"); //FIXME: Make only for specific player
+            }
+
             slot.Item?.Use();
             slot.Amount -= amount;
         }
@@ -44,19 +57,12 @@ public class Inventory{
         if (!Inventories.TryGetValue(playerName, out List<InventorySlot> inventorySlots)){
             Inventories[playerName] = new List<InventorySlot>();
             inventorySlots = Inventories[playerName];
-
-            Trace.Log("If non inventory for player");
         }
 
         if (!CheckIfPlayerHasItem(playerName, item.Id)){ // Player doesn't have the item, add a new InventorySlot
-            Trace.Log($"DEBUG MaxAmount: [{item}], Amount: {amount}");
-
-            if (amount > item.MaxAmount) {
-                Trace.Log("More item then MaxAmount, return;");
+            if (amount > item.MaxAmount) 
                 return;
-            }
             
-            Trace.Log("Add InventorySlot");
             inventorySlots.Add(new InventorySlot(item, amount));
         }else{
             // Player already has the item, increment the amount
@@ -67,7 +73,6 @@ public class Inventory{
             }
 
             existingItem.Amount += amount;
-            Trace.Log("+= amount: " + amount);
         }
     }
 

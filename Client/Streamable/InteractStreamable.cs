@@ -1,6 +1,4 @@
 ﻿using System.Threading.Tasks;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
 
 namespace Client.Streamable{
     public class InteractStreamable{
@@ -25,8 +23,8 @@ namespace Client.Streamable{
                     return;
 
                 int id = marker._id;
-                BaseScript.TriggerServerEvent("player:interact:marker", id);
-                BaseScript.TriggerEvent("player:interact:marker", id);
+                EventDispatcher.Send("player:interact:marker", id);
+                //BaseScript.TriggerEvent("player:interact:marker", id);
                 await BaseScript.Delay(3000);
             }
 

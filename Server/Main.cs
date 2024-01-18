@@ -1,10 +1,8 @@
-﻿using System;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Server.Database.Entities.Player.PlayerInventory;
 using Server.Services;
 using Server.Testable;
+using Server.Utils;
 
 namespace Server{
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -16,15 +14,18 @@ namespace Server{
         }
 
         public Main(){
+            //SnowflakeGenerator.Create(127);
+            EventDispatcher.Initalize(Shared.FxInBound, Shared.FxOutBound, Shared.FxSignature, Shared.FxEncryption);
+            
             Trace.Log("Initializing server resource.");
             Instance = this;
-
-            StreamerTest.Init();
-
+            
             ServiceManager.PlayerService.Init();
             ServiceManager.CharacterCreatorService.Init();
-            //AddEventHandler("playerLoaded", new Action<Player>(CharacterCreatorService.Loader)); // Load and switch between creator / spawn in world
-            AddEventHandler("playerlist:list",
+            StreamerTest.Init();
+            
+            //EventDispatcher.Mount("playerLoaded", new Action<Player>(CharacterCreatorService.Loader)); // Load and switch between creator / spawn in world
+            EventDispatcher.Mount("playerlist:list",
                             new Action<NetworkCallbackDelegate>(call => { // For Player List information
                                                                     call.Invoke(JsonConvert
                                                                                    .SerializeObject(ServiceManager
@@ -32,32 +33,34 @@ namespace Server{
                                                                                        .PlayerSlots));
                                                                 }));
 
-            AddEventHandler("playerlist:list:max",
+            EventDispatcher.Mount("playerlist:list:max",
                             new Action<NetworkCallbackDelegate>(call => { // For getting a max player count
                                                                     int maxPlayers =
                                                                         int.Parse(API.GetConvar("sv_maxclients",
-                                                                            5.ToString()));
+                                                                        5.ToString()));
                                                                     string serverName =
                                                                         API.GetConvar("sv_hostname",
                                                                             "Error while loading");
                                                                     call.Invoke(maxPlayers, serverName);
                                                                 }));
 
-            AddEventHandler("player:get:inventory", new Action<string, NetworkCallbackDelegate>((player, call) => {
-                Trace.Log("Calling a player:get:inventory");
+            EventDispatcher.Mount("player:get:inventory", new Action<string, NetworkCallbackDelegate>((player, call) => {
                 string json = Inventory.ConvertInventoryOfPlayerToJson(player);
                 call.Invoke(json);
             }));
+            
+            //EventDispatcher.Mount("player:sound:playfrontend", new Action<string, string>(SoundEvent.PlayFrontendSound));
             
             new InventoryTest();
             CommandsTest.RegisterCommands(Players);
             
             Trace.Log("Resource is fully loaded!");
         }
+        
 
-        public void AddEventHandler(string handler, Delegate action){
+       /* public void AddEventHandler(string handler, Delegate action){
             EventHandlers[handler] += action;
-        }
+        }*/
 
         public static void sendMessage(string message){
             TriggerEvent("chat:addMessage", new{

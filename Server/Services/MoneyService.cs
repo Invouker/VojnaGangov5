@@ -1,5 +1,3 @@
-using System;
-using CitizenFX.Core;
 using Server.Database.Entities.Player;
 
 namespace Server.Services;
@@ -44,7 +42,7 @@ public class MoneyService : IService{
                                                       "There is no other registred MoneyType than (Wallet,Bank).");
         }
 
-        BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, value);
+        EventDispatcher.Send(player, "player:hud:update:money", (int)moneyType, value);
     }
 
     public static void AddMoney(Player player, MoneyType moneyType, uint value){
@@ -52,12 +50,12 @@ public class MoneyService : IService{
         switch (moneyType){
             case MoneyType.Bank:
                 vgPlayer.BankMoney += value;
-                BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType,
+                EventDispatcher.Send(player, "player:hud:update:money", (int)moneyType,
                                               vgPlayer.BankMoney);
                 break;
             case MoneyType.Wallet:
                 vgPlayer.Money += value;
-                BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
+                EventDispatcher.Send(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType,
@@ -70,12 +68,12 @@ public class MoneyService : IService{
         switch (moneyType){
             case MoneyType.Bank:
                 vgPlayer.BankMoney -= value;
-                BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType,
+                EventDispatcher.Send(player, "player:hud:update:money", (int)moneyType,
                                               vgPlayer.BankMoney);
                 break;
             case MoneyType.Wallet:
                 vgPlayer.Money -= value;
-                BaseScript.TriggerClientEvent(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
+                EventDispatcher.Send(player, "player:hud:update:money", (int)moneyType, vgPlayer.Money);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(moneyType), moneyType, null);

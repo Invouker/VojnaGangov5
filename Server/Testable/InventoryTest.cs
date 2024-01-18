@@ -1,5 +1,3 @@
-using System;
-using CitizenFX.Core;
 using Server.Database.Entities.Player.PlayerInventory;
 
 namespace Server.Testable;
@@ -7,10 +5,10 @@ namespace Server.Testable;
 public class InventoryTest{
     public InventoryTest(){
         Debug.WriteLine(":) static");
-        //Main.Instance.AddEventHandler("player:inventory:add_item", new Action<Player>(AddItem));
-        //Main.Instance.AddEventHandler("player:inventory:take_item", new Action<Player>(TakeItem));
+        // EventDispatcher.Mount("player:inventory:add_item", new Action<Player>(AddItem));
+        // EventDispatcher.Mount("player:inventory:take_item", new Action<Player>(TakeItem));
 
-        Main.Instance.AddEventHandler("afterLoad", new Action<string>(HandleThis));
+         EventDispatcher.Mount("afterLoad", new Action<string>(HandleThis));
     }
 
     public static void HandleThis(string playerName){

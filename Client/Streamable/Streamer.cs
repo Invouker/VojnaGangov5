@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
+﻿using System.Collections.Generic;
 
 namespace Client.Streamable{
     internal static class Streamer{
         public static readonly List<IStreamer> Streamed = new List<IStreamer>();
 
         static Streamer(){
-            Main.Instance.AddEventHandler("streamer:createBlip",
+             EventDispatcher.Mount("streamer:createBlip",
                                           new Action<string, float, float, float, int, int, int, int, float, bool,
                                               bool>(Streamer
                                                        .CreateBlip));
-            Main.Instance.AddEventHandler("streamer:createMarker",
+             EventDispatcher.Mount("streamer:createMarker",
                                           new Action<int, float, float, float, int, int, int, int, bool>(Streamer
                                              .CreateMarker));
-            Main.Instance.AddEventHandler("streamer:create3dText",
+             EventDispatcher.Mount("streamer:create3dText",
                                           new Action<string, float, float, float, int, int, int, int>(Streamer
                                              .Create3dText));
         }

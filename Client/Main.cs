@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using CitizenFX.Core;
+﻿using System.Threading.Tasks;
 using Client.Events;
 using Client.Handlers;
 using Client.Menus;
@@ -15,7 +13,14 @@ namespace Client{
 
         public Main(){
             Instance = this;
-
+            
+            EventDispatcher.Initalize(Shared.FxInBound, Shared.FxOutBound, Shared.FxSignature, Shared.FxEncryption);
+            
+            EventDispatcher.Mount("toClient", new Action<string, int>((from, num) => {
+                Trace.Log($"sideType: {from}, num: {num}");
+            }));
+            
+            EventDispatcher.Send("toServer", "fromClient", 2);
             Tick += InteractStreamable.OnInteractTick;
             Tick += HudRenderEvent.OnRender;
             Tick += InteractiveMenu.Tick;
@@ -23,9 +28,10 @@ namespace Client{
             Tick += VehicleEvents.Tick;
             Tick += PlayerDeadEvent.Tick;
 
-            TriggerServerEvent("playerConnected");
+            Trace.Log("playerConnected");
+            EventDispatcher.Send("playerConnected", LocalPlayer.Handle);
 
-            TriggerServerEvent("playerlist:list:max", new Action<int, string>((max, serverName) => {
+            EventDispatcher.Mount("playerlist:list:max", new Action<int, string>((max, serverName) => {
                 Var.MaxPlayers = max;
                 Var.ServerName = serverName;
             }));
@@ -33,7 +39,7 @@ namespace Client{
             TestClassEvents.Handle(); // For handle test class
             
             Trace.Log("Inventory was received from server.");
-            AddEventHandler("player:inventory:send", new Action<string>(InteractiveMenu.PlayerInventory.LoadPlayerInventory));
+            EventDispatcher.Mount("player:inventory:send", new Action<string>(InteractiveMenu.PlayerInventory.LoadPlayerInventory));
         }
 
         public PlayerList GetPlayers(){
@@ -58,8 +64,8 @@ namespace Client{
             await Task.FromResult(true);
         }
 
-        public void AddEventHandler(string handler, Delegate action){
+        /*public void AddEventHandler(string handler, Delegate action){
             EventHandlers[handler] += action;
-        }
+        }*/
     }
 }

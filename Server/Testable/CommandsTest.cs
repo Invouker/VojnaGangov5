@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
+﻿using System.Collections.Generic;
 using Server.Database.Entities.Player;
 using Server.Services;
 
@@ -10,9 +7,9 @@ namespace Server.Testable{
         public static void RegisterCommands(PlayerList Players){
             API.RegisterCommand("get", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                //ServiceManager.PlayerService.Players.TryGetValue(Utils.GetLicense(player), out VGPlayer vgPlayer);
+                //ServiceManager.PlayerService.Players.TryGetValue(Util.GetLicense(player), out VGPlayer vgPlayer);
                 VGPlayer vgPlayer = PlayerService.GetVgPlayerByPlayer(player);
-                player.TriggerEvent("chat:addMessage", new{
+                EventDispatcher.Send(player, "chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player get: {vgPlayer.ToString()}" }
                 });
@@ -21,7 +18,7 @@ namespace Server.Testable{
             API.RegisterCommand("save", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
                 PlayerService.UpdateVGPlayer(player, player.Name);
-                player.TriggerEvent("chat:addMessage", new{
+                EventDispatcher.Send(player, "chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player saved" }
                 });
@@ -31,7 +28,7 @@ namespace Server.Testable{
                 Player player = Players[source];
 
 
-                player.TriggerEvent("chat:addMessage", new{
+                EventDispatcher.Send(player, "chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{
                         "[Server]",
@@ -42,14 +39,14 @@ namespace Server.Testable{
 
             API.RegisterCommand("test", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                player.TriggerEvent("test:rankup");
+                EventDispatcher.Send(player, "test:rankup");
                 MoneyService.SetMoney(player, MoneyService.MoneyType.Wallet, 32503536);
                 MoneyService.SetMoney(player, MoneyService.MoneyType.Bank, 1503536);
                 Debug.WriteLine("test:rankup");
             }), false);
             API.RegisterCommand("test2", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
-                player.TriggerEvent("test:rankup");
+                EventDispatcher.Send(player, "test:rankup");
                 MoneyService.TakeMoney(player, MoneyService.MoneyType.Wallet, 25300);
                 MoneyService.AddMoney(player, MoneyService.MoneyType.Bank, 5700);
                 Debug.WriteLine("test:rankup");

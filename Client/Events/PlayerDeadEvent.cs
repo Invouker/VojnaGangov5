@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using Client.Utils;
 using ScaleformUI;
-using static Client.Utils.Utils;
 
 namespace Client.Events;
 
@@ -15,7 +11,7 @@ public static class PlayerDeadEvent{
     private static int DiedAt;
 
     static PlayerDeadEvent(){
-        Main.Instance.AddEventHandler("event:player_died", new Action(SpawnAfterDie));
+         EventDispatcher.Mount("event:player_died", new Action(SpawnAfterDie));
     }
 
     public static async Task Tick(){
@@ -55,8 +51,9 @@ public static class PlayerDeadEvent{
 
             if (killer == ped || killer == -1){
                 await DoWastedScreen("You committed suicide.");
-                BaseScript.TriggerEvent("event:player_died", killerType, API.GetEntityCoords(ped, true));
-                BaseScript.TriggerServerEvent("event:player_died", killerType, API.GetEntityCoords(ped, true));
+                
+                //BaseScript.TriggerEvent("event:player_died", killerType, API.GetEntityCoords(ped, true));
+                EventDispatcher.Send("event:player_died", killerType, API.GetEntityCoords(ped, true));
                 HasBeenDead = true;
             }
             else{
@@ -71,8 +68,8 @@ public static class PlayerDeadEvent{
                 };
 
                 await DoWastedScreen("");
-                BaseScript.TriggerEvent("event:player_killed", killerId, eventData);
-                BaseScript.TriggerServerEvent("event:player_killed", killerId, eventData);
+                //BaseScript.TriggerEvent("event:player_killed", killerId, eventData);
+                EventDispatcher.Send("event:player_killed", killerId, eventData);
                 HasBeenDead = true;
             }
         }
@@ -83,8 +80,8 @@ public static class PlayerDeadEvent{
 
         if (!HasBeenDead && DiedAt > 0){
             await DoWastedScreen("");
-            BaseScript.TriggerEvent("event:player_wasted", API.GetEntityCoords(ped, true));
-            BaseScript.TriggerServerEvent("event:player_wasted", API.GetEntityCoords(ped, true));
+            //BaseScript.TriggerEvent("event:player_wasted", API.GetEntityCoords(ped, true));
+            EventDispatcher.Send("event:player_wasted", API.GetEntityCoords(ped, true));
             HasBeenDead = true;
         }
         else if (HasBeenDead && DiedAt != -1 && DiedAt <= 0){

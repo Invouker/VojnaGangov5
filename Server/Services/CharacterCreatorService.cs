@@ -1,6 +1,4 @@
-using System;
 using System.Threading.Tasks;
-using CitizenFX.Core;
 using Dapper;
 using MySqlConnector;
 using Server.Database;
@@ -9,9 +7,9 @@ using Server.Database.Entities.Player;
 namespace Server.Services{
     public class CharacterCreatorService:IService{
         public CharacterCreatorService(){
-            Main.Instance.AddEventHandler("player:data:character",
+             EventDispatcher.Mount("player:data:character",
                                           new Action<Player, string>(SaveCharacterData));
-            Main.Instance.AddEventHandler("player:spawn:to:world:server",
+             EventDispatcher.Mount("player:spawn:to:world:server",
                                           new Action<Player, int>(LoadCharacterData));
         }
 
@@ -85,7 +83,7 @@ namespace Server.Services{
             Character character = await dbConnection.QueryFirstAsync<Character>(SelectQuery, new{ Name = name });
             await dbConnection.CloseAsync();
 
-            player.TriggerEvent("player:character:data", character.SerializeToJson());
+            EventDispatcher.Send(player, "player:character:data", character.SerializeToJson());
         }
 
         public void Init() { }

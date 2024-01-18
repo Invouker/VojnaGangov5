@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using Dapper;
 using MySqlConnector;
 using Server.Database;
 using Server.Database.Entities.Player;
 using Server.Database.Entities.Player.PlayerInventory;
+using Server.Utils;
 
 namespace Server.Services{
     public class PlayerService : IService{
@@ -18,10 +16,10 @@ namespace Server.Services{
 
         public PlayerService(){
             Trace.Log("PlayerService initializing....");
-            Main.Instance.AddEventHandler("playerConnected", new Action<Player>(OnPlayerConnected));
-            Main.Instance.AddEventHandler("playerDropped", new Action<Player, string>(OnPlayerDropped));
-            Main.Instance.AddEventHandler("resourceStop", new Action<string>(OnResourceStop));
-            Main.Instance.AddEventHandler("player:interactive:walkingstyle",
+             EventDispatcher.Mount("playerConnected", new Action<Player>(OnPlayerConnected));
+             EventDispatcher.Mount("playerDropped", new Action<Player, string>(OnPlayerDropped));
+             EventDispatcher.Mount("resourceStop", new Action<string>(OnResourceStop));
+             EventDispatcher.Mount("player:interactive:walkingstyle",
                                           new Action<Player, int>(([FromSource] player, id) => {
                                               VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
                                               vgPlayer.WalkingStyle = id;
@@ -58,7 +56,7 @@ namespace Server.Services{
                 requiredXPForNextLevel = GetReputationToLevel(nextLevel);
             }
 
-            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+            EventDispatcher.Send(player, "player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
         }
 
         public static int GetXP(Player player){
@@ -70,15 +68,15 @@ namespace Server.Services{
             VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
             vgPlayer.Xp += (int)value;
             UpdateLevel(player);
-            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
-            player.TriggerEvent("player:hud:update:show:rank", value);
+            EventDispatcher.Send(player, "player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+            EventDispatcher.Send(player, "player:hud:update:show:rank", value);
         }
 
         public static void TakeXP(Player player, uint value){
             VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
             vgPlayer.Xp -= (int)value;
             UpdateLevel(player);
-            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+            EventDispatcher.Send(player, "player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
         }
 
         public static int GetLevel(Player player){
@@ -89,13 +87,13 @@ namespace Server.Services{
         public static void GiveLevel(Player player, uint value){
             VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
             vgPlayer.Level += (int)value;
-            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+            EventDispatcher.Send(player, "player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
         }
 
         public static void TakeLevel(Player player, uint value){
             VGPlayer vgPlayer = GetVgPlayerByPlayer(player);
             vgPlayer.Level -= (int)value;
-            player.TriggerEvent("player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
+            EventDispatcher.Send(player, "player:hud:update:xp", vgPlayer.Xp, vgPlayer.Level);
         }
 
         #endregion
@@ -110,14 +108,14 @@ namespace Server.Services{
                     new{ Name = player.Name });
 
             API.SetPlayerWantedLevel(player.Handle, vgPlayer.WantedLevel, true);
-
-            player.TriggerEvent("player:load:data",
+Trace.Log("player:load:data");
+            EventDispatcher.Send(player, "player:load:data",
                 vgPlayer.Dimension, vgPlayer.Hp, vgPlayer.MaxHp, vgPlayer.Armour,
                 vgPlayer.MaxArmour, vgPlayer.Level, vgPlayer.Xp, vgPlayer.WalkingStyle);
             Debug.WriteLine($"Loaded data: {vgPlayer}");
 
-            player.TriggerEvent("player:hud:update:money", 0, vgPlayer.Money);
-            player.TriggerEvent("player:hud:update:money", 1, vgPlayer.BankMoney);
+            EventDispatcher.Send(player, "player:hud:update:money", 0, vgPlayer.Money);
+            EventDispatcher.Send(player, "player:hud:update:money", 1, vgPlayer.BankMoney);
 
             await connection.CloseAsync();
             return vgPlayer;
@@ -129,7 +127,7 @@ namespace Server.Services{
             const string LoadPlayer = $"SELECT * FROM {User.TABLE_NAME} WHERE License = @License;";
             User user =
                 await connection.QueryFirstOrDefaultAsync<User>(LoadPlayer,
-                    new{ License = Utils.GetLicense(player) });
+                    new{ License = Util.GetLicense(player) });
 
             await connection.CloseAsync();
             return user;
@@ -163,7 +161,7 @@ namespace Server.Services{
                  INSERT INTO {User.TABLE_NAME} (Name, License, Ip, Token)
                  											VALUES (@Name, @License, @Ip, @Token)
                  """;
-            User user = new User(player.Name, Utils.GetLicense(player), Utils.GetIP(player),
+            User user = new User(player.Name, Util.GetLicense(player), Util.GetIP(player),
                 API.GetPlayerToken(player.Handle, 0));
             await connection.ExecuteAsync(insertQuery, user);
             await connection.CloseAsync();
@@ -202,7 +200,7 @@ namespace Server.Services{
                     await using (MySqlConnection connection = DatabaseConnector.GetConnection()){
                         await connection.OpenAsync();
                         const string CheckExistenceQuery = $"SELECT COUNT(*) FROM {VGPlayer.TABLE_NAME} WHERE License = @License";
-                        int recordCount = await connection.QueryFirstAsync<int>(CheckExistenceQuery, new{ License = Utils.GetLicense(player) });
+                        int recordCount = await connection.QueryFirstAsync<int>(CheckExistenceQuery, new{ License = Util.GetLicense(player) });
                         if (recordCount > 0)
                             return true;
                         await connection.CloseAsync();
@@ -216,7 +214,7 @@ namespace Server.Services{
             const string CheckExistenceQuery = $"SELECT COUNT(*) FROM {User.TABLE_NAME} WHERE License = @License";
             int recordCount =
                 await connection.QueryFirstAsync<int>(CheckExistenceQuery,
-                    new{ License = Utils.GetLicense(player) });
+                    new{ License = Util.GetLicense(player) });
             if (recordCount > 0)
                 return true;
             await connection.CloseAsync();
@@ -249,6 +247,7 @@ namespace Server.Services{
         }
 
         public async void OnPlayerConnected([FromSource] Player player){
+            Trace.Log($"{player.Name} connecting to the server.");
             string playerName = player.Name;
 
             if (PlayerData.ContainsKey(playerName)){
@@ -275,10 +274,10 @@ namespace Server.Services{
             bool tasks = await CharacterCreatorService.CheckIfCharacterExist(player.Name);
             Character character = await CharacterCreatorService.GetCharacter(player.Name);
             if (tasks)
-                player.TriggerEvent("player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY, vgPlayer.PosZ,
+                EventDispatcher.Send(player, "player:spawn:to:world", character.Sex, vgPlayer.PosX, vgPlayer.PosY, vgPlayer.PosZ,
                                     110f);
             else
-                player.TriggerEvent("player:spawn:to:creator");
+                EventDispatcher.Send(player, "player:spawn:to:creator");
 
             PlayerSlots.Add(player.Name, new PlayerSlot{
                 Name = player.Name,
@@ -286,11 +285,15 @@ namespace Server.Services{
                 JobPointsText = "",
                 GangName = ""
             });
-            BaseScript.TriggerEvent("afterLoad", player.Name);
+            Trace.Log("afterLoad");
+            EventDispatcher.Send(Main.Instance.PlayerList(),"afterLoad", player.Name);
             Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
         }
 
-        public void Init() { }
+        public void Init()
+        {
+            Trace.Log("Initializing PlayerService");
+        }
     }
 
     public class Data{

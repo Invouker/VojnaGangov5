@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using Client.Entities;
 using Client.Menus;
 using Client.Utils;
@@ -27,13 +24,11 @@ namespace Client.Events{
         }
 
         static SpawnManager(){
-            Main.Instance.AddEventHandler("player:load:data",
-                                          new Action<int, int, int, int, int, int, int, int>(LoadPlayerData));
+             EventDispatcher.Mount("player:load:data", new Action<int, int, int, int, int, int, int, int>(LoadPlayerData));
 
-            Main.Instance.AddEventHandler("player:spawn:to:world",
-                                          new Action<short, float, float, float, float>(TeleportToWorld));
-            Main.Instance.AddEventHandler("player:character:data", new Action<string>(AssignCharacterData));
-            Main.Instance.AddEventHandler("player:spawn:to:creator", new Action(TeleportToCreator));
+             EventDispatcher.Mount("player:spawn:to:world",new Action<short, float, float, float, float>(TeleportToWorld));
+             EventDispatcher.Mount("player:character:data", new Action<string>(AssignCharacterData));
+             EventDispatcher.Mount("player:spawn:to:creator", new Action(TeleportToCreator));
         }
 
         private static void LoadPlayerData(int dimension, int hp, int maxHp, int armour, int maxArmour, int level,
@@ -47,8 +42,8 @@ namespace Client.Events{
 
             API.SetMaxHealthHudDisplay(maxHp);
             API.SetMaxArmourHudDisplay(maxArmour);
-            string walkingStyle = Utils.Utils.AnimWalkingListIndex.ToArray()[walkingStyleInt];
-            Utils.Utils.SetWalkingAnimToPed(walkingStyle);
+            string walkingStyle = Utils.Util.AnimWalkingListIndex.ToArray()[walkingStyleInt];
+            Utils.Util.SetWalkingAnimToPed(walkingStyle);
             Var.XP = xp;
             Var.Level = level;
             Var.WalkingStyle = walkingStyleInt;
@@ -156,9 +151,9 @@ namespace Client.Events{
             API.ClearPedTasksImmediately(playerPed);
             API.RemoveAllPedWeapons(playerPed, true); //Todo: Do load a weapons for player.
             API.ClearPlayerWantedLevel(player);
-
+            Trace.Log("player:spawn:to:world:server");
             //API.StartPlayerTeleport(player, posX, posY, posZ, heading, false, false, false);
-            BaseScript.TriggerServerEvent("player:spawn:to:world:server", playerPed);
+            EventDispatcher.Send("player:spawn:to:world:server", playerPed);
 
             await BaseScript.Delay(2000);
 

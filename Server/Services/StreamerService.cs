@@ -1,6 +1,4 @@
-﻿using CitizenFX.Core;
-
-namespace Server.Services{
+﻿namespace Server.Services{
     public class StreamerService : IService{
         /// <summary>
         /// Create Marker (checkpoint) in serverside for everyone.
@@ -11,7 +9,7 @@ namespace Server.Services{
         /// <param name="type"></param>
         public static void CreateMarker(int id, float x, float y, float z, int type = 1, int red = 255, int green = 255,
             int blue = 255, bool allowVehcleInteract = true){
-            BaseScript.TriggerClientEvent("streamer:createMarker", id, x, y, z, type, red, green, blue,
+            EventDispatcher.Send(Main.Instance.PlayerList(),"streamer:createMarker", id, x, y, z, type, red, green, blue,
                                           allowVehcleInteract);
         }
 
@@ -28,7 +26,7 @@ namespace Server.Services{
         /// <param name="fontType"></param>
         public static void Create3dText(string text, float x, float y, float z, int red = 255, int green = 255,
             int blue = 255, int fontType = 0){
-            BaseScript.TriggerClientEvent("streamer:create3dText", text, x, y, z, red, green, blue, fontType);
+            EventDispatcher.Send(Main.Instance.PlayerList(),"streamer:create3dText", text, x, y, z, red, green, blue, fontType);
         }
 
         /// <summary>
@@ -48,7 +46,7 @@ namespace Server.Services{
         public static void CreateBlip(string blipName, float posX, float posY, float posZ, int colour = 0,
             int alpha = 255, int blipSprite = 84, int blipDisplay = 2, float blipScale = 1f,
             bool showAsShortRange = false, bool quickGps = false){
-            BaseScript.TriggerClientEvent("streamer:createBlip", blipName, posX, posY, posZ, colour, alpha, blipSprite,
+            EventDispatcher.Send(Main.Instance.PlayerList(),"streamer:createBlip", blipName, posX, posY, posZ, colour, alpha, blipSprite,
                                           blipDisplay, blipScale, showAsShortRange, quickGps);
         }
 

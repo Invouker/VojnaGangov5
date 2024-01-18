@@ -1,16 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using CitizenFX.Core;
-using CitizenFX.Core.Native;
 using Client.Streamable;
 using Client.Utils;
 using Newtonsoft.Json;
 using ScaleformUI;
 using ScaleformUI.Menu;
-using static Client.Utils.Utils;
 
 namespace Client.Menus;
 
@@ -37,7 +33,7 @@ public static class InteractiveMenu{
             string selectedIndex = AnimWalkingListIndex.ToArray()[index];
             SetWalkingAnimToPed(selectedIndex);
             Var.WalkingStyle = index;
-            BaseScript.TriggerServerEvent("player:interactive:walkingstyle", index);
+            EventDispatcher.Send("player:interactive:walkingstyle", index);
         };
 
         #endregion
@@ -185,12 +181,12 @@ public static class InteractiveMenu{
         ToVehicleItem.Activated += (sender, item) => interactiveMenu.SwitchTo(vehicleMenu);
         back.Activated += (sender, item) => vehicleMenu.SwitchTo(interactiveMenu);
 
-        Main.Instance.AddEventHandler("event:entered_vehicle", new Action<int, int, string, int>((vehicle, seat,
+         EventDispatcher.Mount("event:entered_vehicle", new Action<int, int, string, int>((vehicle, seat,
                                                    vehicleName, netID) => {
                                                    ToVehicleItem.Enabled = true;
                                                    ToVehicleItem.SetLeftBadge(BadgeIcon.NONE);
                                                }));
-        Main.Instance.AddEventHandler("event:left_vehicle", new Action<int, int, string, int>((vehicle, seat,
+         EventDispatcher.Mount("event:left_vehicle", new Action<int, int, string, int>((vehicle, seat,
                                                    vehicleName, netID) => {
                                                    ToVehicleItem.Enabled = false;
                                                    ToVehicleItem.SetLeftBadge(BadgeIcon.LOCK);
@@ -198,6 +194,7 @@ public static class InteractiveMenu{
                                                    if (vehicleMenu.Visible){
                                                        vehicleMenu.SwitchTo(interactiveMenu);
                                                    }
+            
         }));
     }
 
@@ -214,7 +211,7 @@ public static class InteractiveMenu{
         UIMenuItem toPlayerInventory = new UIMenuItem("Player Inventory", "You can eat, or use something from your inventory.");
         UIMenuItem back = new UIMenuItem("Return to Interaction", "Switch to interaction menu.");
         
-        BaseScript.TriggerServerEvent("player:get:inventory", Player.Local.Name, new Action<string>(LoadInventory));
+        EventDispatcher.Send("player:get:inventory", Player.Local.Name, new Action<string>(LoadInventory));
         
         toPlayerInventory.SetRightLabel(">>");
         interactiveMenu.AddItem(toPlayerInventory);
@@ -227,7 +224,7 @@ public static class InteractiveMenu{
                 return;
             
             PlayerInventory.InventorySlot inventorySlot = PlayerInventory.Inventory[index];
-            BaseScript.TriggerServerEvent("player:inventory:use", Player.Local.Name, inventorySlot.SlotId);
+            EventDispatcher.Send("player:inventory:use", Player.Local.Name, inventorySlot.SlotId);
             
             UIMenuItem menuItem = sender.MenuItems[index];
             menuItem.SetRightLabel($"{PlayerInventory.Inventory[index].Amount--}");

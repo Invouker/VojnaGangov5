@@ -22,17 +22,15 @@ public static class VehicleEvents{
                 var seat = API.GetSeatPedIsTryingToEnter(ped);
                 var netId = API.VehToNet(vehicle);
                 IsEnteringVehicle = true;
-                BaseScript.TriggerServerEvent("event:entering_vehicle", vehicle, seat,
+                EventDispatcher.Send("event:entering_vehicle", vehicle, seat,
                                               API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(vehicle)),
                                               netId);
-                BaseScript.TriggerEvent("event:entering_vehicle", vehicle, seat,
-                                        API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(vehicle)), netId);
                 // event:entering_vehicle - int,int,string,int
                 await BaseScript.Delay(100);
             }
             else if (!API.DoesEntityExist(API.GetVehiclePedIsTryingToEnter(ped)) && !API.IsPedInAnyVehicle(ped, true) &&
                      IsEnteringVehicle){
-                BaseScript.TriggerServerEvent("event:entering_vehicle_aborted");
+                EventDispatcher.Send("event:entering_vehicle_aborted");
                 IsEnteringVehicle = false;
                 await BaseScript.Delay(100);
             }
@@ -44,8 +42,8 @@ public static class VehicleEvents{
                 var model = API.GetEntityModel(CurrentVehicle);
                 var name = API.GetDisplayNameFromVehicleModel((uint)model);
                 var netId = API.VehToNet(CurrentVehicle);
-                BaseScript.TriggerServerEvent("event:entered_vehicle", CurrentVehicle, CurrentSeat, name, netId);
-                BaseScript.TriggerEvent("event:entered_vehicle", CurrentVehicle, CurrentSeat, name, netId);
+                EventDispatcher.Send("event:entered_vehicle", CurrentVehicle, CurrentSeat, name, netId);
+                //BaseScript.TriggerEvent("event:entered_vehicle", CurrentVehicle, CurrentSeat, name, netId);
                 // event:entered_vehicle - int,int,string,int
                 await BaseScript.Delay(100);
             }
@@ -54,12 +52,12 @@ public static class VehicleEvents{
             //var model = API.GetEntityModel(CurrentVehicle);
             //var name = API.GetDisplayNameFromVehicleModel((uint)CurrentVehicle);
             var netId = API.VehToNet(CurrentVehicle);
-            BaseScript.TriggerServerEvent("event:left_vehicle", CurrentVehicle, CurrentSeat,
+            EventDispatcher.Send("event:left_vehicle", CurrentVehicle, CurrentSeat,
                                           API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(CurrentVehicle)),
                                           netId);
-            BaseScript.TriggerEvent("event:left_vehicle", CurrentVehicle, CurrentSeat,
+            /*BaseScript.TriggerEvent("event:left_vehicle", CurrentVehicle, CurrentSeat,
                                     API.GetDisplayNameFromVehicleModel((uint)API.GetEntityModel(CurrentVehicle)),
-                                    netId);
+                                    netId);*/
             // event:left_vehicle - int, int, string, int
             IsInVehicle = false;
             CurrentVehicle = 0;
