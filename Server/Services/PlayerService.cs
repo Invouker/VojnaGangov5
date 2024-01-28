@@ -5,7 +5,6 @@ using Dapper;
 using MySqlConnector;
 using Server.Database;
 using Server.Database.Entities.Player;
-using Server.Database.Entities.Player.PlayerInventory;
 using Server.Utils;
 
 namespace Server.Services{
@@ -286,7 +285,7 @@ Trace.Log("player:load:data");
                 GangName = ""
             });
             Trace.Log("afterLoad");
-            EventDispatcher.Send(Main.Instance.PlayerList(),"afterLoad", player.Name);
+            
             Debug.WriteLine($"Joining player {player.Name}({player.Handle}) to the server!");
         }
 
@@ -299,7 +298,7 @@ Trace.Log("player:load:data");
     public class Data{
         public User User{ get; set; }
         public VGPlayer VGPlayer{ get; set; }
-        public Inventory Inventory{ get; set; }
+        public InventoryService InventoryService{ get; set; }
     }
 
     public class PlayerSlot{
@@ -328,6 +327,7 @@ Trace.Log("player:load:data");
                     continue;
 
                 PlayerService.UpdateVGPlayer(player, player.Name);
+                ServiceManager.InventoryService.UpdateInventoryPlayer(player.Name);
                 TotalSaved++;
             }
 

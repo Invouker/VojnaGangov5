@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using Server.Database.Entities.Player.PlayerInventory;
+﻿using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Server.Services;
 using Server.Testable;
 using Server.Utils;
@@ -14,13 +14,13 @@ namespace Server{
         }
 
         public Main(){
-            //SnowflakeGenerator.Create(127);
             EventDispatcher.Initalize(Shared.FxInBound, Shared.FxOutBound, Shared.FxSignature, Shared.FxEncryption);
             
             Trace.Log("Initializing server resource.");
             Instance = this;
             
             ServiceManager.PlayerService.Init();
+            ServiceManager.InventoryService.Init();
             ServiceManager.CharacterCreatorService.Init();
             StreamerTest.Init();
             
@@ -44,10 +44,18 @@ namespace Server{
                                                                     call.Invoke(maxPlayers, serverName);
                                                                 }));
 
+            
+            EventDispatcher.Mount("player:get:inventory", new Func<Player, Task<string>>(([FromSource] player) => Task.FromResult(ServiceManager.InventoryService.ConvertInventoryOfPlayerToJson(player.Name))));
+            /*
+            EventDispatcher.Mount("player:get:inventory", new Func<Player, string>(player => {
+                string json = Inventory.ConvertInventoryOfPlayerToJson(player);
+                return json;
+            }));
+            
             EventDispatcher.Mount("player:get:inventory", new Action<string, NetworkCallbackDelegate>((player, call) => {
                 string json = Inventory.ConvertInventoryOfPlayerToJson(player);
                 call.Invoke(json);
-            }));
+            }));*/
             
             //EventDispatcher.Mount("player:sound:playfrontend", new Action<string, string>(SoundEvent.PlayFrontendSound));
             

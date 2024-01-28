@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Client.Streamable;
 using Client.Utils;
+using Inventory.InventorySlot;
 using Newtonsoft.Json;
 using ScaleformUI;
 using ScaleformUI.Menu;
@@ -13,15 +14,17 @@ namespace Client.Menus;
 public static class InteractiveMenu{
     private static readonly Dictionary<int, bool> EngineState = new Dictionary<int, bool>();
 
-    public static UIMenu GetInteractiveUI(){
+    public static async Task<UIMenu> GetInteractiveUI(){
         UIMenu interactiveMenu = new UIMenu("Interaction Menu", "Interaction menu for player", new PointF(20, 20),
                                             "commonmenu", "interaction_bgd"){
             BuildingAnimation = MenuBuildingAnimation.NONE,
             EnableAnimation = false,
-            MaxItemsOnScreen = 6,
+            MaxItemsOnScreen = 7,
             ScrollingType = ScrollingType.CLASSIC,
+            MouseControlsEnabled = false
         };
 
+        
         #region Walking Style
 
         UIMenuListItem walkingStyle =
@@ -75,9 +78,10 @@ public static class InteractiveMenu{
 
         UIMenuItem killYourself = new UIMenuItem("Kill yourself", "You will lose a 5% of your wallet.");
         interactiveMenu.AddItem(killYourself);
+
         
         VehicleSubMenu(interactiveMenu);
-        SubPlayerInventory(interactiveMenu);
+        await SubPlayerInventory(interactiveMenu);
 
         killYourself.Activated += (sender, item) => { Game.Player.Character.Kill(); };
 
@@ -197,55 +201,48 @@ public static class InteractiveMenu{
             
         }));
     }
-
-    private static void SubPlayerInventory(UIMenu interactiveMenu) {
-        Trace.Log("SubPlayerInventory");
-        UIMenu playerInventoryMenu = new UIMenu("Player Inventory", "Inventory of " + Player.Local.Name, new PointF(20, 20),
-            "commonmenu", "interaction_bgd"){
+    
+    private static async Task SubPlayerInventory(UIMenu interactiveMenu) {
+        UIMenu playerInventoryMenu = new UIMenu("Player Inventory", "Inventory of " + Player.Local.Name, new PointF(20, 20), "commonmenu", "interaction_bgd"){
             BuildingAnimation = MenuBuildingAnimation.NONE,
             EnableAnimation = false,
-            MaxItemsOnScreen = 6,
+            MaxItemsOnScreen = 8,
             ScrollingType = ScrollingType.CLASSIC,
+            MouseControlsEnabled = false
         };
         
         UIMenuItem toPlayerInventory = new UIMenuItem("Player Inventory", "You can eat, or use something from your inventory.");
-        UIMenuItem back = new UIMenuItem("Return to Interaction", "Switch to interaction menu.");
         
-        EventDispatcher.Send("player:get:inventory", Player.Local.Name, new Action<string>(LoadInventory));
+        string inventoryData = await EventDispatcher.Get<string>("player:get:inventory");
+        PlayerInventory.LoadPlayerInventory(inventoryData);
+        if (PlayerInventory.Inventory.Count == 0) {
+            toPlayerInventory.Enabled = false;
+            toPlayerInventory.SetLeftBadge(BadgeIcon.LOCK);
+        }
         
-        toPlayerInventory.SetRightLabel(">>");
-        interactiveMenu.AddItem(toPlayerInventory);
-
-        playerInventoryMenu.OnItemSelect += (sender, item, index) => {
-            if (index == PlayerInventory.Inventory.Count) // For return item
+        foreach (InventorySlot inventorySlot in PlayerInventory.Inventory) {
+            UIMenuItem item = new UIMenuItem(inventorySlot.Item.ItemName, $"{inventorySlot.Item.Description} - {inventorySlot.SlotId}");
+            item.SetRightLabel($"{inventorySlot.Amount}/{inventorySlot.Item.MaxAmount}");
+            playerInventoryMenu.AddItem(item);
+        }
+        
+        playerInventoryMenu.OnItemSelect += (sender, itemMenu, index) => {
+            InventorySlot inventorySlot = PlayerInventory.Inventory[index];
+            if (inventorySlot.Amount <= 0) {
+                Notifications.ShowNotification("You dont have enough item of it to use!");
                 return;
-
-            if (PlayerInventory.Inventory[index].Amount < 0)
-                return;
-            
-            PlayerInventory.InventorySlot inventorySlot = PlayerInventory.Inventory[index];
-            EventDispatcher.Send("player:inventory:use", Player.Local.Name, inventorySlot.SlotId);
+            }
             
             UIMenuItem menuItem = sender.MenuItems[index];
-            menuItem.SetRightLabel($"{PlayerInventory.Inventory[index].Amount--}");
+            int amount = inventorySlot.Amount-1;
+            menuItem.SetRightLabel($"{inventorySlot.Amount = amount}/{inventorySlot.Item.MaxAmount}");
+            
+            EventDispatcher.Send("player:inventory:use", Player.Local.Name, inventorySlot.SlotId);
         };
+        interactiveMenu.AddItem(toPlayerInventory);
         toPlayerInventory.Activated += (_, _) => interactiveMenu.SwitchTo(playerInventoryMenu);
-        back.Activated += (_, _) => playerInventoryMenu.SwitchTo(interactiveMenu);
-        return;
-        
-        void LoadInventory(string data) {
-            PlayerInventory.LoadPlayerInventory(data);
-            foreach (PlayerInventory.InventorySlot inventorySlot in PlayerInventory.Inventory) {
-                UIMenuItem item = new UIMenuItem(inventorySlot.Item.ItemName, $"{inventorySlot.SlotId}");
-                item.SetRightLabel($"{inventorySlot.Amount}");
-                playerInventoryMenu.AddItem(item);
-            }
-          
-            playerInventoryMenu.AddItem(back);
-        }
     }
     
-
     private static void InteractVehicleDoor(){
         foreach (Enums.DoorIndex door in Enum.GetValues(typeof(Enums.DoorIndex))){ // Itearate trought all doors
             int id = (int)door;
@@ -297,48 +294,16 @@ public static class InteractiveMenu{
         public static Vector3 BlipRoutePosition;
         public static bool IsRouteFinished;
     }
-
-
-
+    
     internal class PlayerInventory {
 
         public static List<InventorySlot> Inventory;
 
         public static void LoadPlayerInventory(string jsonInventory) {
-            Inventory = JsonConvert.DeserializeObject<List<InventorySlot>>(jsonInventory);
-        }
-
-    public class InventorySlot(Item item, int amount) {
-            private static int _id;
-            public int Amount{ get; set; } = amount;
-            public Item Item{ get; set; } = item;
-            public int SlotId { get; } = _id++;
-        
-            public override string ToString(){
-                return $"Slot: {SlotId}, Amount: {Amount}, Item: {Item}";
+            if (!jsonInventory.Equals("{}")) {
+                Inventory = JsonConvert.DeserializeObject<List<InventorySlot>>(jsonInventory);
+                Trace.Log("Debug, converting json");
             }
         }
-        
-        public class Item(ItemID id, int maxAmount, string itemName, Action useAction) {
-            public ItemID Id{ get; } = id;
-            public string ItemName{ get; } = itemName;
-            private Action UseAction{ get; } = useAction;
-            public int MaxAmount{ get; } = maxAmount;
-
-            public void Use(){
-                Console.WriteLine($"Using {ItemName}...");
-                UseAction?.Invoke();
-            }
-        
-            public override string ToString() {
-                return $"Item ID: {Id}, Name: {ItemName}, Max Amount: {MaxAmount}";
-            }
-        
-        }
-    }
-    
-    public enum ItemID{
-        BREAD,
-        COLA
     }
 }

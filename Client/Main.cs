@@ -16,18 +16,14 @@ namespace Client{
             
             EventDispatcher.Initalize(Shared.FxInBound, Shared.FxOutBound, Shared.FxSignature, Shared.FxEncryption);
             
-            EventDispatcher.Mount("toClient", new Action<string, int>((from, num) => {
-                Trace.Log($"sideType: {from}, num: {num}");
-            }));
             
-            EventDispatcher.Send("toServer", "fromClient", 2);
             Tick += InteractStreamable.OnInteractTick;
             Tick += HudRenderEvent.OnRender;
             Tick += InteractiveMenu.Tick;
             Tick += KeyHandler.Tick;
             Tick += VehicleEvents.Tick;
             Tick += PlayerDeadEvent.Tick;
-
+            
             Trace.Log("playerConnected");
             EventDispatcher.Send("playerConnected");
 
@@ -37,12 +33,14 @@ namespace Client{
             }));
 
             TestClassEvents.Handle(); // For handle test class
+            EventDispatcher.Send("afterLoad", Player.Local.Name);
             
             Trace.Log("Inventory was received from server.");
             EventDispatcher.Mount("player:inventory:send", new Action<string>(InteractiveMenu.PlayerInventory.LoadPlayerInventory));
         }
 
         public PlayerList GetPlayers(){
+            
             return Players;
         }
 

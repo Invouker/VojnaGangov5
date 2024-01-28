@@ -20,9 +20,8 @@ namespace Client.Events{
 
         static HudRenderEvent(){
             KeyHandler.CreateKeyPair(Control.MultiplayerInfo, RenderProps);
-            KeyHandler.CreateKeyPair(Control.InteractionMenu,
-                                     () => {
-                                         UIMenu menu = InteractiveMenu.GetInteractiveUI();
+            KeyHandler.CreateKeyPair(Control.InteractionMenu, async () => {
+                                         UIMenu menu = await InteractiveMenu.GetInteractiveUI();
                                          menu.Visible = !menu.Visible;
                                      });
 
