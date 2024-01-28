@@ -18,7 +18,8 @@ namespace Server.Testable{
             API.RegisterCommand("save", new Action<int, List<object>, string>((source, args, rawCommand) => {
                 Player player = Players[source];
                 PlayerService.UpdateVGPlayer(player, player.Name);
-                EventDispatcher.Send(player, "chat:addMessage", new{
+                ServiceManager.InventoryService.UpdateInventoryPlayer(player.Name);
+                BaseScript.TriggerClientEvent(player, "chat:addMessage", new{
                     color = new[]{ 16, 43, 76 },
                     args = new[]{ "[Server]", $"Player saved" }
                 });

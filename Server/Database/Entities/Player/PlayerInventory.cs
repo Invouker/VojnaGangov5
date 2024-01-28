@@ -12,5 +12,26 @@ public class PlayerInventory : IPlayerMetaData
         PlayerName = playerName;
         Inventory = inventory;
     }
-    
+
+    public PlayerInventory() {
+    }
+
+    public override string ToString() {
+        return $"Id: {Id},  AccId: {AccId}, PlayerName: {PlayerName}, Inventory: {Inventory}";
+    }
+
+
+
+    internal class InventoryJsonConverter {
+        public int Amount { get; set; }
+        public int ItemId { get; set; }
+
+        public InventoryJsonConverter() {
+        }
+
+        public InventoryJsonConverter(int amount, int itemId) {
+            Amount = amount;
+            ItemId = itemId;
+        }
+    }
 }

@@ -13,7 +13,7 @@ public class InventoryTest
         EventDispatcher.Mount("player:inventory:add_item", new Action<Player>(AddItem));
         EventDispatcher.Mount("player:inventory:take_item", new Action<Player>(TakeItem));
 
-        EventDispatcher.Mount("afterLoad", new Action<string>(HandleThis));
+        //EventDispatcher.Mount("afterLoad", new Action<string>(HandleThis));
     }
 
     public static void HandleThis(string playerName){
