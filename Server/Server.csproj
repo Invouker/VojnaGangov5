@@ -37,4 +37,8 @@
     <PackageReference Include="MySqlConnector" Version="2.3.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /E /I /Y &quot;$(ProjectDir)\..\build\Server&quot; &quot;E:\FivemServer\resources\vojnagangov5\Server&quot;" />
+  </Target>
 </Project>

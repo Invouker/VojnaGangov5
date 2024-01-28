@@ -48,5 +48,9 @@
   <ItemGroup>
     <Compile Include="..\Shared\**\*.cs" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /E /I /Y &quot;$(ProjectDir)\..\build\Client&quot; &quot;E:\FivemServer\resources\vojnagangov5\Client&quot;" />
+  </Target>
   
 </Project>
